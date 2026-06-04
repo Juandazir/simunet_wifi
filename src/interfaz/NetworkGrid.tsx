@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Cell, MaterialType, RouterConfig } from "../types";
-import { MATERIALS, getDbmValue, getSignalQuality } from "../solver";
+import { Cell, MaterialType, RouterConfig } from "../traduccion/types";
+import { MATERIALS, getDbmValue, getSignalQuality } from "../metodos/solver";
 import { Router, Trash2, Eraser, PenTool, Radio, HelpCircle, Eye, EyeOff } from "lucide-react";
 
 interface NetworkGridProps {

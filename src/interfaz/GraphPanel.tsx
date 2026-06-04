@@ -1,5 +1,5 @@
 import React from "react";
-import { RunHistory, SolverMethod } from "../types";
+import { RunHistory, SolverMethod } from "../traduccion/types";
 import { TrendingDown, Zap, BarChart3, FileDown, CheckCircle2 } from "lucide-react";
 
 interface GraphPanelProps {

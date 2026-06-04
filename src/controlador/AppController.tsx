@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Cell, SolverMethod, MaterialType, RouterConfig, SimulationConfig, RunHistory, UserProfile, UserSavedNetwork } from "./types";
-import { buildInitialGrid, runSolverStep, solveInstant, MATERIALS, getDbmValue, getSignalQuality } from "./solver";
-import NetworkGrid from "./components/NetworkGrid";
-import ControlPanel from "./components/ControlPanel";
-import GraphPanel from "./components/GraphPanel";
-import LaplaceDoc from "./components/LaplaceDoc";
-import ScientificDocTab from "./components/ScientificDocTab";
+import { Cell, SolverMethod, MaterialType, RouterConfig, SimulationConfig, RunHistory, UserProfile, UserSavedNetwork } from "../traduccion/types";
+import { buildInitialGrid, runSolverStep, solveInstant, MATERIALS, getDbmValue, getSignalQuality } from "../metodos/solver";
+import NetworkGrid from "../interfaz/NetworkGrid";
+import ControlPanel from "../interfaz/ControlPanel";
+import GraphPanel from "../interfaz/GraphPanel";
+import LaplaceDoc from "../interfaz/LaplaceDoc";
+import ScientificDocTab from "../interfaz/ScientificDocTab";
 import { 
   Radio, HelpCircle, Eye, RefreshCw, Signal, Sun, Moon, 
   User, Lock, Shield, FileText, CheckCircle, Save, Trash2, 
@@ -22,7 +22,7 @@ const PRESET_PROFILES: UserProfile[] = [
     savedNetworks: [
       {
         id: "net_default_office",
-        name: "Oficina Central de Telecomunicaciones - U Pamplona",
+        name: "Oficina Central de Ingeniería de Sistemas - U Pamplona",
         timestamp: "03/06/2026, 12:00:00",
         walls: [
           { x: 5, y: 5, material: "concrete" },

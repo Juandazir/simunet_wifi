@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import { SolverMethod, MaterialType, SimulationConfig } from "../types";
-import { MATERIALS } from "../solver";
+import { SolverMethod, MaterialType, SimulationConfig } from "../traduccion/types";
+import { MATERIALS } from "../metodos/solver";
 import { 
   Play, Pause, RotateCcw, FastForward, Sliders, Layout, RefreshCw, 
   Layers, Cpu, Eraser, ShieldAlert, Lock, Upload, Image, SlidersHorizontal, 

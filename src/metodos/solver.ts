@@ -1,4 +1,4 @@
-import { Cell, SolverMethod, MaterialType, RouterConfig } from "./types";
+import { Cell, SolverMethod, MaterialType, RouterConfig } from "../traduccion/types";
 
 export const MATERIALS = {
   air: {

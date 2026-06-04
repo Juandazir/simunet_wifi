@@ -148,7 +148,7 @@ export default function ScientificDocTab({ isDarkMode }: ScientificDocTabProps) 
                   Paso 1: Planteamiento de la Ecuación Rectora (Física de Campos)
                 </h3>
                 <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                  En el estudio de las telecomunicaciones terrestres, modelar la intensidad de una señal electromagnética en ambientes interiores se simplifica suponiendo un <strong>régimen estacionario u estable</strong>, libre de cargas dinámicas excepto las fuentes transmisoras estáticas (los routers).
+                  En el estudio de la ingeniería de sistemas, modelar la intensidad de una señal electromagnética en ambientes interiores se simplifica suponiendo un <strong>régimen estacionario u estable</strong>, libre de cargas dinámicas excepto las fuentes transmisoras estáticas (los routers).
                 </p>
                 <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                   Esto se rige de manera simplista mediante las Leyes de Maxwell integradoras, representadas bidimensionalmente por la célebre <strong>Ecuación Elíptica de Laplace</strong>:
@@ -473,7 +473,7 @@ export default function ScientificDocTab({ isDarkMode }: ScientificDocTabProps) 
         <div className="text-center space-y-2 border-b-2 border-double border-slate-800 pb-6">
           <h1 className="text-lg font-bold tracking-widest uppercase">Universidad de Pamplona</h1>
           <h2 className="text-sm font-semibold tracking-wider uppercase">Facultad de Ciencias Básicas - Departamento de Física y Geología</h2>
-          <h3 className="text-xs font-medium tracking-wide uppercase text-slate-600">Áreas de Redes de Telecomunicaciones e Ingeniería Computacional</h3>
+          <h3 className="text-xs font-medium tracking-wide uppercase text-slate-600">Áreas de Redes de Computadores e Ingeniería de Sistemas</h3>
           <div className="text-[10px] text-slate-500 font-mono mt-2">
             SimuNet WiFi v2.5 • Sistema de Simulación Numérica sobre Ecuaciones de Laplace Estacionarias
           </div>
