@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc; /* Beautiful clean slate-50 background of Bento theme */
+  color: #0f172a; /* Slate-900 readable body text */
+}
+
+h1, h2, h3, h4 {
+  font-family: "Space Grotesk", var(--font-sans);
+  letter-spacing: -0.025em;
+}
+
+/* Custom scrollbar matching clean light theme of the Bento layout */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* Custom Laplace/WiFi Optimization Scan Animations */
+@keyframes scan-y {
+  0% { top: 0%; opacity: 0.4; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0%; opacity: 0.4; }
+}
+
+@keyframes scan-x {
+  0% { left: 0%; opacity: 0.4; }
+  50% { left: 100%; opacity: 1; }
+  100% { left: 0%; opacity: 0.4; }
+}
+
+.animate-scan-y {
+  animation: scan-y 2.5s infinite ease-in-out;
+}
+
+.animate-scan-x {
+  animation: scan-x 2.5s infinite ease-in-out;
+}

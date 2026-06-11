@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Project Activator",
+  "description": "Instantly transforms your project concepts and code into fully functional, operational applications with ease.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
