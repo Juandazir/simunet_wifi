@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Cell, MaterialType, RouterConfig } from "../types";
-import { MATERIALS, getDbmValue, getSignalQuality } from "../solver";
+import { Cell, MaterialType, RouterConfig, MATERIALS } from "../../capa1-dominio";
+import { getDbmValue, getSignalQuality } from "../../capa4-numerico";
 import { Router, Trash2, Eraser, PenTool, Radio, HelpCircle, Eye, EyeOff, Sparkles, MapPin, Award, CheckCircle2, Download } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 

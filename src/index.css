@@ -56,3 +56,26 @@ h1, h2, h3, h4 {
 .animate-scan-x {
   animation: scan-x 2.5s infinite ease-in-out;
 }
+
+/* Estilos de impresión para informes técnicos */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #technical-analysis-print,
+  #technical-analysis-print * {
+    visibility: visible;
+  }
+  #technical-analysis-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+/* Scrollbar en modo oscuro */
+.dark ::-webkit-scrollbar-track,
+:where(.bg-slate-950, .bg-slate-900) ~ * ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+}

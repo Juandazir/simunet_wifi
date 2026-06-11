@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
-import { SolverMethod, MaterialType, SimulationConfig } from "../types";
-import { MATERIALS, ROUTER_MODELS } from "../solver";
+import { SolverMethod, MaterialType, SimulationConfig, MATERIALS, ROUTER_MODELS } from "../../capa1-dominio";
+import { methodUsesOmega } from "../../capa4-numerico";
+import { SOLVER_METHODS } from "../../capa4-numerico/metodos";
 import { 
   Play, Pause, RotateCcw, FastForward, Sliders, Layout, RefreshCw, 
   Layers, Cpu, Eraser, ShieldAlert, Lock, Upload, Image, SlidersHorizontal, 
@@ -98,12 +99,11 @@ export default function ControlPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (!isAdmin) return;
     const method = e.target.value as SolverMethod;
     setConfig((prev) => ({
       ...prev,
       method,
-      omega: method === "sor" || method === "ssor" ? 1.25 : 1.0,
+      omega: method === "sor" ? 1.25 : 1.0,
     }));
   };
 
@@ -824,41 +824,49 @@ export default function ControlPanel({
 
         {/* Selección de Método */}
         <div className="flex flex-col gap-1 p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/40 dark:bg-slate-950/20">
-          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 flex justify-between">
-            <span>Método de Resolución (Capa 4):</span>
+          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400">
+            Método de Resolución:
           </label>
-          <div className="text-xs font-bold text-slate-800 dark:text-slate-200 py-1 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Sobre-Relajación Sucesiva (SOR)
-          </div>
+          <select
+            value={config.method}
+            onChange={handleMethodChange}
+            className={`w-full mt-1 px-2 py-1.5 rounded-xl text-[11px] font-bold focus:outline-none transition ${selectClass}`}
+            id="select_method"
+          >
+            {Object.entries(SOLVER_METHODS).map(([key, meta]) => (
+              <option key={key} value={key}>{meta.label}</option>
+            ))}
+          </select>
           <p className="text-[9px] text-slate-400 dark:text-slate-550 leading-relaxed mt-1">
-            Método de relajación acelerada seleccionado de forma exclusiva (Capa 4) para maximizar la velocidad de convergencia mediante extrapolaciones direccionales ponderadas con el parámetro omega (ω).
+            {SOLVER_METHODS[config.method].description}
           </p>
         </div>
 
-        {/* Omega Slider (SOR) */}
-        <div className="flex flex-col gap-0.5 pt-0.5">
-          <div className="flex justify-between items-center text-[10px]">
-            <span className="font-semibold text-slate-450 dark:text-slate-650">Factor de Relajación Crítico (ω):</span>
-            <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">{config.omega}</span>
+        {/* Omega Slider (solo SOR) */}
+        {methodUsesOmega(config.method) && (
+          <div className="flex flex-col gap-0.5 pt-0.5">
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="font-semibold text-slate-450 dark:text-slate-650">Factor de Relajación (ω):</span>
+              <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">{config.omega}</span>
+            </div>
+            <input
+              type="range"
+              min="0.5"
+              max="1.9"
+              step="0.05"
+              value={config.omega}
+              disabled={!isAdmin}
+              onChange={(e) => setConfig((prev) => ({ ...prev, omega: parseFloat(e.target.value) }))}
+              className={`w-full accent-indigo-500 cursor-pointer my-1 ${!isAdmin ? "opacity-40 cursor-not-allowed" : ""}`}
+              id="slider_omega"
+            />
+            <div className="flex justify-between text-[8px] text-slate-400 font-mono leading-none">
+              <span>0.5</span>
+              <span>1.0 (Gauss-Seidel)</span>
+              <span>1.9</span>
+            </div>
           </div>
-          <input
-            type="range"
-            min="0.1"
-            max="1.9"
-            step="0.05"
-            value={config.omega}
-            disabled={!isAdmin}
-            onChange={(e) => setConfig((prev) => ({ ...prev, omega: parseFloat(e.target.value) }))}
-            className={`w-full accent-indigo-500 cursor-pointer my-1 ${!isAdmin ? "opacity-40 cursor-not-allowed" : ""}`}
-            id="slider_omega"
-          />
-          <div className="flex justify-between text-[8px] text-slate-400 font-mono leading-none">
-            <span>0.1 (Sub-convergencia)</span>
-            <span>1.0 (Sin Relajamiento)</span>
-            <span>1.9 (Sobre-convergencia)</span>
-          </div>
-        </div>
+        )}
 
         {/* Tolerance and Grid Multipliers */}
         <div className="grid grid-cols-2 gap-2">

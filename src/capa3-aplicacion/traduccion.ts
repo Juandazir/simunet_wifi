@@ -1,5 +1,5 @@
 /**
- * CAPA 3: LOCALIZACIÓN Y TRADUCCIÓN
+ * CAPA 3 — APLICACIÓN: Localización y traducción
  * Contiene el mapa estático de diccionarios multilingües y el resolvedor de claves de traducción.
  * Esto separa la lógica de renderizado del componente visual de las etiquetas textuales literales,
  * asegurando flexibilidad internacionalizada tanto en español como en inglés.

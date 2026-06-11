@@ -1,20 +1,74 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# SimuNet WiFi
 
-# Run and deploy your AI Studio app
+Simulador educativo de cobertura WiFi 2D basado en la **ecuación de Laplace**, desarrollado para la Universidad de Pamplona.
 
-This contains everything you need to run your app locally.
+Resuelve el campo electromagnético simplificado sobre una malla discreta usando métodos iterativos (**Jacobi**, **Gauss-Seidel**, **SOR**) y visualiza la intensidad de señal en dBm.
 
-View your app in AI Studio: https://ai.studio/apps/efae2526-4586-47b0-9f82-8bea458b3c41
+## Características
 
-## Run Locally
+- Editor interactivo de planos (paredes con materiales, routers comerciales)
+- Simulación animada paso a paso o resolución instantánea
+- Comparativa de métodos numéricos con gráficas de convergencia
+- Optimización automática de ubicación del router
+- Guardado de diseños por usuario
+- Informes técnicos exportables (.txt / CSV)
+- Tutor IA integrado (Dr. SimuNet) con Gemini
+- Modo oscuro / claro
 
-**Prerequisites:**  Node.js
+## Requisitos
 
+- Node.js 18+
+- Clave API de Gemini (opcional, para el chat tutor)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Instalación
+
+```bash
+npm install
+cp .env.example .env
+# Editar .env y agregar GEMINI_API_KEY
+```
+
+## Desarrollo
+
+```bash
+npm run dev
+```
+
+Abre [http://localhost:3000](http://localhost:3000)
+
+## Producción
+
+```bash
+npm run build
+npm start
+```
+
+## Credenciales de demostración
+
+| Usuario | Contraseña | Rol |
+|---------|-----------|-----|
+| `admin_pamplona` | `admin123` | Administrador |
+| `estudiante_pamplona` | *(sin contraseña)* | Estudiante |
+
+Los nuevos registros se crean siempre como **estudiante**.
+
+## Arquitectura (5 capas)
+
+Ver documentación completa en [ARQUITECTURA.md](./ARQUITECTURA.md).
+
+```
+src/
+├── capa1-dominio/      # Tipos, modelos, presets
+├── capa2-interfaz/     # App.tsx + componentes React
+├── capa3-aplicacion/  # Hooks + traducción i18n
+├── capa4-numerico/     # Solver Laplace + Jacobi/GS/SOR
+└── capa5-servicios/    # Auth, reportes, conversiones dBm
+```
+
+## Modelo físico
+
+Este simulador usa Laplace 2D como **aproximación educativa**. No sustituye herramientas RF profesionales (ray-tracing, modelos log-distance, multipath).
+
+## Licencia
+
+Proyecto académico — Universidad de Pamplona © 2026

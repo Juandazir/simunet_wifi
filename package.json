@@ -1,18 +1,18 @@
 {
-  "name": "react-example",
+  "name": "simunet-wifi",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Simulador educativo de cobertura WiFi basado en la ecuación de Laplace y métodos numéricos iterativos",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "start": "node dist/server.cjs",
-    "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "start": "NODE_ENV=production node dist/server.cjs",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
-    "@langchain/core": "^1.1.48",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^17.2.3",
@@ -30,7 +30,6 @@
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "typescript": "~5.8.2"
   }
 }

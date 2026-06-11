@@ -1,5 +1,5 @@
 import React from "react";
-import { RunHistory, SolverMethod } from "../types";
+import { RunHistory, SolverMethod, METHOD_LABELS } from "../../capa1-dominio";
 import { TrendingDown, Zap, BarChart3, FileDown, CheckCircle2 } from "lucide-react";
 
 interface GraphPanelProps {
@@ -30,10 +30,7 @@ export default function GraphPanel({
   onDownloadFullReport,
 }: GraphPanelProps) {
   
-  const formatMethodName = (m: SolverMethod): string => {
-    // Retorna SOR de forma exclusiva como único resolvedor de la Capa 4
-    return "SOR";
-  };
+  const formatMethodName = (m: SolverMethod): string => METHOD_LABELS[m] ?? m.toUpperCase();
 
   const renderConvergenceSvgGraph = () => {
     if (currentErrorHistory.length < 2) {
@@ -327,31 +324,31 @@ export default function GraphPanel({
                 {history.map((run) => (
                   <tr key={run.id} className={isDarkMode ? "hover:bg-slate-850/40" : "hover:bg-slate-50/50"}>
                     <td className="py-2.5 px-3 font-semibold text-indigo-500 dark:text-indigo-400">
-                      {formatMethodName(run.method)} (ω={run.omega})
+                      {formatMethodName(run.method)}{run.method === "sor" ? ` (ω=${run.omega})` : ""}
                     </td>
                     <td className="py-2.5 px-3 text-slate-450 dark:text-slate-500">{run.gridSize}</td>
                     <td className={`py-2.5 px-3 font-bold ${isDarkMode ? "text-slate-200" : "text-slate-700"}`}>{run.iterations}</td>
                     <td className={`py-2.5 px-3 ${isDarkMode ? "text-slate-350" : "text-slate-700"}`}>{run.executionTimeMs} ms</td>
                     <td className="py-2.5 px-3 text-slate-500">{run.finalError < 1e-4 ? run.finalError.toExponential(2) : run.finalError.toFixed(5)}</td>
                     <td className="py-2.5 px-3">
-                      {run.converged && run.iterations <= 100 ? (
+                      {run.converged ? (
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase border ${
                           isDarkMode 
                             ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/60" 
                             : "bg-emerald-50 text-emerald-700 border-emerald-100"
                         }`}>
-                          Alta
+                          Convergió
                         </span>
                       ) : (
                         <span 
-                          title={run.iterations > 100 ? "Inestable: superó 100 iteraciones" : "Inestable/Sin Convergencia"}
+                          title="No alcanzó la tolerancia dentro del límite de iteraciones"
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase border ${
                             isDarkMode 
                               ? "bg-rose-950/40 text-rose-400 border-rose-900/60" 
                               : "bg-rose-50 text-rose-700 border-rose-100"
                           }`}
                         >
-                          Inestable
+                          Sin converger
                         </span>
                       )}
                     </td>
