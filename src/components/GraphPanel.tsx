@@ -13,6 +13,7 @@ interface GraphPanelProps {
   isConverged: boolean;
   method: SolverMethod;
   isDarkMode: boolean;
+  onDownloadFullReport?: () => void;
 }
 
 export default function GraphPanel({
@@ -26,9 +27,11 @@ export default function GraphPanel({
   isConverged,
   method,
   isDarkMode,
+  onDownloadFullReport,
 }: GraphPanelProps) {
   
   const formatMethodName = (m: SolverMethod): string => {
+    // Retorna SOR de forma exclusiva como único resolvedor de la Capa 4
     return "SOR";
   };
 
@@ -104,25 +107,25 @@ export default function GraphPanel({
             </linearGradient>
           </defs>
 
-          {/* Grid lines */}
+          {/* Líneas de cuadrícula */}
           <line x1={paddingLeft} y1={paddingTop} x2={width - paddingRight} y2={paddingTop} stroke={gridColor} strokeDasharray="3,3" />
           <line x1={paddingLeft} y1={paddingTop + plotHeight / 2} x2={width - paddingRight} y2={paddingTop + plotHeight / 2} stroke={gridColor} strokeDasharray="3,3" />
           <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} stroke={bottomLineColor} />
 
-          {/* Boundaries labels */}
+          {/* Etiquetas de condiciones de frontera */}
           <text x={paddingLeft - 8} y={paddingTop + 4} fill={labelColor} className="text-[9px] font-mono font-bold" textAnchor="end">10¹</text>
           <text x={paddingLeft - 8} y={paddingTop + plotHeight / 2 + 4} fill={labelColor} className="text-[9px] font-mono font-bold" textAnchor="end">10⁻²</text>
           <text x={paddingLeft - 8} y={height - paddingBottom + 4} fill={labelColor} className="text-[9px] font-mono font-bold" textAnchor="end">&epsilon;</text>
 
-          {/* Horizontal Labels */}
+          {/* Etiquetas horizontales */}
           <text x={paddingLeft} y={height - 8} fill={labelColor} className="text-[9px] font-mono font-bold">It. 1</text>
           <text x={paddingLeft + plotWidth / 2} y={height - 8} fill={labelColor} className="text-[9px] font-mono font-bold" textAnchor="middle">k = {Math.round(currentErrorHistory.length / 2)}</text>
           <text x={width - paddingRight} y={height - 8} fill={labelColor} className="text-[9px] font-mono font-bold" textAnchor="end">It. {currentErrorHistory.length}</text>
 
-          {/* Area under curve */}
+          {/* Área bajo la curva */}
           {areaPathData && <path d={areaPathData} fill="url(#gradient-area)" />}
 
-          {/* Main Curve */}
+          {/* Curva principal */}
           {strokePathData && (
             <path
               d={strokePathData}
@@ -134,7 +137,7 @@ export default function GraphPanel({
             />
           )}
 
-          {/* Pulsating last dot */}
+          {/* Punto final pulsante */}
           {points.length > 0 && (
             <>
               <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="5" fill="#10b981" />
@@ -175,7 +178,7 @@ export default function GraphPanel({
 
   return (
     <div className={`flex flex-col gap-6 rounded-3xl border p-6 transition-all duration-300 ${mainCardClass}`}>
-      {/* Metrics Header */}
+      {/* Encabezado de Métricas */}
       <div className={`border-b pb-4 ${headerBorders}`}>
         <h3 className="text-lg font-bold flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-indigo-500" />
@@ -186,7 +189,7 @@ export default function GraphPanel({
         </p>
       </div>
 
-      {/* Live Solvers Telemetry Indicators inside modern bento compartments */}
+      {/* Indicadores de telemetría de solucionadores en vivo dentro de compartimientos bento modernos */}
       <div className={`grid grid-cols-2 md:grid-cols-4 gap-3 p-4 rounded-2xl border ${bentoGridBg}`}>
         <div className="flex flex-col">
           <span className="text-[10px] text-slate-400 dark:text-slate-550 uppercase tracking-wide font-bold">Iteración Actual</span>
@@ -254,7 +257,21 @@ export default function GraphPanel({
             Tabla Comparativa de Experimentos
           </h4>
           {history.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center flex-wrap">
+              {onDownloadFullReport && (
+                <button
+                  onClick={onDownloadFullReport}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-[10px] font-bold border rounded-xl transition cursor-pointer ${
+                    isDarkMode
+                      ? "bg-indigo-950/40 hover:bg-indigo-900/40 text-indigo-400 border-indigo-800/60"
+                      : "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
+                  }`}
+                  id="btn_download_full_report"
+                >
+                  <FileDown className="w-3.5 h-3.5 animate-pulse" />
+                  Descargar Malla y Stats (.txt)
+                </button>
+              )}
               <button
                 onClick={exportHistoryToCsv}
                 className={`flex items-center gap-1 px-3 py-1.5 text-[10px] font-bold border rounded-xl transition cursor-pointer ${
@@ -310,14 +327,14 @@ export default function GraphPanel({
                 {history.map((run) => (
                   <tr key={run.id} className={isDarkMode ? "hover:bg-slate-850/40" : "hover:bg-slate-50/50"}>
                     <td className="py-2.5 px-3 font-semibold text-indigo-500 dark:text-indigo-400">
-                      {formatMethodName(run.method)} {run.method === "sor" || run.method === "ssor" ? `(ω=${run.omega})` : ""}
+                      {formatMethodName(run.method)} (ω={run.omega})
                     </td>
                     <td className="py-2.5 px-3 text-slate-450 dark:text-slate-500">{run.gridSize}</td>
                     <td className={`py-2.5 px-3 font-bold ${isDarkMode ? "text-slate-200" : "text-slate-700"}`}>{run.iterations}</td>
                     <td className={`py-2.5 px-3 ${isDarkMode ? "text-slate-350" : "text-slate-700"}`}>{run.executionTimeMs} ms</td>
                     <td className="py-2.5 px-3 text-slate-500">{run.finalError < 1e-4 ? run.finalError.toExponential(2) : run.finalError.toFixed(5)}</td>
                     <td className="py-2.5 px-3">
-                      {run.converged ? (
+                      {run.converged && run.iterations <= 100 ? (
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase border ${
                           isDarkMode 
                             ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/60" 
@@ -326,11 +343,14 @@ export default function GraphPanel({
                           Alta
                         </span>
                       ) : (
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase border ${
-                          isDarkMode 
-                            ? "bg-rose-950/40 text-rose-400 border-rose-900/60" 
-                            : "bg-rose-50 text-rose-700 border-rose-100"
-                        }`}>
+                        <span 
+                          title={run.iterations > 100 ? "Inestable: superó 100 iteraciones" : "Inestable/Sin Convergencia"}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase border ${
+                            isDarkMode 
+                              ? "bg-rose-950/40 text-rose-400 border-rose-900/60" 
+                              : "bg-rose-50 text-rose-700 border-rose-100"
+                          }`}
+                        >
                           Inestable
                         </span>
                       )}

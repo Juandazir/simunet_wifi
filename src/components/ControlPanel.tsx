@@ -52,6 +52,8 @@ interface ControlPanelProps {
     }>;
   } | null;
   onApplyBestRouterPlace: (customX?: number, customY?: number) => void;
+  routers: any[];
+  onClearRouters: () => void;
 }
 
 export default function ControlPanel({
@@ -84,9 +86,11 @@ export default function ControlPanel({
   isOptimizing,
   optimizationResult,
   onApplyBestRouterPlace,
+  routers,
+  onClearRouters,
 }: ControlPanelProps) {
   
-  // Digitizer States
+  // Estados del digitalizador
   const [uploadWallMaterial, setUploadWallMaterial] = useState<MaterialType>("concrete");
   const [sensitivity, setSensitivity] = useState<number>(160);
   const [scanSuccessMsg, setScanSuccessMsg] = useState<string>("");
@@ -107,7 +111,7 @@ export default function ControlPanel({
     setGridSize({ rows: size, cols: size });
   };
 
-  // 1-Click Preset Canvas Architectural Drawer & Analyzer
+  // Dibujador y analizador del canvas para planos predefinidos con un clic
   const drawAndAnalyzePresetBlueprint = (presetType: string) => {
     const w = 300;
     const h = 300;
@@ -117,54 +121,54 @@ export default function ControlPanel({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Draw clean architectural blueprint (white bg, pure indigo for walls)
+    // Dibuja un plano arquitectónico limpio (fondo blanco, índigo puro para las paredes)
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "#1e1b4b"; // Dark Indigo (low brightness < 160)
-    ctx.lineWidth = 14; // bold lines to translate well to N x N grid
+    ctx.strokeStyle = "#1e1b4b"; // Índigo oscuro (luminosidad baja < 160)
+    ctx.lineWidth = 14; // Líneas gruesas para trasladarse de forma óptima a la cuadrícula de N x N
 
     if (presetType === "apartment") {
-      // Outer border walls
+      // Muros perimetrales exteriores
       ctx.strokeRect(10, 10, w - 20, h - 20);
       
-      // Horizontal apartment dividing line
+      // Línea divisoria horizontal del apartamento
       ctx.beginPath();
       ctx.moveTo(10, h / 2);
       ctx.lineTo(w - 10, h / 2);
       ctx.stroke();
 
-      // Room separation vertical walls
+      // Paredes verticales de separación de habitaciones
       ctx.beginPath();
       ctx.moveTo(w / 3, 10);
-      ctx.lineTo(w / 3, h / 2 - 40); // and leave opening for a door
+      ctx.lineTo(w / 3, h / 2 - 40); // dejando espacio para una puerta
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.moveTo((w * 2) / 3, h / 2 + 40); // door opening
+      ctx.moveTo((w * 2) / 3, h / 2 + 40); // apertura de la puerta
       ctx.lineTo((w * 2) / 3, h - 10);
       ctx.stroke();
 
-      // Additional center pillar
+      // Pilar central adicional
       ctx.fillRect(w / 2 - 10, h / 2 - 40, 20, 80);
 
     } else if (presetType === "classroom") {
-      // Outer border walls
+      // Muros perimetrales exteriores
       ctx.strokeRect(10, 10, w - 20, h - 20);
 
-      // Professor desk and computer labs dividing line
+      // Línea divisoria entre el escritorio del profesor y el laboratorio de computación
       ctx.beginPath();
       ctx.moveTo(10, h / 3);
       ctx.lineTo(w - 100, h / 3);
       ctx.stroke();
 
-      // Central server cabinet room
+      // Sala central del gabinete de servidores
       ctx.strokeRect(w / 2 - 40, h / 2 - 40, 80, 80);
 
     } else if (presetType === "hosp") {
-      // General structure boundary
+      // Frontera estructural de la estructura general
       ctx.strokeRect(10, 10, w - 20, h - 20);
 
-      // Central long corridor
+      // Pasillo largo central
       ctx.beginPath();
       ctx.moveTo(10, h / 2 - 15);
       ctx.lineTo(w - 10, h / 2 - 15);
@@ -172,7 +176,7 @@ export default function ControlPanel({
       ctx.lineTo(w - 10, h / 2 + 15);
       ctx.stroke();
 
-      // Three separation rooms (upper corridor)
+      // Tres salas de separación (pasillo superior)
       ctx.beginPath();
       ctx.moveTo(w / 3, 10);
       ctx.lineTo(w / 3, h / 2 - 15);
@@ -180,18 +184,18 @@ export default function ControlPanel({
       ctx.lineTo((w * 2) / 3, h / 2 - 15);
       ctx.stroke();
 
-      // Three separations rooms (lower corridor)
+      // Tres salas de separación (pasillo inferior)
       ctx.beginPath();
       ctx.moveTo(w / 2, h / 2 + 15);
       ctx.lineTo(w / 2, h - 10);
       ctx.stroke();
     }
 
-    // Pass canvas to core image-to-matrix pixel scanner
+    // Pasa el lienzo al escáner de píxeles principal para convertir imagen a matriz
     runPixelScan(canvas, uploadWallMaterial, sensitivity);
   };
 
-  // Helper routine to scan a canvas pixels & update the walls grid
+  // Rutina de soporte para escanear píxeles de un lienzo y actualizar la rejilla de muros
   const runPixelScan = (canvas: HTMLCanvasElement, wallMat: MaterialType, thresh: number) => {
     const scanCanvas = document.createElement("canvas");
     scanCanvas.width = gridSize.cols;
@@ -199,7 +203,7 @@ export default function ControlPanel({
     const scanCtx = scanCanvas.getContext("2d");
     if (!scanCtx) return;
 
-    // Draw original onto downscaled target size
+    // Dibuja el original sobre el tamaño objetivo reducido
     scanCtx.drawImage(canvas, 0, 0, gridSize.cols, gridSize.rows);
     const imgData = scanCtx.getImageData(0, 0, gridSize.cols, gridSize.rows);
     const data = imgData.data;
@@ -208,7 +212,7 @@ export default function ControlPanel({
 
     for (let r = 0; r < gridSize.rows; r++) {
       for (let c = 0; c < gridSize.cols; c++) {
-        // Prevent drawing on Dirichlet boundaries
+        // Evita dibujar en las fronteras exteriores de Dirichlet
         if (r === 0 || r === gridSize.rows - 1 || c === 0 || c === gridSize.cols - 1) {
           continue;
         }
@@ -219,10 +223,10 @@ export default function ControlPanel({
         const blue = data[idx + 2];
         const alpha = data[idx + 3];
 
-        // Standard Luminance Formula
+        // Fórmula estándar de luminancia
         const brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
 
-        // Low brightness (dark spots count as structural blueprint lines) or opacity exists
+        // Baja luminosidad (los puntos oscuros cuentan como líneas estructurales del plano) o canal alfa activo
         if (alpha > 40 && brightness < thresh) {
           newScannedWalls.push({ x: r, y: c, material: wallMat });
         }
@@ -237,7 +241,7 @@ export default function ControlPanel({
     }, 4500);
   };
 
-  // Dynamic Image File Reader
+  // Lector dinámico de archivos de imagen plano
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -391,13 +395,22 @@ export default function ControlPanel({
           </button>
         </div>
 
-        <button
-          onClick={onClearWalls}
-          className={`w-full py-1.8 rounded-xl text-center text-[10px] font-bold shadow-sm transition cursor-pointer border ${itemBgClass} hover:border-rose-300 dark:hover:border-rose-950 hover:bg-rose-500/5`}
-          id="btn_clear_walls"
-        >
-          Limpiar Todo el Plano (Cero Obstáculos)
-        </button>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={onClearWalls}
+            className={`py-1.8 rounded-xl text-center text-[10px] font-bold shadow-sm transition cursor-pointer border ${itemBgClass} hover:border-rose-300 dark:hover:border-rose-950 hover:bg-rose-500/5`}
+            id="btn_clear_walls"
+          >
+            Quitar Muros ({walls.length})
+          </button>
+          <button
+            onClick={onClearRouters}
+            className={`py-1.8 rounded-xl text-center text-[10px] font-bold shadow-sm transition cursor-pointer border ${itemBgClass} hover:border-emerald-300 dark:hover:border-emerald-950 hover:bg-emerald-500/5`}
+            id="btn_clear_routers"
+          >
+            Quitar Routers ({routers.length})
+          </button>
+        </div>
       </div>
 
       {/* SECCIÓN PROPUESTA DE MEJOR UBICACIÓN DEL ROUTER / OPTIMIZACIÓN INTELIGENTE */}
@@ -659,7 +672,7 @@ export default function ControlPanel({
                   }`}
                 >
                   <div className={`w-2.5 h-2.5 rounded border ${material.color.split(" ")[0]}`} />
-                  <span className="text-[8px] font-black line-clamp-1 leading-none">{material.name.split(" ")[0]}</span>
+                  <span className="text-[8px] font-black line-clamp-1 leading-none">{material.name}</span>
                   <span className={`text-[7px] font-mono leading-none ${isSelected ? "text-indigo-400" : "text-slate-500"}`}>-{material.dbLoss}dB</span>
                 </button>
               );
@@ -809,17 +822,17 @@ export default function ControlPanel({
           )}
         </div>
 
-        {/* Selection of Method */}
+        {/* Selección de Método */}
         <div className="flex flex-col gap-1 p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/40 dark:bg-slate-950/20">
           <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 flex justify-between">
-            <span>Método de Resolución de Laplace:</span>
+            <span>Método de Resolución (Capa 4):</span>
           </label>
-          <div className="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 mt-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="text-xs font-bold text-slate-800 dark:text-slate-200 py-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             Sobre-Relajación Sucesiva (SOR)
           </div>
-          <p className="text-[9px] text-slate-400 dark:text-slate-550 leading-relaxed mt-0.5">
-            Método de relajación acelerada seleccionado de forma exclusiva para lograr una velocidad de convergencia máxima y optimizada.
+          <p className="text-[9px] text-slate-400 dark:text-slate-550 leading-relaxed mt-1">
+            Método de relajación acelerada seleccionado de forma exclusiva (Capa 4) para maximizar la velocidad de convergencia mediante extrapolaciones direccionales ponderadas con el parámetro omega (ω).
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Cell, MaterialType, RouterConfig } from "../types";
 import { MATERIALS, getDbmValue, getSignalQuality } from "../solver";
-import { Router, Trash2, Eraser, PenTool, Radio, HelpCircle, Eye, EyeOff, Sparkles, MapPin, Award, CheckCircle2 } from "lucide-react";
+import { Router, Trash2, Eraser, PenTool, Radio, HelpCircle, Eye, EyeOff, Sparkles, MapPin, Award, CheckCircle2, Download } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 // Ticker component displaying custom scientific messages during optimization process
@@ -81,7 +81,118 @@ export default function NetworkGrid({
   optimizationResult = null,
 }: NetworkGridProps) {
   
-  // Calculate a beautiful thermal color for the cell based on its power [0 - 100]
+  // Función para descargar la representación visual de la malla electromagnética como imagen PNG
+  const downloadGridImage = () => {
+    const rows = grid.length;
+    const cols = grid[0]?.length || 0;
+    if (rows === 0 || cols === 0) return;
+
+    const cellSizePx = 28; // Resolución por celda para garantizar alta definición
+    const canvas = document.createElement("canvas");
+    canvas.width = cols * cellSizePx;
+    canvas.height = rows * cellSizePx;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Relleno de fondo adaptado para la fidelidad visual
+    ctx.fillStyle = isDarkMode ? "#020617" : "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = grid[r][c];
+        const x = c * cellSizePx;
+        const y = r * cellSizePx;
+
+        // Renderizado térmico u obstrucción física
+        let cellColor = "";
+        if (cell.type === "wall") {
+          switch (cell.material) {
+            case "drywall":
+              cellColor = isDarkMode ? "#475569" : "#cbd5e1";
+              break;
+            case "brick":
+              cellColor = isDarkMode ? "#92400e" : "#d97706";
+              break;
+            case "concrete":
+              cellColor = isDarkMode ? "#4b5563" : "#4b5563";
+              break;
+            case "metal":
+              cellColor = isDarkMode ? "#3f3f46" : "#334155";
+              break;
+            default:
+              cellColor = "#94a3b8";
+          }
+        } else if (cell.type === "router") {
+          cellColor = "#10b981"; // Emisor central
+        } else {
+          if (!showHeatmap) {
+            cellColor = isDarkMode ? "rgba(2, 6, 23, 0.4)" : "rgba(241, 245, 249, 0.4)";
+          } else {
+            const val = cell.val;
+            if (val <= 1.0) {
+              cellColor = isDarkMode ? "#020617" : "#f8fafc";
+            } else if (val < 15) {
+              const ratio = val / 15;
+              cellColor = `rgba(59, 130, 246, ${isDarkMode ? 0.25 + ratio * 0.35 : 0.15 + ratio * 0.25})`;
+            } else if (val < 45) {
+              const ratio = (val - 15) / 30;
+              cellColor = `rgba(139, 92, 246, ${isDarkMode ? 0.5 + ratio * 0.3 : 0.4 + ratio * 0.35})`;
+            } else if (val < 75) {
+              const ratio = (val - 45) / 30;
+              cellColor = `rgba(249, 115, 22, ${isDarkMode ? 0.8 + ratio * 0.15 : 0.75 + ratio * 0.15})`;
+            } else {
+              const ratio = (val - 75) / 25;
+              cellColor = `rgba(234, 179, 8, ${isDarkMode ? 0.9 + ratio * 0.1 : 0.85 + ratio * 0.15})`;
+            }
+          }
+        }
+
+        ctx.fillStyle = cellColor;
+        ctx.fillRect(x + 0.5, y + 0.5, cellSizePx - 1, cellSizePx - 1);
+
+        // Malla estructural ligera
+        ctx.strokeStyle = isDarkMode ? "rgba(30, 41, 59, 0.3)" : "rgba(226, 232, 240, 0.8)";
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x + 0.5, y + 0.5, cellSizePx - 1, cellSizePx - 1);
+
+        // Superponer marcas o etiquetas informativas
+        if (cell.type === "router") {
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(x + cellSizePx / 2, y + cellSizePx / 2, 4, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(x + cellSizePx / 2, y + cellSizePx / 2, 9, 0, 2 * Math.PI);
+          ctx.stroke();
+        } else if (cell.type === "wall") {
+          ctx.fillStyle = isDarkMode ? "#f8fafc" : "#0f172a";
+          ctx.font = "bold 11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(cell.material[0].toUpperCase(), x + cellSizePx / 2, y + cellSizePx / 2);
+        } else if (showValues && cell.val > 0.1) {
+          ctx.fillStyle = showHeatmap && cell.val > 45 ? "#ffffff" : isDarkMode ? "#e2e8f0" : "#1e293b";
+          ctx.font = "bold 9px monospace";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(Math.round(cell.val).toString(), x + cellSizePx / 2, y + cellSizePx / 2);
+        }
+      }
+    }
+
+    const link = document.createElement("a");
+    link.download = `malla_wifi_espectro_laplace_${new Date().getTime()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Calcula un color térmico para la celda basado en su potencia matemática [0 - 100]
   const getCellBgColor = (cell: Cell) => {
     if (cell.type === "wall") {
       switch (cell.material) {
@@ -111,7 +222,7 @@ export default function NetworkGrid({
       return isDarkMode ? "bg-slate-950 border-slate-950" : "bg-slate-50 border-slate-100";
     }
 
-    // Custom gradient interpolation designed to look clean on light or dark modes
+    // Interpolación de gradiente personalizada diseñada para verse limpia tanto en tema claro como en oscuro
     if (val < 15) {
       const ratio = val / 15;
       return `rgba(59, 130, 246, ${isDarkMode ? 0.25 + ratio * 0.35 : 0.15 + ratio * 0.25})`; // Blue
@@ -187,6 +298,20 @@ export default function NetworkGrid({
             <span className="font-mono text-xs font-bold">%</span>
             Valores
           </button>
+
+          <button
+            onClick={downloadGridImage}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition cursor-pointer ${
+              isDarkMode
+                ? "bg-emerald-950/40 border-emerald-800 text-emerald-400 hover:bg-emerald-900/40"
+                : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+            }`}
+            title="Descargar Malla como Imagen PNG"
+            id="btn_download_grid_image"
+          >
+            <Download className="w-4 h-4 animate-bounce" />
+            Descargar Imagen
+          </button>
         </div>
       </div>
 
@@ -241,7 +366,7 @@ export default function NetworkGrid({
         </AnimatePresence>
 
         <div 
-          className={`grid gap-[1px] p-[1.5px] rounded-xl shadow-sm w-full max-w-[580px] aspect-square mx-auto ${
+          className={`grid gap-[1px] p-[1.5px] rounded-xl shadow-sm w-full max-w-[760px] aspect-square mx-auto ${
             isDarkMode ? "bg-slate-850" : "bg-slate-200/60"
           }`}
           style={{
@@ -384,7 +509,7 @@ export default function NetworkGrid({
                 </div>
 
                 {!isBoundary && (
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-1.5">
                       <span className="text-slate-400">Potencia:</span>
                       <span className={`font-bold ${getDbmColorClass(dbm)}`}>
@@ -392,7 +517,14 @@ export default function NetworkGrid({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-slate-800 pl-3">
+                      <span className="text-slate-400">Pérdida/m:</span>
+                      <span className={`font-mono font-bold ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>
+                        {(hoveredCell.attenuation * (1 + 1 / cellSize)).toFixed(3)} (Escala: {cellSize}m/celda)
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${qual.bg}`} />
                       <span className={`font-semibold ${qual.color}`}>{qual.text}</span>
                     </div>

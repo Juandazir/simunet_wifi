@@ -241,7 +241,7 @@ export default function App() {
 
       if (achievedConvergence || hitLimit) {
         setIsRunning(false);
-        setIsConverged(achievedConvergence);
+        setIsConverged(achievedConvergence && newIteration <= 100);
 
         // Append item into run comparative database
         const runId = Math.random().toString();
@@ -252,7 +252,7 @@ export default function App() {
           iterations: newIteration,
           executionTimeMs: elapsed,
           finalError: newError,
-          converged: achievedConvergence,
+          converged: achievedConvergence && newIteration <= 100,
           omega: config.omega,
           tolerance: config.tolerance,
           gridSize: `${gridSize.rows}x${gridSize.cols}`,
@@ -272,18 +272,19 @@ export default function App() {
 
     if (selectedTool === "router") {
       const model = ROUTER_MODELS[selectedRouterModelId];
-      const updatedRouters = [
-        { 
-          x, 
-          y, 
-          power: Math.round(model.eirpDbm * (100 / 38)), 
-          ssid: `${model.brand}_${model.model}`.replace(/[\s\-\.]+/g, "_"), 
-          frequency: model.frequency,
-          modelId: selectedRouterModelId
-        }
-      ];
+      const newRouter = { 
+        x, 
+        y, 
+        power: Math.round(model.eirpDbm * (100 / 38)), 
+        ssid: `${model.brand}_${model.model}_${routers.length + 1}`.replace(/[\s\-\.]+/g, "_"), 
+        frequency: model.frequency,
+        modelId: selectedRouterModelId
+      };
       setWalls((prev) => prev.filter((w) => !(w.x === x && w.y === y)));
-      setRouters(updatedRouters);
+      setRouters((prev) => {
+        const filtered = prev.filter((r) => !(r.x === x && r.y === y));
+        return [...filtered, newRouter];
+      });
     } else if (selectedTool === "eraser") {
       setWalls((prev) => prev.filter((w) => !(w.x === x && w.y === y)));
       setRouters((prev) => prev.filter((r) => !(r.x === x && r.y === y)));
@@ -374,7 +375,7 @@ export default function App() {
     setCurrentIteration(result.iterations);
     setCurrentError(result.finalError);
     setTimeMs(result.timeMs);
-    setIsConverged(result.finalError < config.tolerance);
+    setIsConverged(result.finalError < config.tolerance && result.iterations <= 100);
     setCurrentErrorHistory(result.errorHistory);
 
     const runId = Math.random().toString();
@@ -385,7 +386,7 @@ export default function App() {
       iterations: result.iterations,
       executionTimeMs: result.timeMs,
       finalError: result.finalError,
-      converged: result.finalError < config.tolerance,
+      converged: (result.finalError < config.tolerance) && result.iterations <= 100,
       omega: config.omega,
       tolerance: config.tolerance,
       gridSize: `${gridSize.rows}x${gridSize.cols}`,
@@ -733,7 +734,7 @@ export default function App() {
 
     const optimalRun = [...history].sort((a,b) => a.executionTimeMs - b.executionTimeMs)[0];
     const wallsCount = walls.length;
-    const isSOROptimal = optimalRun.method === "sor" || optimalRun.method === "ssor";
+    const isSOROptimal = optimalRun.method === "sor";
 
     return (
       <div className="space-y-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
@@ -745,7 +746,7 @@ export default function App() {
           {isSOROptimal ? (
             " Esto valida la teoría matemática: los esquemas con factores de sobre-relajación óptimos sobrepasan exponencialmente la velocidad de Jacobi o Gauss-Seidel."
           ) : (
-            " Se recomienda experimentar con el método diferencial SOR configurando ω entre 1.1 y 1.4, lo que usualmente reduce las iteraciones requeridas en un 60%."
+            " Se recomienda experimentar con el método de relajación SOR configurando ω entre 1.1 y 1.4, lo que usualmente acelera significativamente la convergencia."
           )}
         </p>
         <p>
@@ -758,6 +759,144 @@ export default function App() {
         </p>
       </div>
     );
+  };
+
+  // Genera, mapea y descarga el archivo con los datos completos de la malla y estadísticas en formato de texto estructurado (.txt)
+  const descargarDocumentoMallaCompleto = () => {
+    let content = "";
+    content += "================================================================================\n";
+    content += "        REPORTE TÉCNICO OFICIAL DE SIMULACIÓN MULTIDIMENSIONAL DE COBERTURA     \n";
+    content += "              SIMNET - RESOLVEDOR DE ECUACIONES DE LAPLACE (SOR)                \n";
+    content += "================================================================================\n\n";
+
+    content += `Fecha de Expedición: ${new Date().toLocaleString()}\n`;
+    content += `Entorno de simulación operado por: ${currentUser.username}\n`;
+    content += `Rol de evaluación: ${currentUser.role.toUpperCase()}\n`;
+    content += `Dimensiones físicas de la sala: ${(gridSize.rows * cellSize).toFixed(1)}m x ${(gridSize.cols * cellSize).toFixed(1)}m (Resolución: ${cellSize}m por celda)\n`;
+    content += `Área total simulada: ${(gridSize.rows * gridSize.cols * cellSize * cellSize).toFixed(1)} m²\n`;
+    content += `Número de celdas computacionales: ${gridSize.rows} x ${gridSize.cols} (${gridSize.rows * gridSize.cols} nodos de Dirichlet y Poisson)\n`;
+    content += `Cantidad de obstrucciones de pared colocadas: ${walls.length}\n`;
+    content += `Cantidad de emisores enrutadores activos: ${routers.length}\n\n`;
+
+    content += "--------------------------------------------------------------------------------\n";
+    content += "1. PARÁMETROS OPERACIONALES DEL MOTOR NUMÉRICO (SOBRE-RELAJACIÓN SUCESIVA)\n";
+    content += "--------------------------------------------------------------------------------\n";
+    content += `Esquema de Resolución: Sobre-Relajación Sucesiva (SOR)\n`;
+    content += `Factor Relajación Óptima (Omega - ω): ${config.omega}\n`;
+    content += `Tolerancia Estricta de Convergencia (Épsilon - ε): ${config.tolerance}\n`;
+    content += `Límite Máximo de Iteraciones: ${config.maxIterations}\n`;
+    content += `Última Ejecución - Iteraciones Realizadas: ${currentIteration} itr\n`;
+    content += `Última Ejecución - Residuo Erróneo Máximo: ${currentError <= config.tolerance ? 'CONVERGIDO' : 'FUERA DE LÍMITE'} (${currentError})\n`;
+    content += `Última Ejecución - Tiempo de Cálculo de la Cpu: ${timeMs} ms\n\n`;
+
+    content += "--------------------------------------------------------------------------------\n";
+    content += "2. CONFIGURACIÓN COMPLETA DE ENRUTADORES WI-FI ACTIVOS\n";
+    content += "--------------------------------------------------------------------------------\n";
+    if (routers.length === 0) {
+      content += "No se registran enrutadores activos en el espacio bidimensional de simulación.\n\n";
+    } else {
+      routers.forEach((r, idx) => {
+        content += `Enrutador #${idx + 1}:\n`;
+        content += `  - SSID (Identificador de Red): ${r.ssid}\n`;
+        content += `  - Frecuencia del Espectro: ${r.frequency}\n`;
+        content += `  - Coordenadas Espaciales: Fila ${r.x}, Columna ${r.y}\n`;
+        content += `  - Potencia Transmisora Nominal: ${r.power} W (Frontera fija de excitación de señal)\n`;
+        content += `  - Pérdida Base del Espectro por celda: 2.25x potencial excitación\n\n`;
+      });
+    }
+
+    content += "--------------------------------------------------------------------------------\n";
+    content += "3. HISTORIAL DE EXPERIMENTOS EJECUTADOS EN LA SESIÓN\n";
+    content += "--------------------------------------------------------------------------------\n";
+    if (history.length === 0) {
+      content += "No se registran experimentos anteriores guardados en esta sesión.\n\n";
+    } else {
+      content += `ID | Método (Capa 4) | Malla | Iteraciones | Tiempo CPU | Residuo Final | Estado de Convergencia\n`;
+      content += `--------------------------------------------------------------------------------\n`;
+      history.forEach((run, index) => {
+        content += `${String(index + 1).padEnd(2)} | SOR (w=${run.omega})      | ${run.gridSize.padEnd(5)} | ${String(run.iterations).padEnd(11)} | ${String(run.executionTimeMs).padEnd(7)} ms | ${run.finalError.toExponential(3)} | ${run.converged ? "CONVERGIDO" : "FALLIDO"}\n`;
+      });
+      content += "\n";
+    }
+
+    content += "--------------------------------------------------------------------------------\n";
+    content += "4. MAPA ELECTROMAGNÉTICO BIDIMENSIONAL (VISTA EN SÍMBOLOS ASCII)\n";
+    content += "--------------------------------------------------------------------------------\n";
+    content += "Simbología de Referencia:\n";
+    content += "   [ R ] : Enrutador Operativo WiFi\n";
+    content += "   [ M ] : Obstrucción de Metal Dieléctrico (Atenuación crítica ponderada)\n";
+    content += "   [ C ] : Obstrucción de Hormigón de Alta Pérdida\n";
+    content += "   [ L ] : Obstrucción de Ladrillo de Media Pérdida\n";
+    content += "   [ Y ] : Obstrucción de Tabiquería Drywall de Baja Pérdida\n";
+    content += "   [ # ] : Frontera exterior de Dirichlet (Contención a cero absoluto)\n";
+    content += "   [9-1] : Intensidad en deciles (u.val de 90% a 10% respectivamente)\n";
+    content += "   [ . ] : Zona ciega / Cobertura menor al 10% o ruido absoluto\n\n";
+
+    for (let i = 0; i < grid.length; i++) {
+      let rowStr = "";
+      for (let j = 0; j < grid[i].length; j++) {
+        const cell = grid[i][j];
+        const isB = i === 0 || i === grid.length - 1 || j === 0 || j === grid[i].length - 1;
+        if (cell.type === "router") {
+          rowStr += " R  ";
+        } else if (cell.type === "wall") {
+          const matChar = cell.material === "metal" ? "M" : cell.material === "concrete" ? "C" : cell.material === "brick" ? "L" : "Y";
+          rowStr += ` ${matChar}  `;
+        } else if (isB) {
+          rowStr += " #  ";
+        } else {
+          const val = cell.val;
+          if (val >= 90) rowStr += " 9  ";
+          else if (val >= 80) rowStr += " 8  ";
+          else if (val >= 70) rowStr += " 7  ";
+          else if (val >= 60) rowStr += " 6  ";
+          else if (val >= 50) rowStr += " 5  ";
+          else if (val >= 40) rowStr += " 4  ";
+          else if (val >= 30) rowStr += " 3  ";
+          else if (val >= 20) rowStr += " 2  ";
+          else if (val >= 10) rowStr += " 1  ";
+          else rowStr += " .  ";
+        }
+      }
+      content += rowStr + "\n";
+    }
+    content += "\n";
+
+    content += "--------------------------------------------------------------------------------\n";
+    content += "5. MATRIZ NUMÉRICA COORDENADA POR COORDENADA (DATOS DISCRETOS DE COMPORTAMIENTO)\n";
+    content += "--------------------------------------------------------------------------------\n";
+    content += "Coordenada | Material Local  | Valor Potencial (%) | Potencia WiFi (dBm) | Tipo de Nodo\n";
+    content += "--------------------------------------------------------------------------------\n";
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[i].length; j++) {
+        const cell = grid[i][j];
+        const isB = i === 0 || i === grid.length - 1 || j === 0 || j === grid[i].length - 1;
+        const coord = `[${String(i).padStart(2)}, ${String(j).padStart(2)}]`;
+        const material = cell.type === "wall" ? cell.material.toUpperCase() : "AIRE";
+        const valPct = cell.val.toFixed(2) + "%";
+        const dbmStr = getDbmValue(cell.val) + " dBm";
+        let typeNode = "Interior (Libre)";
+        if (isB) typeNode = "Borde (Dirichlet)";
+        else if (cell.type === "router") typeNode = "Excitador (Fijo)";
+        else if (cell.type === "wall") typeNode = "Atenuador (Muro)";
+
+        content += `${coord.padEnd(10)} | ${material.padEnd(15)} | ${valPct.padEnd(19)} | ${dbmStr.padEnd(19)} | ${typeNode}\n`;
+      }
+    }
+
+    content += "\n================================================================================\n";
+    content += "                  FIN DEL INFORME TÉCNICO INALÁMBRICO DE MALLA                  \n";
+    content += "================================================================================\n";
+
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `reporte_malla_wifi_pamplona_${currentUser.username}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Styling helpers based on theme mode
@@ -1111,6 +1250,7 @@ export default function App() {
                   isConverged={isConverged}
                   method={config.method}
                   isDarkMode={isDarkMode}
+                  onDownloadFullReport={descargarDocumentoMallaCompleto}
                 />
 
                 {/* Admin Audit system evaluation module */}
@@ -1210,6 +1350,8 @@ export default function App() {
                   isOptimizing={isOptimizing}
                   optimizationResult={optimizationResult}
                   onApplyBestRouterPlace={applyBestRouterLocation}
+                  routers={routers}
+                  onClearRouters={() => setRouters([])}
                 />
 
                 {/* User Personal Save Storage Compartment */}
@@ -1339,6 +1481,13 @@ export default function App() {
                 </div>
                 <div className="flex gap-2">
                   <button
+                    onClick={descargarDocumentoMallaCompleto}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 text-white font-bold rounded-2xl text-xs hover:bg-emerald-700 transition cursor-pointer"
+                  >
+                    <FileCheck className="w-4 h-4" />
+                    Descargar Datos (.txt)
+                  </button>
+                  <button
                     onClick={() => window.print()}
                     className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 text-white font-bold rounded-2xl text-xs hover:bg-indigo-700 transition cursor-pointer"
                   >
@@ -1401,7 +1550,7 @@ export default function App() {
                       <li>Tolerancia estricta de Convergencia (&epsilon;): {config.tolerance}</li>
                       <li>Factor Optimal de Relajación ω: {config.omega}</li>
                       <li>Condición Dirichlet de Borde (Paredes Perimetrales): u = 0.0</li>
-                      <li>Poder Máximo Inicial Router (SSID: {routers[0]?.ssid || "WiFi_Pamplona"}): {routers[0]?.power || 100}% (P_{`max`})</li>
+                      <li>Enrutadores Activos ({routers.length}): {routers.length > 0 ? routers.map(r => `${r.ssid} (${r.frequency})`).join(", ") : "Ninguno colocado"}</li>
                     </ul>
                   </div>
                 </div>
@@ -1428,10 +1577,12 @@ export default function App() {
                             <td className="py-2 px-3">{run.executionTimeMs} ms</td>
                             <td className="py-2 px-3">{run.finalError < 1e-4 ? run.finalError.toExponential(2) : run.finalError.toFixed(5)}</td>
                             <td className="py-2 px-3">
-                              {run.converged ? (
+                              {run.converged && run.iterations <= 100 ? (
                                 <span className="text-emerald-650 font-bold">ESTABLE</span>
                               ) : (
-                                <span className="text-rose-650 font-bold">INCONGRUENTE</span>
+                                <span className="text-rose-650 font-bold">
+                                  {run.iterations > 100 ? "INESTABLE (>100)" : "INCONGRUENTE"}
+                                </span>
                               )}
                             </td>
                           </tr>
