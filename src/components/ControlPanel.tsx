@@ -1,0 +1,1190 @@
+import React, { useState, useRef, useEffect } from "react";
+import { SolverMethod, MaterialType, SimulationConfig } from "../types";
+import { MATERIALS, ROUTER_MODELS, buildInitialGrid, solveInstant } from "../controlador";
+import { traducirImagenAMatriz } from "../traduccion";
+import { 
+  Play, Pause, RotateCcw, FastForward, Sliders, Layout, RefreshCw, 
+  Layers, Cpu, Eraser, ShieldAlert, Lock, Upload, Image, SlidersHorizontal, 
+  CheckCircle2, Sparkles, Binary, FileSpreadsheet, Radio, Maximize2,
+  MapPin, TrendingUp, Award, Move
+} from "lucide-react";
+
+interface ControlPanelProps {
+  config: SimulationConfig;
+  setConfig: React.Dispatch<React.SetStateAction<SimulationConfig>>;
+  isRunning: boolean;
+  onStart: () => void;
+  onPause: () => void;
+  onSolveInstant: () => void;
+  onSingleStep: () => void;
+  onReset: () => void;
+  onClearWalls: () => void;
+  selectedTool: "router" | MaterialType | "eraser" | "move";
+  setSelectedTool: (tool: "router" | MaterialType | "eraser" | "move") => void;
+  currentIteration: number;
+  currentError: number;
+  timeMs: number;
+  onLoadPreset: (presetName: string) => void;
+  gridSize: { rows: number; cols: number };
+  setGridSize: (size: { rows: number; cols: number }) => void;
+  isDarkMode: boolean;
+  isAdmin: boolean;
+  walls: { x: number; y: number; material: MaterialType }[];
+  setWalls: React.Dispatch<React.SetStateAction<{ x: number; y: number; material: MaterialType }[]>>;
+  selectedRouterModelId: string;
+  setSelectedRouterModelId: (id: string) => void;
+  cellSize: number;
+  setCellSize: (size: number) => void;
+  onFindBestRouterPlace: (targetCount?: number) => void;
+  isOptimizing: boolean;
+  optimizationResult: {
+    x: number;
+    y: number;
+    avgSignal: number;
+    coveragePct: number;
+    candidatesTested: number;
+    topCandidates?: Array<{
+      x: number;
+      y: number;
+      avgSignal: number;
+      coveragePct: number;
+      score: number;
+      zoneName: string;
+    }>;
+    isMultiRouter?: boolean;
+    optimizedRouters?: Array<{
+      x: number;
+      y: number;
+      power: number;
+      ssid: string;
+      frequency: string;
+      modelId: string;
+      zoneName: string;
+    }>;
+    uniformityIndex?: number;
+  } | null;
+  onApplyBestRouterPlace: (customX?: number, customY?: number) => void;
+  routers: any[];
+  onClearRouters: () => void;
+}
+
+export default function ControlPanel({
+  config,
+  setConfig,
+  isRunning,
+  onStart,
+  onPause,
+  onSolveInstant,
+  onSingleStep,
+  onReset,
+  onClearWalls,
+  selectedTool,
+  setSelectedTool,
+  currentIteration,
+  currentError,
+  timeMs,
+  onLoadPreset,
+  gridSize,
+  setGridSize,
+  isDarkMode,
+  isAdmin,
+  walls,
+  setWalls,
+  selectedRouterModelId,
+  setSelectedRouterModelId,
+  cellSize,
+  setCellSize,
+  onFindBestRouterPlace,
+  isOptimizing,
+  optimizationResult,
+  onApplyBestRouterPlace,
+  routers,
+  onClearRouters,
+}: ControlPanelProps) {
+  
+  // Estados del digitalizador e índice de optimización
+  const [numRoutersToOpt, setNumRoutersToOpt] = useState<number>(routers.length > 0 ? routers.length : 1);
+  const [uploadWallMaterial, setUploadWallMaterial] = useState<MaterialType>("concrete");
+
+  // Mantener la cantidad sincronizada con los routers reales si se añaden manualmente
+  useEffect(() => {
+    if (routers.length > 0) {
+      setNumRoutersToOpt(routers.length);
+    }
+  }, [routers.length]);
+  const [sensitivity, setSensitivity] = useState<number>(160);
+  const [scanSuccessMsg, setScanSuccessMsg] = useState<string>("");
+  const [dragActive, setDragActive] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Estados para optimización de Omega (w)
+  const [isOptimizingOmega, setIsOptimizingOmega] = useState(false);
+  const [omegaResults, setOmegaResults] = useState<Array<{
+    omega: number;
+    iterations: number;
+    error: number;
+    converged: boolean;
+  }> | null>(null);
+  const [bestOmegaFound, setBestOmegaFound] = useState<number | null>(null);
+
+  const handleOptimizeOmega = () => {
+    setIsOptimizingOmega(true);
+    setOmegaResults(null);
+    setBestOmegaFound(null);
+
+    // Timeout para dar sensación de procesamiento físico y analítico
+    setTimeout(() => {
+      try {
+        const results: Array<{
+          omega: number;
+          iterations: number;
+          error: number;
+          converged: boolean;
+        }> = [];
+
+        // Barrido de omegas de 1.0 a 1.9 con paso de 0.05
+        const omegasToTest = [1.0, 1.1, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9];
+        const testTolerance = config.tolerance;
+        const testMaxIterations = 150;
+
+        for (const w of omegasToTest) {
+          const testInitialGrid = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
+          const solveResult = solveInstant(
+            testInitialGrid,
+            "sor",
+            w,
+            testTolerance,
+            testMaxIterations
+          );
+
+          const converged = solveResult.finalError < testTolerance && solveResult.iterations < testMaxIterations;
+          results.push({
+            omega: w,
+            iterations: solveResult.iterations,
+            error: solveResult.finalError,
+            converged
+          });
+        }
+
+        // Ordenar: primero convergentes con menor número de iteraciones, si ninguno converge por menor error
+        const sorted = [...results].sort((a, b) => {
+          if (a.converged && !b.converged) return -1;
+          if (!a.converged && b.converged) return 1;
+          if (a.converged && b.converged) {
+            return a.iterations - b.iterations;
+          }
+          return a.error - b.error;
+        });
+
+        const best = sorted[0];
+        setOmegaResults(results);
+        setBestOmegaFound(best.omega);
+        
+        // Aplicar el omega óptimo del SOR
+        setConfig((prev) => ({
+          ...prev,
+          omega: best.omega
+        }));
+      } catch (err) {
+        console.error("Error optimizando omega:", err);
+      } finally {
+        setIsOptimizingOmega(false);
+      }
+    }, 1205);
+  };
+
+  const handleGridSizeChange = (size: number) => {
+    setGridSize({ rows: size, cols: size });
+  };
+
+  // Dibujador y analizador del canvas para planos predefinidos con un clic
+  const drawAndAnalyzePresetBlueprint = (presetType: string) => {
+    const w = 300;
+    const h = 300;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Dibuja un plano arquitectónico limpio (fondo blanco, índigo puro para las paredes)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#1e1b4b"; // Índigo oscuro (luminosidad baja < 160)
+    ctx.lineWidth = 14; // Líneas gruesas para trasladarse de forma óptima a la cuadrícula de N x N
+
+    if (presetType === "apartment") {
+      // Muros perimetrales exteriores
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+      
+      // Línea divisoria horizontal del apartamento
+      ctx.beginPath();
+      ctx.moveTo(10, h / 2);
+      ctx.lineTo(w - 10, h / 2);
+      ctx.stroke();
+
+      // Paredes verticales de separación de habitaciones
+      ctx.beginPath();
+      ctx.moveTo(w / 3, 10);
+      ctx.lineTo(w / 3, h / 2 - 40); // dejando espacio para una puerta
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo((w * 2) / 3, h / 2 + 40); // apertura de la puerta
+      ctx.lineTo((w * 2) / 3, h - 10);
+      ctx.stroke();
+
+      // Pilar central adicional
+      ctx.fillRect(w / 2 - 10, h / 2 - 40, 20, 80);
+
+    } else if (presetType === "classroom") {
+      // Muros perimetrales exteriores
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+
+      // Línea divisoria entre el escritorio del profesor y el laboratorio de computación
+      ctx.beginPath();
+      ctx.moveTo(10, h / 3);
+      ctx.lineTo(w - 100, h / 3);
+      ctx.stroke();
+
+      // Sala central del gabinete de servidores
+      ctx.strokeRect(w / 2 - 40, h / 2 - 40, 80, 80);
+
+    } else if (presetType === "hosp") {
+      // Frontera estructural de la estructura general
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+
+      // Pasillo largo central
+      ctx.beginPath();
+      ctx.moveTo(10, h / 2 - 15);
+      ctx.lineTo(w - 10, h / 2 - 15);
+      ctx.moveTo(10, h / 2 + 15);
+      ctx.lineTo(w - 10, h / 2 + 15);
+      ctx.stroke();
+
+      // Tres salas de separación (pasillo superior)
+      ctx.beginPath();
+      ctx.moveTo(w / 3, 10);
+      ctx.lineTo(w / 3, h / 2 - 15);
+      ctx.moveTo((w * 2) / 3, 10);
+      ctx.lineTo((w * 2) / 3, h / 2 - 15);
+      ctx.stroke();
+
+      // Tres salas de separación (pasillo inferior)
+      ctx.beginPath();
+      ctx.moveTo(w / 2, h / 2 + 15);
+      ctx.lineTo(w / 2, h - 10);
+      ctx.stroke();
+    }
+
+    // Pasa el lienzo al escáner de píxeles principal para convertir imagen a matriz
+    runPixelScan(canvas, uploadWallMaterial, sensitivity);
+  };
+
+  // Rutina de soporte para escanear píxeles de un lienzo y actualizar la rejilla de muros delegada a la Capa 3: Traducción
+  const runPixelScan = (canvas: HTMLCanvasElement, wallMat: MaterialType, thresh: number) => {
+    const scanCanvas = document.createElement("canvas");
+    scanCanvas.width = gridSize.cols;
+    scanCanvas.height = gridSize.rows;
+    const scanCtx = scanCanvas.getContext("2d");
+    if (!scanCtx) return;
+
+    // Dibuja el original sobre el tamaño objetivo reducido
+    scanCtx.drawImage(canvas, 0, 0, gridSize.cols, gridSize.rows);
+    const imgData = scanCtx.getImageData(0, 0, gridSize.cols, gridSize.rows);
+    
+    // Traducir los píxeles digitales de la imagen cargada en muros discretos numéricos de la malla (Capa 3: Traducción)
+    const newScannedWalls = traducirImagenAMatriz(imgData.data, gridSize.rows, gridSize.cols, thresh, wallMat);
+
+    setWalls(newScannedWalls);
+    setScanSuccessMsg(`¡Plano convertido! Encontrados ${newScannedWalls.length} bloques de muro (${MATERIALS[wallMat].name}) en la matriz.`);
+    
+    setTimeout(() => {
+      setScanSuccessMsg("");
+    }, 4500);
+  };
+
+  // Lector dinámico de archivos de imagen plano
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = 400;
+        tempCanvas.height = 400;
+        const tempCtx = tempCanvas.getContext("2d");
+        if (tempCtx) {
+          tempCtx.fillStyle = "#ffffff";
+          tempCtx.fillRect(0, 0, 400, 400);
+          tempCtx.drawImage(img, 0, 0, 400, 400);
+          runPixelScan(tempCanvas, uploadWallMaterial, sensitivity);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = 400;
+          tempCanvas.height = 400;
+          const tempCtx = tempCanvas.getContext("2d");
+          if (tempCtx) {
+            tempCtx.fillStyle = "#ffffff";
+            tempCtx.fillRect(0, 0, 400, 400);
+            tempCtx.drawImage(img, 0, 0, 400, 400);
+            runPixelScan(tempCanvas, uploadWallMaterial, sensitivity);
+          }
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const cardBgClass = isDarkMode 
+    ? "bg-slate-900 border-slate-800 text-slate-100" 
+    : "bg-white border-slate-200 text-slate-800 shadow-sm";
+
+  const itemBgClass = isDarkMode
+    ? "bg-slate-950 border-slate-800 text-slate-350 hover:bg-slate-850 hover:text-slate-100"
+    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900";
+
+  const formBgClass = isDarkMode
+    ? "bg-slate-950/60 border-slate-800/80"
+    : "bg-slate-50 border-slate-100 shadow-inner";
+
+  const selectClass = isDarkMode
+    ? "bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-100 focus:ring-indigo-600 focus:border-indigo-600"
+    : "bg-white border-slate-200 hover:border-slate-300 text-slate-800 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm";
+
+  return (
+    <div className={`flex flex-col gap-4.5 rounded-3xl border p-5 transition-all duration-300 ${cardBgClass}`}>
+      
+      {/* Simulation Information Header in sleek Bento styling */}
+      <div className={`border-b pb-3 ${isDarkMode ? "border-slate-850" : "border-slate-100"}`}>
+        <h3 className="text-base font-extrabold flex items-center gap-1.5 leading-none">
+          <Sliders className="w-4.5 h-4.5 text-indigo-500 animate-pulse" />
+          Controles de Simulación
+        </h3>
+        <p className="text-[11px] text-slate-550 dark:text-slate-400 mt-1 leading-relaxed">
+          Diseña el espacio, sintoniza el solucionador electrodinámico y calcula señales de manera digital.
+        </p>
+      </div>
+
+      {/* COMPACT OPERATIONAL BUTTONS GROUP (SOLVES 'AWAY' BUTTON PROBLEM) */}
+      <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-slate-50/50 dark:bg-slate-950/40 border dark:border-slate-850">
+        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 block mb-1">
+          Panel de Acción Directa
+        </span>
+        <div className="grid grid-cols-2 gap-1.5">
+          {/* Play / Pause animation solving */}
+          {isRunning ? (
+            <button
+              onClick={onPause}
+              className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition hover:scale-[1.02] cursor-pointer text-[11px]"
+              id="btn_pause"
+            >
+              <Pause className="w-3.5 h-3.5 fill-current" />
+              Pausar
+            </button>
+          ) : (
+            <button
+              onClick={onStart}
+              className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/15 transition hover:scale-[1.02] cursor-pointer text-[11px]"
+              id="btn_start"
+            >
+              <Play className="w-3.5 h-3.5 fill-current animate-pulse" />
+              Animar Finito
+            </button>
+          )}
+
+          {/* Instant solver convergence logic */}
+          <button
+            onClick={onSolveInstant}
+            className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition hover:scale-[1.02] cursor-pointer text-[11px] shadow-sm"
+            id="btn_solve_instant"
+          >
+            <FastForward className="w-3.5 h-3.5" />
+            Instantáneo (Rápido)
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5">
+          {/* Run standard single step loop */}
+          <button
+            onClick={onSingleStep}
+            disabled={isRunning}
+            className={`flex items-center justify-center gap-1 px-3 py-1.8 disabled:opacity-50 rounded-xl transition cursor-pointer text-[11px] border ${itemBgClass}`}
+            id="btn_single_step"
+          >
+            <RefreshCw className="w-3 h-3 animate-spin-slow" />
+            Iteración +1
+          </button>
+
+          {/* Restart signal powers */}
+          <button
+            onClick={onReset}
+            className={`flex items-center justify-center gap-1 px-3 py-1.8 rounded-xl transition cursor-pointer text-[11px] border ${itemBgClass}`}
+            id="btn_reset"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Resetear Señal
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={onClearWalls}
+            className={`py-1.8 rounded-xl text-center text-[10px] font-bold shadow-sm transition cursor-pointer border ${itemBgClass} hover:border-rose-300 dark:hover:border-rose-950 hover:bg-rose-500/5`}
+            id="btn_clear_walls"
+          >
+            Quitar Muros ({walls.length})
+          </button>
+          <button
+            onClick={onClearRouters}
+            className={`py-1.8 rounded-xl text-center text-[10px] font-bold shadow-sm transition cursor-pointer border ${itemBgClass} hover:border-emerald-300 dark:hover:border-emerald-950 hover:bg-emerald-500/5`}
+            id="btn_clear_routers"
+          >
+            Quitar Routers ({routers.length})
+          </button>
+        </div>
+      </div>
+
+      {/* SECCIÓN PROPUESTA DE MEJOR UBICACIÓN DEL ROUTER / OPTIMIZACIÓN NUMÉRICA */}
+      <div className="flex flex-col gap-2.5 p-3 rounded-2xl bg-amber-500/5 dark:bg-amber-500/5 border border-amber-500/20 dark:border-amber-500/20 shadow-sm animate-fade-in">
+        <label className="text-[10px] uppercase font-black tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+          <Binary className="w-3.5 h-3.5 text-amber-500 shadow-sm" />
+          Distribución Uniforme de Señal
+        </label>
+        
+        <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal">
+          Calcula la distribución óptima espacial de acuerdo a la cantidad de enrutadores deseados. Utiliza agrupamiento de Dirichlet y Laplace para fragmentar el mapa y nivelar la señal uniformemente.
+        </p>
+
+        {/* NÚMERO DE ROUTERS PARA DISTRIBUCIÓN UNIFORME */}
+        <div className="flex items-center justify-between gap-1 bg-amber-500/5 dark:bg-amber-950/25 p-1 px-2 rounded-xl text-[10px] border border-amber-550/10">
+          <span className="font-semibold text-amber-700 dark:text-amber-300 font-sans">
+            Enrutadores a distribuir:
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setNumRoutersToOpt(prev => Math.max(1, prev - 1))}
+              className="p-1 px-1.5 rounded-lg bg-slate-200/50 dark:bg-slate-800 hover:bg-slate-300 pointer-events-auto cursor-pointer font-bold disabled:opacity-40 text-slate-600 dark:text-slate-300 text-[10px] transition"
+              disabled={numRoutersToOpt <= 1 || isOptimizing}
+            >
+              -
+            </button>
+            <span className="font-mono font-black text-amber-800 dark:text-amber-200 text-[11px] w-4 text-center">
+              {numRoutersToOpt}
+            </span>
+            <button
+              type="button"
+              onClick={() => setNumRoutersToOpt(prev => Math.min(6, prev + 1))}
+              className="p-1 px-1.5 rounded-lg bg-slate-200/50 dark:bg-slate-800 hover:bg-slate-300 pointer-events-auto cursor-pointer font-bold disabled:opacity-40 text-slate-600 dark:text-slate-300 text-[10px] transition"
+              disabled={numRoutersToOpt >= 6 || isOptimizing}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        {isOptimizing ? (
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl font-bold bg-amber-500/20 text-amber-500 cursor-not-allowed text-xs"
+          >
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            Optimizando y nivelando señal...
+          </button>
+        ) : (
+          <button
+            onClick={() => onFindBestRouterPlace(numRoutersToOpt)}
+            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white transition hover:scale-[1.01] cursor-pointer text-xs shadow-md shadow-amber-500/10"
+          >
+            <Binary className="w-3.5 h-3.5" />
+            {numRoutersToOpt > 1 ? `Distribuir ${numRoutersToOpt} Routers` : "Calcular Posición Óptima"}
+          </button>
+        )}
+
+        {optimizationResult && (
+          <div className="mt-1 p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 dark:bg-amber-950/30 flex flex-col gap-2.5 text-[10px] animate-fade-in">
+            {optimizationResult.isMultiRouter ? (
+              // --- RENDERIZADO CUANDO SE OPTIMIZAN MÚLTIPLES ROUTERS ---
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center border-b border-amber-500/10 pb-1 flex-wrap">
+                  <span className="font-bold text-amber-700 dark:text-amber-350 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 animate-bounce" />
+                    Distribución Uniforme Calculada
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200/50 dark:border-slate-800 font-mono text-[9px]">
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[8px] uppercase">Señal Promedio</span>
+                    <strong className="text-slate-800 dark:text-slate-100 text-[10px]">{optimizationResult.avgSignal}%</strong>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[8px] uppercase">Área Cobertura</span>
+                    <strong className="text-emerald-600 dark:text-emerald-400 text-[10px]">{optimizationResult.coveragePct}%</strong>
+                  </div>
+                </div>
+
+                {/* ÍNDICE DE UNIFORMIDAD DE SEÑAL */}
+                <div className="p-2 rounded-xl bg-indigo-500/5 border border-indigo-500/20 flex flex-col gap-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-indigo-700 dark:text-indigo-300 uppercase text-[8.5px]">
+                      Índice de Uniformidad Global (I.U.):
+                    </span>
+                    <span className="font-mono font-black text-indigo-600 dark:text-indigo-400 text-[10px]">
+                      {optimizationResult.uniformityIndex}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-indigo-500 rounded-full transition-all duration-500" 
+                      style={{ width: `${optimizationResult.uniformityIndex || 50}%` }}
+                    />
+                  </div>
+                  <p className="text-[8px] text-slate-500 dark:text-slate-400 leading-tight">
+                    {Number(optimizationResult.uniformityIndex) > 80 
+                      ? "Excelente equilibrio: la señal está sumamente equilibrada en todo el plano." 
+                      : "Distribución equilibrada óptima calculada en base a las particiones de la sala."}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[9px] uppercase font-extrabold text-slate-400 dark:text-slate-500 tracking-wider">
+                    Ubicaciones Coordenadas Recomendadas:
+                  </span>
+                  <div className="grid grid-cols-1 gap-1 max-h-[140px] overflow-y-auto pr-0.5">
+                    {optimizationResult.optimizedRouters?.map((r, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-1.5 px-2 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-200/55 dark:border-slate-800/80">
+                        <span className="font-bold text-slate-600 dark:text-slate-350">
+                          Router #{idx + 1} ({r.zoneName})
+                        </span>
+                        <span className="font-mono font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.2 rounded-full text-[8.5px]">
+                          [{r.x}, {r.y}]
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => onApplyBestRouterPlace()}
+                  className="w-full py-2 mt-1 rounded-xl bg-amber-500 hover:bg-amber-600 font-bold text-white transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-amber-500/10 text-xs"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Aplicar Sistema Distribuido Completo
+                </button>
+              </div>
+            ) : (
+              // --- RENDERIZADO CLÁSICO CUANDO ES SOLAMENTE 1 ROUTER ---
+              <div>
+                <div className="flex justify-between items-center border-b border-amber-500/10 pb-1 flex-wrap">
+                  <span className="font-bold text-amber-700 dark:text-amber-350 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    Análisis de Ubicación Completado
+                  </span>
+                  <span className="font-mono text-[9px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-bold">
+                    {optimizationResult.candidatesTested} puntos testeados
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  <span className="text-[9px] uppercase font-extrabold text-slate-400 dark:text-slate-500 tracking-wider">
+                    Comparativa de Posiciones Candidatas:
+                  </span>
+
+                  <div className="flex flex-col gap-2">
+                    {optimizationResult.topCandidates && optimizationResult.topCandidates.map((cand, idx) => {
+                      const isAbsoluteBest = idx === 0;
+                      return (
+                        <div 
+                          key={`${cand.x}-${cand.y}`}
+                          className={`p-2 rounded-xl border transition-all ${
+                            isAbsoluteBest 
+                              ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/40 shadow-sm"
+                              : "bg-slate-50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-bold flex items-center gap-1 text-[9.5px]">
+                              {isAbsoluteBest ? (
+                                <Award className="w-3.5 h-3.5 text-amber-500" />
+                              ) : (
+                                <MapPin className="w-3 h-3 text-slate-400" />
+                              )}
+                              <span className={isAbsoluteBest ? "text-amber-600 dark:text-amber-400 font-extrabold" : "text-slate-600 dark:text-slate-300 font-bold"}>
+                                {idx + 1}º Opción ({cand.zoneName})
+                              </span>
+                            </span>
+                            <span className="font-mono font-bold text-[8.5px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded-full">
+                              [{cand.x}, {cand.y}]
+                            </span>
+                          </div>
+
+                          {/* Stats comparisons bar */}
+                          <div className="grid grid-cols-2 gap-1 text-[9px] text-slate-500 dark:text-slate-400 font-mono mb-1">
+                            <div className="flex items-center gap-1">
+                              <span>Señal Promedio:</span>
+                              <strong className="text-slate-800 dark:text-white font-bold">{cand.avgSignal}%</strong>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span>Cobertura (&ge;-75 dBm):</span>
+                              <strong className="text-emerald-500 font-bold">{cand.coveragePct}%</strong>
+                            </div>
+                          </div>
+
+                          {/* Score indicator indicator bar */}
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <div className="flex-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full ${isAbsoluteBest ? "bg-amber-500" : "bg-indigo-500"}`}
+                                style={{ width: `${Math.min(100, Math.max(10, cand.score))}%` }}
+                              />
+                            </div>
+                            <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 font-mono">
+                              Puntaje: {Math.round(cand.score)}/100
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => onApplyBestRouterPlace(cand.x, cand.y)}
+                            className={`w-full py-1 rounded-lg text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+                              isAbsoluteBest
+                                ? "bg-amber-500 hover:bg-amber-600 text-white shadow"
+                                : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                            }`}
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            {isAbsoluteBest ? "Aplicar Posición Ideal (Recom.)" : "Aplicar Posición Alternativa"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* SECCIÓN PLANIFICADOR DE EQUIPO (ROUTER DIGITAL) */}
+      <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-indigo-50/20 dark:bg-slate-950/25 border border-indigo-100/30 dark:border-slate-850">
+        <label className="text-[10px] uppercase font-black tracking-wider text-indigo-500/90 dark:text-indigo-400 flex items-center gap-1.5">
+          <Radio className="w-3.5 h-3.5 text-indigo-500" />
+          Enrutador Comercial Activo
+        </label>
+        <select
+          value={selectedRouterModelId}
+          onChange={(e) => setSelectedRouterModelId(e.target.value)}
+          className={`w-full px-2.5 py-1.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-505 focus:outline-none transition ${selectClass}`}
+          id="select_router_model"
+        >
+          {Object.entries(ROUTER_MODELS).map(([id, r]) => (
+            <option key={id} value={id}>
+              {r.name} ({r.frequency}) • Tx {r.txPowerDbm}dBm
+            </option>
+          ))}
+        </select>
+        
+        {/* Router Specs card */}
+        <div className="p-2 border rounded-xl bg-white/50 dark:bg-slate-900/40 text-[10px] flex flex-col gap-1 text-slate-500 font-medium border-slate-100 dark:border-slate-800">
+          <div className="flex justify-between">
+            <span className="font-bold text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].brand} • {ROUTER_MODELS[selectedRouterModelId].model}</span>
+            <span className="font-mono text-[9px] text-indigo-500 bg-indigo-500/10 px-1 py-0.5 rounded leading-none font-bold">{ROUTER_MODELS[selectedRouterModelId].standard}</span>
+          </div>
+          <div className="flex justify-between font-mono text-[9px] mt-0.5 border-t border-dashed border-slate-200 dark:border-slate-800 pt-1">
+            <span>Banda: <strong className="text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].frequency}</strong></span>
+            <span>Potencia Tx: <strong className="text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].txPowerDbm} dBm</strong></span>
+          </div>
+          <div className="flex justify-between font-mono text-[9px]">
+            <span>Ganancia: <strong className="text-slate-600 dark:text-slate-300">+{ROUTER_MODELS[selectedRouterModelId].gainDbi} dBi</strong></span>
+            <span>EIRP Total: <strong className="text-indigo-500 font-bold">{ROUTER_MODELS[selectedRouterModelId].eirpDbm} dBm</strong></span>
+          </div>
+          <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal mt-1 italic">
+            "{ROUTER_MODELS[selectedRouterModelId].description}"
+          </p>
+        </div>
+      </div>
+
+      {/* SECCIÓN ESCALADO FÍSICO DE CELDAS */}
+      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-emerald-50/20 dark:bg-slate-950/25 border border-emerald-100/30 dark:border-slate-850">
+        <label className="text-[10px] uppercase font-black tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+          <span className="flex items-center gap-1.5 font-bold">
+            <Maximize2 className="w-3.5 h-3.5" />
+            Escala Física de Celdas
+          </span>
+          <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded leading-none">
+            {cellSize} metros
+          </span>
+        </label>
+        
+        <input
+          type="range"
+          min="0.1"
+          max="2.5"
+          step="0.05"
+          value={cellSize}
+          onChange={(e) => setCellSize(parseFloat(e.target.value))}
+          className="w-full accent-emerald-500 cursor-pointer my-1 text-emerald-550"
+          id="slider_cell_size"
+        />
+        <div className="flex justify-between text-[8px] font-mono text-slate-500 dark:text-slate-400 leading-none">
+          <span>0.1m (Micro-resolución)</span>
+          <span>1.0m (Escalado Medio)</span>
+          <span>2.5m (Largo Rango)</span>
+        </div>
+        <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal mt-1">
+          La propagación de la señal se debilita a mayor distancia física, modelando con rigor un espacio real.
+        </p>
+      </div>
+
+      {/* DRAWING TOOLS & PEN SETS SECTION */}
+      <div>
+        <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1.5 flex items-center gap-1">
+          <Layers className="w-3.5 h-3.5 text-indigo-500" />
+          Herramientas de Lápiz y Pinceles
+        </h4>
+        <div className="grid grid-cols-3 gap-1">
+          {/* Router tool selection */}
+          <button
+            onClick={() => setSelectedTool("router")}
+            className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
+              selectedTool === "router"
+                ? isDarkMode 
+                  ? "bg-emerald-950/40 border-emerald-800 text-emerald-400 shadow-sm font-bold"
+                  : "bg-emerald-50 border-emerald-250 text-emerald-700 shadow-sm font-bold"
+                : itemBgClass
+            }`}
+            id="tool_router"
+          >
+            <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-mono text-[8px] font-bold shrink-0">R</div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[10px] font-bold truncate">Router</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Fuente</span>
+            </div>
+          </button>
+
+          {/* Move router tool */}
+          <button
+            onClick={() => setSelectedTool("move")}
+            className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
+              selectedTool === "move"
+                ? isDarkMode
+                  ? "bg-indigo-950/40 border-indigo-800 text-indigo-400 shadow-sm font-bold"
+                  : "bg-indigo-50 border-indigo-250 text-indigo-700 shadow-sm font-bold"
+                : itemBgClass
+            }`}
+            id="tool_move"
+          >
+            <Move className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[10px] font-bold truncate">Mover</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Arrastrar</span>
+            </div>
+          </button>
+
+          {/* Eraser tool */}
+          <button
+            onClick={() => setSelectedTool("eraser")}
+            className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
+              selectedTool === "eraser"
+                ? isDarkMode
+                  ? "bg-rose-950/40 border-rose-800 text-rose-400 shadow-sm font-bold"
+                  : "bg-rose-50 border-rose-250 text-rose-700 shadow-sm font-bold"
+                : itemBgClass
+            }`}
+            id="tool_eraser"
+          >
+            <Eraser className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[10px] font-bold truncate">Borrador</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Limpiar</span>
+            </div>
+          </button>
+        </div>
+
+        {/* Dynamic obstacle material catalog */}
+        <div className="mt-2">
+          <span className="text-[9px] text-slate-550 dark:text-slate-400 font-extrabold mb-1 block">Materiales de Construcción Manual:</span>
+          <div className="grid grid-cols-4 gap-1">
+            {Object.values(MATERIALS).map((material) => {
+              if (material.id === "air") return null;
+              const isSelected = selectedTool === material.id;
+              
+              return (
+                <button
+                  key={material.id}
+                  id={`tool_mat_${material.id}`}
+                  onClick={() => setSelectedTool(material.id)}
+                  className={`flex flex-col items-center justify-center p-1.5 rounded-lg border text-center transition gap-0.5 cursor-pointer ${
+                    isSelected
+                      ? isDarkMode
+                        ? "bg-indigo-950 border-indigo-700 text-indigo-400 font-bold shadow-sm"
+                        : "bg-slate-900 border-slate-900 text-white font-bold shadow-sm"
+                      : itemBgClass
+                  }`}
+                >
+                  <div className={`w-2.5 h-2.5 rounded border ${material.color.split(" ")[0]}`} />
+                  <span className="text-[8px] font-black line-clamp-1 leading-none">{material.name}</span>
+                  <span className={`text-[7px] font-mono leading-none ${isSelected ? "text-indigo-400" : "text-slate-500"}`}>-{material.dbLoss}dB</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* BLUEPRINT DIGITIZER (IMAGE ➜ MATRIX) - SOLVES SECOND REQUIREMENT */}
+      <div className={`p-3 rounded-2xl border ${formBgClass} space-y-2.5 shadow-inner`}>
+        <div className="flex items-center justify-between">
+          <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400 flex items-center gap-1">
+            <Layers className="w-3.5 h-3.5 text-indigo-500" />
+            Digitalizador de Planos (Imagen ➜ Malla 2D)
+          </h4>
+          <span className="bg-indigo-500/10 text-indigo-500 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md leading-none">
+            Análisis Algorítmico
+          </span>
+        </div>
+
+        <p className="text-[10px] text-slate-550 dark:text-slate-400 leading-snug">
+          Coloca o carga un plano técnico con paredes y la aplicación estimará automáticamente sus coordenadas para formar la matriz electromagnética de análisis.
+        </p>
+
+        {scanSuccessMsg && (
+          <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-505/20 text-indigo-500 text-[10px] font-bold animate-pulse text-center leading-tight">
+            {scanSuccessMsg}
+          </div>
+        )}
+
+        {/* Blueprint preset test button (1-click conversion without file finding) */}
+        <div className="space-y-1">
+          <span className="text-[8px] uppercase tracking-wider font-extrabold text-slate-550 dark:text-slate-400 block">
+            A) Probar con Diseños de Plano Preestablecidos:
+          </span>
+          <div className="grid grid-cols-3 gap-1">
+            <button
+              type="button"
+              onClick={() => drawAndAnalyzePresetBlueprint("apartment")}
+              className={`py-1.5 rounded-lg border text-center text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${itemBgClass}`}
+              title="Carga un plano complejo de apartamento residencial y lo escanea a la matriz"
+            >
+              <Layout className="w-3 h-3 text-indigo-500" />
+              Apartamento
+            </button>
+            <button
+              type="button"
+              onClick={() => drawAndAnalyzePresetBlueprint("classroom")}
+              className={`py-1.5 rounded-lg border text-center text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${itemBgClass}`}
+              title="Carga un plano de laboratorio o salón de informática de la Universidad"
+            >
+              <Binary className="w-3 h-3 text-emerald-500" />
+              Laboratorio
+            </button>
+            <button
+              type="button"
+              onClick={() => drawAndAnalyzePresetBlueprint("hosp")}
+              className={`py-1.5 rounded-lg border text-center text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${itemBgClass}`}
+              title="Carga un plano tipo hospital de camillas divididas por muros densos"
+            >
+              <FileSpreadsheet className="w-3 h-3 text-rose-500" />
+              Hospital
+            </button>
+          </div>
+        </div>
+
+        {/* Drag & Drop uploader area */}
+        <div className="space-y-1">
+          <span className="text-[8px] uppercase tracking-wider font-extrabold text-slate-550 dark:text-slate-400 block">
+            B) Cargar tu Archivo de Imagen Personal (Plano / Croquis):
+          </span>
+          <div 
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-xl p-3 text-center transition duration-200 cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+              dragActive 
+                ? "border-indigo-500 bg-indigo-500/10 text-indigo-400" 
+                : "border-slate-300 dark:border-slate-800 hover:border-indigo-400"
+            }`}
+          >
+            <Upload className={`w-5 h-5 ${dragActive ? "text-indigo-400 scale-110 animate-bounce" : "text-slate-550 dark:text-slate-400"}`} />
+            <div className="flex flex-col select-none">
+              <span className="text-[9px] font-bold text-slate-600 dark:text-slate-300 text-center">Arrastra tu plano o haz clic para subir</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400">Acepta JPEG, PNG (Detecta contornos oscuros)</span>
+            </div>
+            <input 
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+          </div>
+        </div>
+
+        {/* Parameter configuration for scanner */}
+        <div className="pt-1.5 border-t dark:border-slate-850/60 grid grid-cols-2 gap-2">
+          {/* Scan Wall Material Selector */}
+          <div className="flex flex-col gap-0.5">
+            <label className="text-[8.5px] font-bold text-slate-550 dark:text-slate-400">Material Resultante:</label>
+            <select
+              value={uploadWallMaterial}
+              onChange={(e) => setUploadWallMaterial(e.target.value as MaterialType)}
+              className={`w-full px-2 py-1 rounded-lg text-[9px] focus:outline-none transition ${selectClass}`}
+            >
+              <option value="concrete">Hormigón (Fuerte)</option>
+              <option value="brick">Ladrillo (Medio)</option>
+              <option value="drywall">Panel Yeso (Suave)</option>
+              <option value="metal">Metal (Absoluto)</option>
+            </select>
+          </div>
+
+          {/* Threshold Slider */}
+          <div className="flex flex-col gap-0.5">
+            <div className="flex justify-between items-center text-[8.5px] font-bold text-slate-550 dark:text-slate-400">
+              <span>Sensibilidad Escáner:</span>
+              <span className="font-mono text-indigo-500">{sensitivity}</span>
+            </div>
+            <input
+              type="range"
+              min="80"
+              max="240"
+              step="10"
+              value={sensitivity}
+              onChange={(e) => setSensitivity(parseInt(e.target.value))}
+              className="w-full accent-indigo-500 h-1 cursor-pointer my-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* LAPLACE NUMERICAL EQUATORIAL PARAMETERS BLOCK */}
+      <div className={`space-y-3 rounded-2xl p-4 border transition-all ${formBgClass}`}>
+        <div className="flex items-center justify-between">
+          <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 flex items-center gap-1">
+            <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+            Parámetros de Resolución de Laplace
+          </h4>
+          {!isAdmin && (
+            <span className="inline-flex items-center gap-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-extrabold px-1.5 py-0.5 rounded">
+              <Lock className="w-2.5 h-2.5" />
+              Lectura
+            </span>
+          )}
+        </div>
+
+        {/* Selección de Método */}
+        <div className="flex flex-col gap-1.5 p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/40 dark:bg-slate-950/20">
+          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 flex justify-between">
+            <span>Método de Resolución:</span>
+          </label>
+          <div className="w-full px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-tight bg-indigo-550/5 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-between">
+            <span>Sobre-Relajación Sucesiva (SOR)</span>
+            <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 bg-indigo-500/10 rounded leading-none text-indigo-500 dark:text-indigo-400">Exclusivo</span>
+          </div>
+          <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-relaxed mt-1">
+            ✓ SOR: Extrapola activamente la dirección esperada del residuo con el parámetro de aceleración omega (ω &gt; 1).
+          </p>
+        </div>
+
+        {/* Omega Slider (SOR) */}
+        <div className="flex flex-col gap-0.5 pt-0.5">
+          <div className="flex justify-between items-center text-[10px]">
+            <span className="font-semibold text-slate-605 dark:text-slate-300">Factor de Relajación Crítico (ω):</span>
+            <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">{config.omega}</span>
+          </div>
+          <input
+            type="range"
+            min="0.1"
+            max="1.9"
+            step="0.05"
+            value={config.omega}
+            disabled={!isAdmin}
+            onChange={(e) => setConfig((prev) => ({ ...prev, omega: parseFloat(e.target.value) }))}
+            className={`w-full accent-indigo-500 cursor-pointer my-1 ${!isAdmin ? "opacity-40 cursor-not-allowed" : ""}`}
+            id="slider_omega"
+          />
+          <div className="flex justify-between text-[8px] text-slate-500 dark:text-slate-400 font-mono leading-none">
+            <span>0.1 (Sub-convergencia)</span>
+            <span>1.0 (Sin Relajamiento)</span>
+            <span>1.9 (Sobre-convergencia)</span>
+          </div>
+        </div>
+
+        {/* Optimización de Omega (w) */}
+        <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800/50 flex flex-col gap-1.5">
+          {isOptimizingOmega ? (
+            <button
+              type="button"
+              disabled
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl font-bold bg-indigo-500/15 text-indigo-500/80 cursor-not-allowed text-xs animate-pulse"
+            >
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-500" />
+              Buscando ω Óptimo...
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={!isAdmin}
+              onClick={handleOptimizeOmega}
+              className={`w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl font-bold bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 transition cursor-pointer text-[10.5px] ${
+                !isAdmin ? "opacity-35 cursor-not-allowed hover:bg-transparent" : "hover:scale-[1.01]"
+              }`}
+            >
+              <Cpu className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
+              Auto-calcular ω Óptimo (SOR)
+            </button>
+          )}
+
+          {bestOmegaFound !== null && omegaResults && (
+            <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col gap-1.5 text-[10px] animate-fade-in">
+              <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                ¡Valor de ω Óptimo Encontrado!
+              </span>
+              <p className="text-[9px] text-slate-555 dark:text-slate-400 leading-normal">
+                El algoritmo de barrido rápido determinó que <strong className="text-emerald-600 dark:text-emerald-400">&omega; = {bestOmegaFound}</strong> requiere el menor número de iteraciones para estabilizar la señal de la matriz dada con respecto a muros y obstáculos.
+              </p>
+              
+              <div className="flex flex-col gap-1 mt-1 font-mono text-[8.5px] border-t border-emerald-500/10 pt-1.5">
+                <span className="text-[8px] uppercase font-black text-slate-550 dark:text-slate-400 tracking-wider mb-0.5">Velocidad de Convergencia:</span>
+                {omegaResults
+                  .filter(r => r.converged)
+                  .sort((a, b) => a.iterations - b.iterations)
+                  .slice(0, 3)
+                  .map((r, i) => (
+                    <div key={r.omega} className="flex justify-between items-center text-slate-500 dark:text-slate-455 px-1 hover:bg-slate-500/5 rounded">
+                      <span className={r.omega === bestOmegaFound ? "font-bold text-emerald-600 dark:text-emerald-400" : ""}>
+                        {i + 1}º) &omega; = {r.omega.toFixed(2)} {r.omega === bestOmegaFound ? "★" : ""}
+                      </span>
+                      <span className={r.omega === bestOmegaFound ? "font-bold text-emerald-600 dark:text-emerald-400" : ""}>
+                        {r.iterations} iters
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Tolerance and Grid Multipliers */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-0.5">
+            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">Tolerancia Límite (ε):</label>
+            <select
+              value={config.tolerance}
+              onChange={(e) => isAdmin && setConfig((prev) => ({ ...prev, tolerance: parseFloat(e.target.value) }))}
+              disabled={!isAdmin}
+              className={`w-full px-2 py-1 rounded-xl text-[11px] focus:outline-none transition ${selectClass} ${!isAdmin ? "opacity-60 cursor-not-allowed" : ""}`}
+              id="select_tolerance"
+            >
+              <option value="0.01">10⁻² (Rápida)</option>
+              <option value="0.001">10⁻³ (Estándar)</option>
+              {isAdmin && (
+                <>
+                  <option value="0.0001">10⁻⁴ (Alta)</option>
+                  <option value="0.000001">10⁻⁶ (Laboratorio)</option>
+                </>
+              )}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-0.5">
+            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">Malla Nodos (N &times; N):</label>
+            <select
+              value={gridSize.rows}
+              onChange={(e) => handleGridSizeChange(parseInt(e.target.value))}
+              className={`w-full px-2 py-1 rounded-xl text-[11px] focus:outline-none transition ${selectClass}`}
+              id="select_gridsize"
+            >
+              <option value="16">16 x 16 (Veloz)</option>
+              <option value="24">24 x 24 (Equilibrado)</option>
+              <option value="32">32 x 32 (Fino)</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Animation delay speed control slider */}
+        <div className="flex flex-col gap-0.5">
+          <div className="flex justify-between text-[10px]">
+            <span className="font-semibold text-slate-605 dark:text-slate-300 font-sans">Retardo de Animación:</span>
+            <span className="font-mono text-indigo-500 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">
+              {config.animationDelay === 0 ? "0 ms (Fijo)" : `${config.animationDelay} ms`}
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="150"
+            step="10"
+            value={config.animationDelay}
+            onChange={(e) => setConfig((prev) => ({ ...prev, animationDelay: parseInt(e.target.value) }))}
+            className="w-full accent-indigo-500 h-1 cursor-pointer my-1"
+            id="slider_delay"
+          />
+        </div>
+      </div>
+
+      {/* FIXED CLASSIC PRESET LOADERS BOX */}
+      <div className={`border-t pt-3 ${isDarkMode ? "border-slate-850" : "border-slate-100"}`}>
+        <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-2 flex items-center gap-1">
+          <Layout className="w-3.5 h-3.5 text-indigo-500" />
+          Escenarios Digitales Rápidos
+        </h4>
+        <div className="flex flex-col gap-1.5">
+          <button
+            onClick={() => onLoadPreset("empty")}
+            className={`w-full text-left text-[11px] px-3 py-2 rounded-xl font-medium transition truncate cursor-pointer border ${itemBgClass}`}
+          >
+            ⚡ Espacio Libre de Obstáculos
+          </button>
+          <button
+            onClick={() => onLoadPreset("office")}
+            className={`w-full text-left text-[11px] px-3 py-2 rounded-xl font-medium transition truncate cursor-pointer border ${itemBgClass}`}
+          >
+            🏢 Oficina Corporativa (Muros Concreto)
+          </button>
+          <button
+            onClick={() => onLoadPreset("metal-cage")}
+            className={`w-full text-left text-[11px] px-3 py-2 rounded-xl font-medium transition truncate cursor-pointer border ${itemBgClass}`}
+          >
+            🔒 Jaula de Faraday (Blindaje Metálico)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

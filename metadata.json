@@ -1,0 +1,8 @@
+{
+  "name": "SIMNET WiFi Mesh Simulator",
+  "description": "Simulador interactivo de redes y malla WiFi en entornos digitales 2D para optimizar la ubicación de enrutadores usando algoritmos numéricos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
