@@ -136,6 +136,7 @@
           <button onclick="goToSlide(13)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">14.</strong> Análisis Físico de Resultados 2D y Tablas</button>
           <button onclick="goToSlide(14)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">15.</strong> Defensa ante el Jurado: Preguntas y Respuestas</button>
           <button onclick="goToSlide(15)" class="p-2 rounded-xl bg-cyan-950/60 border border-cyan-600 text-left hover:bg-cyan-800/50 transition cursor-pointer"><strong class="text-cyan-300">16. 🔤</strong> Diccionario Maestro de Letras y Variables</button>
+          <button onclick="goToSlide(16)" class="p-2 rounded-xl bg-amber-950/60 border border-amber-600 text-left hover:bg-amber-800/50 transition cursor-pointer sm:col-span-2 lg:col-span-4"><strong class="text-amber-300">17. 🎙️ GUION DE EXPOSICIÓN DEL PÓSTER PASO A PASO:</strong> Qué bloque del póster señalar con la mano, cómo ordenar tus ideas y qué decir palabra por palabra en tus 5 minutos</button>
         </div>
       </div>
     </div>
@@ -1313,7 +1314,68 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
   </section>
 
   <!-- =========================================================================
-       BARRA DE NAVEGACIÓN FIJA INFERIOR CON SELECTOR DE LAS 16 DIAPOSITIVAS
+       DIAPOSITIVA 17: GUION PASO A PASO PARA EXPONER EL PÓSTER BLOQUE POR BLOQUE
+       ========================================================================= -->
+  <section class="slide" id="slide-17">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+      <h2 class="text-xl md:text-2xl font-black text-amber-400">17. 🎙️ Guion Maestro para Exponer el Póster Bloque por Bloque (5 Minutos)</h2>
+      <span class="text-xs font-mono text-slate-400">Orden Exacto de las Secciones del Póster 80×120 cm • Qué Señalar y Qué Decir</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 max-w-7xl mx-auto w-full my-auto text-xs">
+      <!-- Paso 1 y 2 -->
+      <div class="formula-card border-amber-700/60 bg-amber-950/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/40">PASO 1 y 2 (0:00 – 1:20) • Encabezado, Resumen y Bloque 1</span>
+          <span class="text-[10px] text-slate-400 font-mono">📍 Señalar Arriba e Izquierda Superior</span>
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          <strong>1. Saludo y Resumen (Arriba):</strong> «Buenos días, estimado jurado. Mi nombre es <strong>Juan David Conde Duarte</strong> y presento el proyecto <em>“Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos”</em>, asesorado por la profesora <strong>Gladys Liliana Bautista Wilches</strong> en Electromagnetismo. Nuestro modelo simula cómo se propagan y atenúan las ondas en <strong>$2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$)</strong> y <strong>$5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$)</strong> dentro de edificaciones.»<br/>
+          <strong>2. Bloque 1 — Introducción y Motivación:</strong> «Cuando una onda viaja en un recinto cerrado, pierde energía por dos causas: por <strong>divergencia geométrica</strong> al abrirse en el espacio y por <strong>absorción dieléctrica</strong> al atravesar muros con permitividad $\varepsilon_r$ y conductividad $\sigma$. Como las fórmulas de espacio libre solo sirven en el vacío sin paredes, nuestro objetivo general fue modelar y validar en 2D la potencia recibida $P_{\text{rx}}$, el <strong>Vector de Poynting $\langle S \rangle$</strong> y el <strong>campo eléctrico eficaz $E_{\text{rms}}$</strong> mediante Diferencias Finitas y relajación SOR.»
+        </p>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formula-card border-indigo-700/60 bg-indigo-950/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">PASO 3 (1:20 – 2:15) • Bloque 2: Marco Teórico y Ecuaciones (1) y (2)</span>
+          <span class="text-[10px] text-slate-400 font-mono">📍 Señalar Ecuación (1) y Ecuación (2)</span>
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          «En el <strong>Bloque 2 (Marco Teórico)</strong> tenemos las dos ecuaciones físicas centrales:<br/>
+          • En la <strong>Ecuación (1)</strong> acoplamos las magnitudes electromagnéticas en el aire (cuya impedancia intrínseca es $\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$): la densidad superficial de potencia del <strong>Vector de Poynting</strong> es $\langle S \rangle = \frac{4\pi P_{\text{rx}}}{\lambda^2} = \frac{E_{\text{rms}}^2}{\eta_0}$, de donde despejamos el <strong>campo eléctrico eficaz</strong> $E_{\text{rms}} = \sqrt{4\pi\eta_0 P_{\text{rx}}/\lambda^2}$ en $\text{V/m}$ y el campo magnético $H_{\text{rms}} = E_{\text{rms}}/\eta_0$ en $\text{A/m}$.<br/>
+          • Al cruzar un muro, la onda decae exponencialmente por la <strong>Ley de Beer-Lambert</strong> ($E(x) = E_0 e^{-\alpha x}$). En estado estacionario 2D, modelamos la envolvente de intensidad $u(x,y)$ con la <strong>Ecuación Diferencial Parcial elíptica (2)</strong>: $\nabla^2 u - \kappa^2(x,y)u = 0$, donde el Laplaciano $\nabla^2 u$ representa la difusión espacial y $-\kappa^2 u$ la absorción del muro, con condiciones de frontera de <strong>Dirichlet</strong> fijas en el router y nulas ($u=0$) en el borde exterior.»
+        </p>
+      </div>
+
+      <!-- Paso 4 y 5 -->
+      <div class="formula-card border-cyan-700/60 bg-cyan-950/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">PASO 4 y 5 (2:15 – 3:30) • Bloques 3 y 4: Tabla 1 y Ecuaciones (3) y (4)</span>
+          <span class="text-[10px] text-slate-400 font-mono">📍 Señalar Tabla 1 y Abajo Izquierda</span>
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          <strong>4. Bloque 3 y Tabla 1 (Materiales ITU-R P.2040):</strong> «Discretizamos recintos de $12\text{ m}\times 12\text{ m}$ en mallas de $24\times 24$ nodos ($h = 0.5\text{ m}$). En la <strong>Tabla 1</strong> tomamos de la norma <strong>ITU-R P.2040</strong> la permitividad $\varepsilon_r$, conductividad $\sigma$ y pérdida en $\text{dB}$ de 5 medios: aire ($0\text{ dB}$), yeso ($3\text{ dB}$), ladrillo ($8\text{ dB}$), concreto ($\varepsilon_r = 6.5, 15\text{ dB}$) y metal ($\sigma = 3.5\times 10^7\text{ S/m}, \ge 35\text{ dB}$).»<br/>
+          <strong>5. Bloque 4 — Metodología Computacional (Ec. 3 y 4):</strong> «Por series de Taylor de segundo orden obtenemos la <strong>Ecuación (3) en Diferencias Finitas</strong>: cada celda $u_{i,j}^{\text{GS}}$ es el promedio de sus 4 vecinos ortogonales multiplicado por el factor de transmisión $(1 - \alpha_{i,j})$. Y en la <strong>Ecuación (4)</strong> aplicamos <strong>Sobre-Relajación Sucesiva (SOR)</strong>: $u_{i,j}^{(k+1)} = (1-\omega)u_{i,j}^{(k)} + \omega u_{i,j}^{\text{GS}}$, extrapolando con el factor $\omega \in (1,2)$ hasta que el error máximo cumple $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$.»
+        </p>
+      </div>
+
+      <!-- Paso 6 y 7 -->
+      <div class="formula-card border-emerald-700/60 bg-emerald-950/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">PASO 6 y 7 (3:30 – 5:00) • Bloques 5 y 6: Figuras 1 y 2, Tabla 2 y Conclusiones</span>
+          <span class="text-[10px] text-slate-400 font-mono">📍 Señalar Columna Derecha Completa</span>
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          <strong>6. Bloque 5 — Resultados (Figuras 1, 2 y Tabla 2):</strong> «En la <strong>Figura 1(a) vs 1(b)</strong> comprobamos que $2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$) atraviesa mejor los muros de concreto que $5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$), la cual sufre $8.5\text{ dB}$ más de absorción. En la <strong>Figura 1(c)</strong> demostramos la <strong>Jaula de Faraday</strong> en metal: como la profundidad pelicular es $\delta \approx 1.3\,\mu\text{m}$, el campo exterior se anula ($< 1\text{ mV/m}$). En la <strong>Figura 2(a)</strong> validamos la simulación contra el modelo analítico <strong>ITU-R P.1238</strong> obteniendo <strong>$R^2 = 0.978$</strong> y <strong>$\text{RMSE} = 1.84\text{ dB}$</strong>. Y en la <strong>Figura 2(b) y Tabla 2</strong> probamos que Jacobi, Gauss-Seidel y SOR convergen al mismo campo físico ($-56.5\text{ dBm}$, $\langle S \rangle = 1.80\,\mu\text{W/m}^2$, $E_{\text{rms}} = 0.0260\text{ V/m}$ a $3\text{ m}$), pero <strong>SOR ($\omega = 1.45$) converge en 66 iteraciones ($2.8\text{ ms}$), un $73.7\%$ más rápido que Jacobi (251 iteraciones)</strong>.»<br/>
+          <strong>7. Bloque 6 — Conclusiones:</strong> «En conclusión, el modelo cuantifica con alta fidelidad las magnitudes de Maxwell-Poynting en tiempo real, proyectándose a futuro hacia la ecuación de Helmholtz con fase compleja. Muchas gracias.»
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       BARRA DE NAVEGACIÓN FIJA INFERIOR CON SELECTOR DE LAS 17 DIAPOSITIVAS
        ========================================================================= -->
   <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 z-50">
     <div class="flex items-center gap-2">
@@ -1340,15 +1402,16 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
         <option value="13">14. Análisis Físico de Resultados y Gráficas</option>
         <option value="14">15. Defensa Oral: Preguntas del Jurado</option>
         <option value="15">16. 🔤 Diccionario Maestro de Todas las Letras y Variables</option>
+        <option value="16">17. 🎙️ Guion Paso a Paso para Exponer el Póster</option>
       </select>
     </div>
 
     <div class="flex items-center gap-2">
+      <button onclick="goToSlide(16)" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition cursor-pointer shadow-lg shadow-amber-950/50">
+        🎙️ Guion del Póster
+      </button>
       <button onclick="toggleSymbolModal()" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition cursor-pointer shadow-lg shadow-cyan-950/50">
         🔍 Consultar Letra / Variable
-      </button>
-      <button onclick="goToSlide(15)" class="px-3 py-1.5 rounded-xl bg-cyan-900/60 border border-cyan-600 text-cyan-200 text-xs font-bold hover:bg-cyan-800/70 transition cursor-pointer">
-        🔤 Diapositiva 16 (Glosario)
       </button>
       <a href="/presentacion/poster/Poster_Visual_80x120cm.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-900/50 border border-emerald-700 text-emerald-200 text-xs font-bold hover:bg-emerald-800/60 transition">
         🇪🇸 Ver Póster (ES)
@@ -1356,7 +1419,7 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
       <a href="/presentacion/poster/Poster_Visual_80x120cm_EN.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-amber-900/50 border border-amber-700 text-amber-200 text-xs font-bold hover:bg-amber-800/60 transition">
         🇬🇧 View Poster (EN)
       </a>
-      <span id="slide-counter" class="text-xs font-mono font-bold text-slate-300">Diapositiva 1 / 16</span>
+      <span id="slide-counter" class="text-xs font-mono font-bold text-slate-300">Diapositiva 1 / 17</span>
     </div>
   </div>
 

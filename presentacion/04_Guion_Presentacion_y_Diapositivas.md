@@ -222,30 +222,95 @@ Para comprender y explicar de inmediato qué significa cada letra de cada ecuaci
 
 ---
 
-## Parte 3: Guion Cronometrado de 5 Minutos para la Defensa Oral frente al Póster y la App
+## Parte 3: Guion Maestro para Exponer el Póster Bloque por Bloque (Ordenado Según la Estructura Exacta del Póster $80 \times 120\text{ cm}$)
 
-### Minuto 0:00 – 0:50 | Apertura y Fenómeno Físico Central
-> «Buenos días, estimado jurado. Mi nombre es **Juan David Conde Duarte**, y presento el proyecto titulado **“Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos”**, asesorado por la profesora **Gladys Liliana Bautista Wilches** en la asignatura de Electromagnetismo.  
-> El fenómeno físico central que abordamos es cómo decae espacialmente la energía de una onda electromagnética en las bandas **UHF ($2.4\text{ GHz}$, longitud de onda $\lambda = 12.5\text{ cm}$)** y **SHF ($5.0\text{ GHz}$, $\lambda = 6.0\text{ cm}$)** cuando se propaga dentro de un recinto y atraviesa materiales dieléctricos con pérdidas (yeso, ladrillo, concreto) o conductores metálicos. Mientras las fórmulas analíticas de espacio libre sólo sirven en el vacío sin paredes, nuestro modelo numérico resuelve planos arquitectónicos reales.»
+### Mapa Mental Rápido (El Orden de tus Ideas en 7 Pasos Siguiendo el Póster)
+1. **Encabezado y Resumen (Arriba):** Quién eres, qué fenómeno físico estudias (ondas UHF $2.4\text{ GHz}$ y SHF $5.0\text{ GHz}$ dentro de recintos con muros) y qué resuelve tu software.
+2. **Bloque 1 — Introducción y Motivación (Izquierda arriba):** Por qué las fórmulas de espacio libre fallan cuando hay paredes ($\varepsilon_r, \sigma$) y cuál es el objetivo general.
+3. **Bloque 2 — Marco Teórico y Ecuaciones (1) y (2) (Izquierda centro-arriba):** Cómo se conectan la potencia $P_{\text{rx}}$, el Vector de Poynting $\langle S \rangle$ y el campo eléctrico $E_{\text{rms}}$ (Ec. 1), y cuál es la Ecuación Diferencial Parcial estacionaria $\nabla^2 u - \kappa^2 u = 0$ con fronteras de Dirichlet (Ec. 2).
+4. **Bloque 3 — Sistema Modelado y Tabla 1 (Izquierda centro-abajo):** La malla de $24\times 24$ nodos ($12\text{ m}\times 12\text{ m}$, $h = 0.5\text{ m}$) y las propiedades de los 5 materiales (aire, yeso, ladrillo, concreto y metal) según ITU-R P.2040.
+5. **Bloque 4 — Metodología Computacional y Ecuaciones (3) y (4) (Izquierda abajo):** Cómo funciona el promedio de los 4 vecinos en Diferencias Finitas (Ec. 3), cómo acelera el método SOR con el factor $\omega$ (Ec. 4) y cómo se valida con la fórmula ITU-R P.1238.
+6. **Bloque 5 — Resultados: Figura 1, Figura 2 y Tabla 2 (Columna Derecha):**
+   - *Figura 1:* Comparación $2.4\text{ GHz}$ vs $5.0\text{ GHz}$ en concreto y el efecto **Jaula de Faraday** en metal.
+   - *Figura 2 y Tabla 2:* Validación analítica ($\text{RMSE} = 1.84\text{ dB}$, $R^2 = 0.978$) y rapidez de SOR ($66$ iteraciones, $73.7\%$ menos que Jacobi).
+7. **Bloque 6 — Conclusiones y Cierre (Derecha abajo):** Síntesis de los 3 hallazgos principales y paso a las preguntas del jurado.
 
-### Minuto 0:50 – 2:00 | Marco Físico y Fórmulas Electromagnéticas
-> «En el bloque de **Marco Teórico**, partimos de la relación entre la potencia recibida $P_{\text{rx}}$ por una apertura efectiva isotrópica $A_{\text{eff}} = \frac{\lambda^2}{4\pi}$ y la magnitud media temporal del **Vector de Poynting** $\langle S \rangle$ en $\text{W/m}^2$ (Ecuación 1):
-> $$\langle S \rangle = \frac{4\pi\,P_{\text{rx}}}{\lambda^2} = \frac{E_{\text{rms}}^2}{\eta_0} \implies E_{\text{rms}} = \sqrt{\eta_0\,\langle S \rangle}, \qquad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0}$$
-> donde $\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$ es la impedancia intrínseca del aire. Cuando la onda atraviesa un muro con permitividad relativa $\varepsilon_r$ y conductividad $\sigma$ (Tabla 1, recomendación ITU-R P.2040), sufre atenuación exponencial por la Ley de Beer-Lambert. En régimen estacionario 2D, modelamos la envolvente normalizada de intensidad $u(x,y)$ mediante la ecuación diferencial parcial elíptica de difusión-absorción (Ecuación 2):
-> $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0$$
-> aplicando condiciones de frontera de **Dirichlet** fijas en la fuente emisora y absorbentes nulas en el borde exterior.»
+---
 
-### Minuto 2:00 – 3:10 | Metodología en Diferencias Finitas y Método SOR
-> «Para resolver esta ecuación diferencial en nuestro software **SimuNet Física**, discretizamos el recinto de $12\text{ m} \times 12\text{ m}$ en una malla de $24 \times 24$ nodos ($h = 0.5\text{ m}$). Expandiendo el operador Laplaciano por series de Taylor de segundo orden, obtenemos el esquema en **Diferencias Finitas de 5 puntos** (Ecuación 3), donde cada nodo es el promedio de sus 4 vecinos ortogonales multiplicado por el factor de transmisión $(1 - \alpha_{i,j})$ del material.  
-> El sistema acoplado se resuelve iterativamente comparando **Jacobi**, **Gauss-Seidel** y **Sobre-Relajación Sucesiva (SOR, Ecuación 4)**:
-> $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}}$$
-> hasta que la norma infinito del residuo cumple $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$.»
+### Guion Detallado Bloque por Bloque (Qué Señalar en el Póster y Qué Decir)
 
-### Minuto 3:10 – 4:15 | Resultados Físicos, Jaula de Faraday y Validación Analítica
-> «En la **Figura 1** del póster observamos tres resultados físicos fundamentales:  
-> 1. Al comparar **(a) $2.4\text{ GHz}$** frente a **(b) $5.0\text{ GHz}$** en el mismo recinto de concreto, comprobamos que la banda de $2.4\text{ GHz}$ logra mayor penetración dieléctrica debido a su mayor longitud de onda ($12.5\text{ cm}$ vs $6.0\text{ cm}$), mientras que $5.0\text{ GHz}$ sufre $8.5\text{ dB}$ adicionales de absorción.  
-> 2. En la **Figura 1(c)** verificamos el caso límite de **Jaula de Faraday** ($\sigma = 3.5\times 10^7\text{ S/m}$): como la profundidad pelicular es $\delta \approx 1.3\,\mu\text{m}$, el recinto metálico confina la onda y anula el campo eléctrico exterior ($< 1\text{ mV/m}$).  
-> 3. En la **Figura 2(a)** validamos el perfil radial numérico contra el modelo analítico internacional **ITU-R P.1238**, obteniendo una correlación $R^2 = 0.978$ y un error cuadrático medio $\text{RMSE} = 1.84\text{ dB}$. Y en la **Figura 2(b)** y **Tabla 2**, demostramos que **SOR ($\omega = 1.45$)** converge en solo $66$ iteraciones ($2.8\text{ ms}$), reduciendo en un **$73.7\%$** el costo computacional frente a Jacobi ($251$ iteraciones).»
+#### PASO 1: Encabezado, Título y Resumen (Tiempo: `0:00 – 0:45`)
+- **📍 Qué señalar en el póster:** Señala la franja superior del póster (el título y el recuadro de Resumen).
+- **💡 Idea clave:** Presentarte con seguridad, mencionar a la profesora tutora y dejar claro que el proyecto es de **Física Electromagnética Computacional**, no solo de informática.
+- **🗣️ Qué decir:**
+  > «Buenos días, estimado jurado. Mi nombre es **Juan David Conde Duarte**, estudiante de Ingeniería de Sistemas, y presento el proyecto titulado **“Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos”**, desarrollado bajo la tutoría de la profesora **Gladys Liliana Bautista Wilches** en la asignatura de Electromagnetismo, en la modalidad **Computacional**.  
+  > Como se sintetiza en el **Resumen** superior del póster, este trabajo resuelve numéricamente cómo se propaga y se atenúa una onda electromagnética en las bandas **UHF de $2.4\text{ GHz}$** (con longitud de onda $\lambda = 12.5\text{ cm}$) y **SHF de $5.0\text{ GHz}$** ($\lambda = 6.0\text{ cm}$) cuando interactúa con muros dieléctricos y conductores dentro de una edificación.»
 
-### Minuto 4:15 – 5:00 | Conclusiones y Demostración en Vivo
-> «En conclusión, el modelo en diferencias finitas con relajación SOR permite cuantificar con rigor físico y en tiempo real la potencia recibida, el Vector de Poynting y el campo eléctrico eficaz en geometrías heterogéneas reales. Aquí en pantalla pueden observar el simulador interactivo donde podemos cambiar la frecuencia, el material de los muros o activar la Jaula de Faraday y ver al instante todas las magnitudes electromagnéticas. Muchas gracias y quedo atento a sus preguntas.»
+---
+
+#### PASO 2: Columna Izquierda — 1. Introducción y Motivación (Tiempo: `0:45 – 1:20`)
+- **📍 Qué señalar en el póster:** Señala el **Bloque 1 (Introducción y motivación)** arriba a la izquierda.
+- **💡 Idea clave:** Explicar **el problema físico** (la onda pierde energía por dos causas: porque se abre en el espacio y porque los muros la absorben) y **el objetivo**.
+- **🗣️ Qué decir:**
+  > «Pasando al **primer bloque de Introducción y Motivación**, cuando una onda electromagnética viaja dentro de un recinto cerrado, su energía disminuye por dos fenómenos físicos simultáneos: primero, por la **divergencia geométrica** del frente de onda al alejarse de la fuente; y segundo, por la **absorción dieléctrica y disipación óhmica** al atravesar paredes con permitividad relativa $\varepsilon_r$ y conductividad eléctrica $\sigma$.  
+  > Las fórmulas analíticas clásicas de espacio libre sólo sirven en el vacío sin obstáculos. Por eso, nuestro **objetivo general** fue modelar y validar numéricamente en 2D la potencia recibida $P_{\text{rx}}$, el **Vector de Poynting** $\langle S \rangle$ y el **campo eléctrico eficaz** $E_{\text{rms}}$ usando el método de Diferencias Finitas y Sobre-Relajación Sucesiva (SOR).»
+
+---
+
+#### PASO 3: Columna Izquierda — 2. Marco Teórico y Ecuaciones (1) y (2) (Tiempo: `1:20 – 2:15`)
+- **📍 Qué señalar en el póster:** Señala el **Bloque 2 (Marco teórico / Modelo físico)** y apunta directamente a la **Ecuación (1)** y luego a la **Ecuación (2)**.
+- **💡 Idea clave:** Explicar qué significa cada letra de la Ecuación (1) (Poynting y campo eléctrico) y de la Ecuación (2) (la ecuación diferencial parcial en 2D).
+- **🗣️ Qué decir:**
+  > «En el **segundo bloque, Marco Teórico**, formulamos las dos ecuaciones físicas que gobiernan nuestro simulador:  
+  > En la **Ecuación (1)** relacionamos las magnitudes electromagnéticas en cada punto del aire, cuya impedancia intrínseca es **eta sub cero** ($\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$):
+  > $$\langle S \rangle = \frac{E_{\text{rms}}^2}{\eta_0} = \frac{4\pi\,P_{\text{rx}}}{\lambda^2} \implies E_{\text{rms}} = \sqrt{\frac{4\pi\,\eta_0\,P_{\text{rx}}}{\lambda^2}}, \qquad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0}$$
+  > Aquí, $\langle S \rangle$ es la magnitud media temporal del **Vector de Poynting** en $\text{W/m}^2$ (que mide cuánta potencia electromagnética cruza cada metro cuadrado), $P_{\text{rx}}$ es la potencia captada por una antena isotrópica de área efectiva $A_{\text{eff}} = \lambda^2/(4\pi)$, $\lambda$ es la longitud de onda, $E_{\text{rms}}$ es el **campo eléctrico eficaz** en voltios por metro ($\text{V/m}$) y $H_{\text{rms}}$ es el **campo magnético eficaz** en amperios por metro ($\text{A/m}$).  
+  > Cuando la onda atraviesa un muro, decae exponencialmente según la **Ley de Beer-Lambert** ($E(x) = E_0 e^{-\alpha x}$). Para calcular la distribución estacionaria de energía en todo el plano 2D, planteamos la **Ecuación (2)**, que es una ecuación diferencial parcial elíptica de difusión-absorción sobre la envolvente normalizada $u(x,y)$:
+  > $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0$$
+  > donde el Laplaciano $\nabla^2 u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}$ modela cómo se esparce espacialmente la energía en 2D y el término $-\kappa^2(x,y)u$ representa la absorción local en cada muro, aplicando **condiciones de frontera de Dirichlet** fijas en el emisor y absorbentes nulas ($u=0$) en el borde exterior.»
+
+---
+
+#### PASO 4: Columna Izquierda — 3. Descripción del Sistema y Tabla 1 (Tiempo: `2:15 – 2:45`)
+- **📍 Qué señalar en el póster:** Señala el **Bloque 3** y recorre con el dedo las filas de la **Tabla 1**.
+- **💡 Idea clave:** Mostrar que los materiales no son inventados, sino tomados de la norma internacional **ITU-R P.2040** con su permitividad $\varepsilon_r$ y conductividad $\sigma$.
+- **🗣️ Qué decir:**
+  > «En el **tercer bloque, Descripción del Sistema Modelado**, nuestro software **SimuNet Física** divide un recinto de $12\text{ m} \times 12\text{ m}$ en una malla de $24 \times 24$ nodos, donde cada celda mide $h = 0.5\text{ m}$.  
+  > En la **Tabla 1** parametrizamos cinco medios constructivos reales siguiendo la recomendación internacional **ITU-R P.2040**: desde el **aire** ($\varepsilon_r \approx 1, \sigma = 0$), pasando por dieléctricos con pérdidas crecientes como el **yeso** ($\varepsilon_r = 2.8, 3\text{ dB}$), el **ladrillo** ($\varepsilon_r = 4.5, 8\text{ dB}$) y el **concreto** ($\varepsilon_r = 6.5, \sigma = 0.085\text{ S/m}, 15\text{ dB}$), hasta llegar al **metal** ($\sigma = 3.5\times 10^7\text{ S/m}$), que actúa como conductor casi perfecto.»
+
+---
+
+#### PASO 5: Columna Izquierda — 4. Metodología Computacional y Ecuaciones (3) y (4) (Tiempo: `2:45 – 3:30`)
+- **📍 Qué señalar en el póster:** Señala el **Bloque 4 (Metodología computacional)** abajo a la izquierda, apuntando a la **Ecuación (3)** y la **Ecuación (4)**.
+- **💡 Idea clave:** Explicar cómo el computador resuelve la ecuación diferencial usando los 4 vecinos (Ec. 3) y por qué el método SOR con $\omega$ es tan rápido (Ec. 4).
+- **🗣️ Qué decir:**
+  > «En el **cuarto bloque, Metodología Computacional**, aproximamos las segundas derivadas del Laplaciano mediante series de Taylor de segundo orden, obteniendo el esquema en **Diferencias Finitas de 5 puntos** de la **Ecuación (3)**:
+  > $$u_{i,j}^{\text{GS}} = \big(1 - \alpha_{i,j}\big)\,\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4}$$
+  > Es decir, el potencial de cada celda $(i,j)$ es el promedio aritmético de sus 4 celdas vecinas ortogonales multiplicado por el factor de transmisión $(1 - \alpha_{i,j})$ del material.  
+  > Para resolver este sistema de ecuaciones acopladas en tiempo real, implementamos y comparamos Jacobi, Gauss-Seidel y **Sobre-Relajación Sucesiva (SOR)** en la **Ecuación (4)**:
+  > $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}}$$
+  > donde $(k)$ es la iteración anterior, $(k+1)$ es la nueva iteración y **omega** ($\omega \in (1,2)$) es el factor de sobre-relajación que extrapola el paso de Gauss-Seidel hasta que el error máximo cumple $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$.»
+
+---
+
+#### PASO 6: Columna Derecha — 5. Resultados: Figura 1, Figura 2 y Tabla 2 (Tiempo: `3:30 – 4:30`)
+- **📍 Qué señalar en el póster:** Pasa a la **Columna Derecha**, señalando en orden **Figura 1(a)**, **Figura 1(b)**, **Figura 1(c)**, luego **Figura 2(a)**, **Figura 2(b)** y finalmente la **Tabla 2**.
+- **💡 Idea clave:** Este es el corazón de tu calificación: demostrar 3 resultados físicos reales ($2.4$ vs $5.0\text{ GHz}$, Jaula de Faraday y validación ITU-R) y 1 resultado numérico (SOR es $73.7\%$ más rápido).
+- **🗣️ Qué decir:**
+  > «Pasando a la columna derecha, en el **Bloque 5 de Resultados y Discusión**, la **Figura 1** muestra los mapas bidimensionales de potencia y campo eléctrico:  
+  > 1. Al comparar la **Figura 1(a) en $2.4\text{ GHz}$** con la **Figura 1(b) en $5.0\text{ GHz}$** frente a los mismos muros de concreto, demostramos físicamente que la onda de **$2.4\text{ GHz}$ penetra mucho mejor los obstáculos** porque su longitud de onda es el doble de grande ($\lambda = 12.5\text{ cm}$ frente a $6.0\text{ cm}$), mientras que en $5.0\text{ GHz}$ la absorción dieléctrica del concreto aumenta en $8.5\text{ dB}$ adicionales, dejando zonas de sombra más marcadas.  
+  > 2. En la **Figura 1(c)** comprobamos el fenómeno de **Jaula de Faraday**: cuando encerramos la fuente en paredes metálicas ($\sigma = 3.5\times 10^7\text{ S/m}$), la profundidad de penetración pelicular es de apenas $\delta = \sqrt{2/(\omega\mu\sigma)} \approx 1.3\,\mu\text{m}$. Por tanto, la onda no puede atravesar el metal y el campo eléctrico afuera cae a menos de $1\text{ mV/m}$ ($-85\text{ dBm}$, piso de ruido).  
+  > 3. Debajo, en la **Figura 2(a)**, validamos nuestros resultados numéricos contra el modelo analítico internacional **ITU-R P.1238**, logrando un coeficiente de correlación **$R^2 = 0.978$** y un error cuadrático medio **$\text{RMSE} = 1.84\text{ dB}$**, observándose claramente el escalón de caída de $-14\text{ dB}$ justo a los $2\text{ m}$ donde se ubica el muro de concreto.  
+  > 4. Y en la **Figura 2(b)** y la **Tabla 2**, demostramos que los tres métodos (Jacobi, Gauss-Seidel y SOR) llegan exactamente al mismo estado físico estacionario a $3\text{ m}$ ($P_{\text{rx}} = -56.5\text{ dBm}$, Vector de Poynting $\langle S \rangle = 1.80\,\mu\text{W/m}^2$ y campo eléctrico $E_{\text{rms}} = 0.0260\text{ V/m}$), pero **SOR con $\omega = 1.45$ converge en sólo $66$ iteraciones ($2.8\text{ ms}$)**, reduciendo en un **$73.7\%$** las $251$ iteraciones de Jacobi.»
+
+---
+
+#### PASO 7: Columna Derecha — 6. Conclusiones y Demostración en Vivo (Tiempo: `4:30 – 5:00`)
+- **📍 Qué señalar en el póster:** Señala el **Bloque 6 (Conclusiones)** abajo a la derecha y luego muestra la pantalla del computador con la aplicación abierta.
+- **💡 Idea clave:** Cerrar con contundencia mencionando la validación física, la eficiencia de SOR y las limitaciones/trabajo futuro (que es uno de los puntos evaluados en la guía de la Feria).
+- **🗣️ Qué decir:**
+  > «Para finalizar, en el **Bloque 6 de Conclusiones**, destacamos tres puntos:  
+  > Primero, formulamos e implementamos con éxito un modelo en Diferencias Finitas que cuantifica en cada punto del espacio la potencia recibida, el Vector de Poynting y el campo eléctrico eficaz $E_{\text{rms}}$, validado frente a la norma ITU-R P.1238 con un $97.8\%$ de correlación.  
+  > Segundo, la Sobre-Relajación Sucesiva ($\text{SOR}, \omega = 1.45$) aceleró la convergencia $3.8$ veces respecto a Jacobi, permitiendo simulación interactiva en tiempo real.  
+  > Y tercero, como alcance y proyección futura, dado que nuestro modelo estacionario 2D calcula la envolvente media de energía sin interferencia destructiva de fase, el siguiente paso natural es extenderlo a la ecuación de Helmholtz compleja con fronteras absorbentes PML.  
+  > Aquí en el computador tengo el simulador en ejecución por si desean que probemos en vivo cualquier cambio de frecuencia, material o método numérico. Muchas gracias por su atención.»
