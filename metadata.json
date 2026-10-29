@@ -1,8 +1,7 @@
 {
-  "name": "SIMNET WiFi Mesh Simulator",
-  "description": "Simulador interactivo de redes y malla WiFi en entornos digitales 2D para optimizar la ubicación de enrutadores usando algoritmos numéricos.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "name": "SimuNet Física — Modelado Electromagnético UHF/SHF",
+  "description": "Simulador computacional en diferencias finitas (Jacobi, Gauss-Seidel y SOR) para modelar la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos.",
+  "author": "Juan David Conde Duarte — Universidad de Pamplona",
+  "advisor": "Gladys Liliana Bautista Wilches — Departamento de Física",
+  "version": "1.0.0"
 }

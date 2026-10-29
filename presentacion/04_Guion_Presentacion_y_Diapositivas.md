@@ -8,7 +8,7 @@
 
 ## Parte 1: Enciclopedia de Todas las Fórmulas del Proyecto (Origen, Deducción, Resolución y Uso en el Código)
 
-Esta sección te prepara para responder **cualquier pregunta de pizarrón** que te haga un jurado de Física o Matemáticas sobre de dónde sale cada ecuación, cómo se despeja y cómo está programada en `SimuNet Física`.
+Esta sección documenta de forma rigurosa el origen físico, la deducción algebraica, la resolución numérica y la implementación computacional exacta de cada una de las 10 ecuaciones empleadas en `SimuNet Física`.
 
 ---
 

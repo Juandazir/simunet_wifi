@@ -1,72 +1,51 @@
-# SimuNet WiFi
+# SimuNet Física — Modelado Electromagnético UHF/SHF
 
-Simulador educativo de cobertura WiFi 2D basado en la **ecuación de Laplace**, desarrollado para la Universidad de Pamplona.
+**Título del Proyecto:** *Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos*  
+**Autor:** Juan David Conde Duarte — Programa de Ingeniería de Sistemas, Universidad de Pamplona  
+**Docente Tutora:** Gladys Liliana Bautista Wilches — Asignatura: Electromagnetismo, Departamento de Física  
 
-Resuelve el campo electromagnético simplificado sobre una malla discreta usando métodos iterativos (**Jacobi**, **Gauss-Seidel**, **SOR**) y visualiza la intensidad de señal en dBm.
+Simulador computacional bidimensional basado en **Diferencias Finitas Centradas (5 puntos)** con condiciones de frontera de **Dirichlet**, resuelto mediante los métodos iterativos de **Jacobi**, **Gauss-Seidel** y **Sobre-Relajación Sucesiva (SOR)** para cuantificar la potencia recibida ($P_{\text{rx}}$ en $\text{dBm}$ y $\text{mW}$), la magnitud media del **Vector de Poynting** ($\langle S \rangle$ en $\mu\text{W/m}^2$), el **campo eléctrico eficaz** ($E_{\text{rms}}$ en $\text{V/m}$) y el **campo magnético eficaz** ($H_{\text{rms}}$ en $\text{mA/m}$) en las bandas de $2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$) y $5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$).
 
-## Características
+## Características Principales
 
-- Editor interactivo de planos (paredes con materiales, routers comerciales)
-- Simulación animada paso a paso o resolución instantánea
-- Comparativa de métodos numéricos con gráficas de convergencia
-- Optimización automática de ubicación del router
-- Guardado de diseños por usuario
-- Informes técnicos exportables (.txt / CSV)
-- Modo oscuro / claro
+- **Editor interactivo 2D** con materiales dieléctricos y conductores (Aire, Yeso, Ladrillo, Concreto y Metal / Jaula de Faraday según **ITU-R P.2040**).
+- **Fuentes de radiación UHF/SHF** con parámetros reales de potencia de transmisión ($P_{\text{tx}}$), ganancia ($G$) y $\text{PIRE}$.
+- **Comparativa de métodos numéricos** (Jacobi, Gauss-Seidel y SOR) y buscador empírico del factor de relajación óptimo $\omega_{\text{ópt}}$.
+- **Validación física analítica en tiempo real** frente al modelo internacional **ITU-R P.1238 / Log-Distancia Multi-Muro** ($\text{RMSE}$ en $\text{dB}$ y coeficiente $R^2$).
+- **Digitalizador de planos arquitectónicos** mediante luminancia perceptual **ITU-R BT.601** y optimización espacial de emisores con **K-Means**.
+- **Exportación de reportes técnicos** (`.txt`, `.csv`, `.png`).
 
 ## Requisitos
 
 - Node.js 18+
-- Clave API de Gemini (opcional, para el chat tutor)
 
-## Instalación
+## Instalación y Ejecución
 
 ```bash
 npm install
-cp .env.example .env
-```
-
-## Desarrollo
-
-```bash
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000)
+Abre en el navegador:
+- **Simulador Principal:** `http://localhost:3000`
+- **Presentación Interactiva Detallada:** `http://localhost:3000/presentacion/05_Presentacion_Interactiva_Feria_Fisica.html`
+- **Póster Científico 80×120 cm (Español):** `http://localhost:3000/presentacion/poster/Poster_Visual_80x120cm.html`
+- **Póster Científico 80×120 cm (Inglés):** `http://localhost:3000/presentacion/poster/Poster_Visual_80x120cm_EN.html`
 
-## Producción
+## Compilación para Producción
 
 ```bash
 npm run build
 npm start
 ```
 
-## Credenciales de demostración
+## Credenciales de Demostración
 
 | Usuario | Contraseña | Rol |
 |---------|-----------|-----|
 | `admin_pamplona` | `admin123` | Administrador |
 | `estudiante_pamplona` | *(sin contraseña)* | Estudiante |
 
-Los nuevos registros se crean siempre como **estudiante**.
-
-## Arquitectura (5 capas)
-
-Ver documentación completa en [ARQUITECTURA.md](./ARQUITECTURA.md).
-
-```
-src/
-├── capa1-dominio/      # Tipos, modelos, presets
-├── capa2-interfaz/     # App.tsx + componentes React
-├── capa3-aplicacion/  # Hooks + traducción i18n
-├── capa4-numerico/     # Solver Laplace + Jacobi/GS/SOR
-└── capa5-servicios/    # Auth, reportes, conversiones dBm
-```
-
-## Modelo físico
-
-Este simulador usa Laplace 2D como **aproximación educativa**. No sustituye herramientas RF profesionales (ray-tracing, modelos log-distance, multipath).
-
 ## Licencia
 
-Proyecto académico — Universidad de Pamplona © 2026
+Proyecto académico e investigativo — Universidad de Pamplona © 2026

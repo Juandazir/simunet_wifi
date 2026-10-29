@@ -1,84 +1,55 @@
-# Arquitectura de 5 Capas — SimuNet WiFi
+# Arquitectura de 5 Capas — SimuNet Física
 
 ```
 src/
 ├── main.tsx                    # Punto de arranque React
 ├── index.css                   # Estilos globales
-│
-├── capa1-dominio/              # CAPA 1 — Dominio
-│   ├── types.ts                # Entidades y tipos del negocio
-│   ├── modelos/
-│   │   ├── routers.ts          # Catálogo de hardware WiFi
-│   │   └── materiales.ts       # Propiedades de materiales
-│   ├── presets.ts              # Perfiles, entornos y utilidades
+├── types.ts                    # CAPA 1 — Dominio (Entidades, modelos, métricas EM)
+├── interfaz.tsx                # CAPA 2 — Interfaz principal y vistas interactivas
+├── components/
+│   ├── NetworkGrid.tsx         # Lienzo 2D de campo electromagnético e inspector
+│   ├── ControlPanel.tsx        # Controles de frecuencia, materiales y métodos
+│   └── GraphPanel.tsx          # Gráficas de convergencia, omega y validación ITU-R
+├── traduccion.ts               # CAPA 3 — Digitalización ITU-R BT.601 e i18n (es/en)
+├── controlador.ts              # CAPA 4 — Motor de malla Dirichlet y validación física
+├── metodos/
+│   ├── jacobi.ts               # Esquema iterativo de Jacobi
+│   ├── gauss-seidel.ts         # Esquema iterativo de Gauss-Seidel
+│   ├── sor.ts                  # Esquema de Sobre-Relajación Sucesiva (SOR)
 │   └── index.ts
-│
-├── capa2-interfaz/             # CAPA 2 — Interfaz (Presentación)
-│   ├── App.tsx                 # Composición de la aplicación
-│   ├── componentes/            # Componentes React visuales
-│   │   ├── NetworkGrid.tsx
-│   │   ├── ControlPanel.tsx
-│   │   ├── GraphPanel.tsx
-│   │   ├── AuthPortal.tsx
-│   │   ├── ChatAssistant.tsx
-│   │   ├── PhysicsDisclaimer.tsx
-│   │   └── SavedNetworksPanel.tsx
-│   └── index.ts
-│
-├── capa3-aplicacion/           # CAPA 3 — Aplicación (Orquestación)
-│   ├── hooks/
-│   │   ├── useAuth.ts          # Sesión y persistencia de usuario
-│   │   ├── useSimulation.ts    # Ciclo de simulación
-│   │   └── useRouterOptimization.ts
-│   ├── traduccion.ts           # i18n (es/en)
-│   └── index.ts
-│
-├── capa4-numerico/             # CAPA 4 — Motor Numérico
-│   ├── solver.ts               # Malla Laplace, pasos e instantáneo
-│   ├── metodos/
-│   │   ├── jacobi.ts
-│   │   ├── gauss-seidel.ts
-│   │   ├── sor.ts
-│   │   └── index.ts
-│   └── index.ts
-│
-└── capa5-servicios/            # CAPA 5 — Servicios Transversales
-    ├── servicios.ts            # dBm, calidad de señal, CSV
-    ├── auth.ts                 # Hash de contraseñas
-    ├── reportGenerator.ts      # Informes técnicos .txt
-    └── index.ts
+└── servicios.ts                # CAPA 5 — Conversión dBm, Vector de Poynting y campos E/H
 ```
 
 ## Reglas de dependencia
 
 | Capa | Puede importar de |
 |------|-------------------|
-| 1 — Dominio | *(ninguna otra capa)* |
-| 2 — Interfaz | 1, 3, 4, 5 |
-| 3 — Aplicación | 1, 4, 5 |
-| 4 — Numérico | 1, 5 |
-| 5 — Servicios | 1 |
+| 1 — Dominio (`types.ts`) | *(ninguna otra capa)* |
+| 2 — Interfaz (`interfaz.tsx`, `components/`) | 1, 3, 4, 5 |
+| 3 — Aplicación (`traduccion.ts`) | 1 |
+| 4 — Numérico (`controlador.ts`, `metodos/`) | 1, 5 |
+| 5 — Servicios (`servicios.ts`) | 1 |
 
-**Prohibido:** que capas inferiores importen de capas superiores (ej. capa4 no importa capa2).
+**Prohibido:** que capas inferiores importen de capas superiores.
 
 ## Flujo de datos
 
 ```
-Usuario (Capa 2)
+Usuario (Capa 2: Interfaz)
     ↓ eventos
-Hooks (Capa 3)
+Controlador y Digitalizador (Capas 3 y 4)
     ↓ invoca
-Solver + Métodos (Capa 4)
-    ↓ usa tipos/materiales
+Métodos Iterativos: Jacobi / Gauss-Seidel / SOR (Capa 4)
+    ↓ usa tipos/materiales ITU-R P.2040
 Dominio (Capa 1)
-    ↓ convierte/exporta
-Servicios (Capa 5)
+    ↓ calcula dBm, Vector de Poynting, E_rms, H_rms y CSV
+Servicios Electromagnéticos (Capa 5)
 ```
 
 ## Responsabilidad por capa
 
-- **Capa 1:** Qué es el sistema (celdas, routers, materiales, usuarios)
-- **Capa 2:** Cómo se ve e interactúa el usuario
-- **Capa 3:** Cuándo y cómo se coordinan las operaciones
-- **Capa 4:** Cómo se resuelve matemáticamente Laplace
-- **Capa 5:** Servicios auxiliares reutilizables (auth, reportes, conversiones)
+- **Capa 1:** Qué es el sistema (celdas, routers UHF/SHF, materiales dieléctricos, métricas electromagnéticas).
+- **Capa 2:** Cómo se ve e interactúa el usuario con la malla 2D y las gráficas científicas.
+- **Capa 3:** Procesamiento de imágenes de planos (ITU-R BT.601) y diccionarios de idioma.
+- **Capa 4:** Discretización en Diferencias Finitas, condiciones de Dirichlet, métodos iterativos y validación analítica ITU-R P.1238.
+- **Capa 5:** Cálculos físicos electromagnéticos ($P_{\text{rx}}$, $\langle S \rangle$, $E_{\text{rms}}$, $H_{\text{rms}}$) y exportación de reportes.

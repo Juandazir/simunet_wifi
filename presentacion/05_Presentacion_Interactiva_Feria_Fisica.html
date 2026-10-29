@@ -539,7 +539,7 @@ attenuation = MATERIALS[wall.material].attenuation * multiplier * (cellSize / 0.
         </div>
 
         <div class="formula-card">
-          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-2">2. ¿Qué responder si el jurado pregunta: "Por qué no usaron Helmholtz oscilatorio"?</span>
+          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-2">2. Justificación Física: EDP Elíptica de Envolvente vs. Ecuación de Helmholtz Oscilatoria</span>
           <p class="text-xs text-slate-300 leading-relaxed">
             La ecuación de Helmholtz oscilatoria ($\nabla^2 E + k^2 E = 0$) exige al menos $10\text{ nodos}$ por longitud de onda ($\Delta x \le \lambda/10 = 6\text{ mm}$ a $5\text{ GHz}$), lo que en un edificio requeriría millones de nodos. En cambio, al modelar la <strong>envolvente estacionaria media de intensidad energética $u(x,y)$</strong> mediante la EDP elíptica difusivo-absorbente ($\nabla^2 u - \kappa^2 u = 0$), capturamos con altísima precisión ($R^2 = 0.978$) el decaimiento con la distancia y la atenuación por muros en mallas de $h = 0.5\text{ m}$ en menos de $3\text{ milisegundos}$.
           </p>
@@ -587,7 +587,7 @@ if (router) {<br/>
   <section class="slide" id="slide-8">
     <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
       <h2 class="text-xl md:text-2xl font-black text-indigo-400">8. Deducción Matemática Completa: De la EDP al Esténcil de 5 Puntos (Taylor)</h2>
-      <span class="text-xs font-mono text-slate-400">Demostración de Pizarrón por si el Jurado pide Deducir la Fórmula</span>
+      <span class="text-xs font-mono text-slate-400">Demostración Analítica por Expansión en Polinomios de Taylor</span>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-7xl mx-auto w-full my-auto">

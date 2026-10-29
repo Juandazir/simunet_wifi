@@ -8,7 +8,7 @@ Bienvenido a **SimuNet WiFi**, el simulador educativo bidimensional diseñado pa
 
 Para comenzar a utilizar SimuNet WiFi, necesitas iniciar sesión. Existen dos perfiles principales:
 
-- **Estudiante:** Acceso completo a las herramientas de simulación, tutoría de inteligencia artificial y almacenamiento de mapas. *(Si eres nuevo, puedes registrarte directamente. Por defecto obtendrás este rol).*
+- **Estudiante:** Acceso completo a las herramientas de simulación, validación analítica electromagnética y almacenamiento de mapas. *(Si eres nuevo, puedes registrarte directamente. Por defecto obtendrás este rol).*
 - **Administrador:** Además de las herramientas de simulación, posee capacidades adicionales para gestionar usuarios y escenarios globales.
 
 *Nota: Una vez iniciada la sesión, tus proyectos (mapas de paredes y routers) se guardarán automáticamente bajo tu usuario.*

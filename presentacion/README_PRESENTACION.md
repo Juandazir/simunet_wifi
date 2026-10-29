@@ -17,20 +17,20 @@
    - **3ª Revisión (Calificación Final):** Tablas comparativas de convergencia (Jacobi vs. Gauss-Seidel vs. SOR), resultados en $2.4\text{ GHz}$ y $5.0\text{ GHz}$, Jaula de Faraday y validación frente al modelo analítico ITU-R P.1238 ($R^2 = 0.978$, $\text{RMSE} = 1.84\text{ dB}$).
 
 2. **[`02_Carta_Aval_y_Permiso_Academico.md`](./02_Carta_Aval_y_Permiso_Academico.md)**  
-   - **Carta de Aval Docente** lista para imprimir y firmar por la profesora **Gladys Liliana Bautista Wilches** y **Juan David Conde Duarte** (requisito obligatorio para el $100\%$ del segundo parcial).
-   - **Formato de Solicitud de Permiso Académico** para presentar ante los demás docentes el día del evento.
+   - **Carta de Aval Docente** para impresión y firma de la profesora **Gladys Liliana Bautista Wilches** y **Juan David Conde Duarte** (requisito para el $100\%$ del segundo parcial).
+   - **Formato de Solicitud de Permiso Académico** para presentar ante los docentes de otras asignaturas el día del evento.
 
 3. **[`03_Documento_Estudio_Profundo_Electromagnetismo.md`](./03_Documento_Estudio_Profundo_Electromagnetismo.md)**  
-   Manual de estudio intensivo diseñado para dominar toda la física del proyecto:
-   - Qué sí exponer y qué no exponer para blindar tu defensa ante el jurado de Física.
-   - Explicación paso a paso desde las ecuaciones de Maxwell, el Vector de Poynting $\langle S \rangle$, la impedancia del vacío $\eta_0 = 376.73\,\Omega$, el campo eléctrico $E_{\text{rms}}$ ($\text{V/m}$), el efecto pelicular $\delta$ en la Jaula de Faraday y la discretización en Diferencias Finitas.
-   - **Respuestas exactas a las 5 preguntas obligatorias de la defensa oral** de la guía oficial de la Feria de la Física.
+   Memoria técnica y fundamentación físico-matemática del proyecto:
+   - Alcance físico-matemático y delimitación de módulos experimentales frente al núcleo de validación.
+   - Deducción paso a paso desde las ecuaciones de Maxwell, el Vector de Poynting $\langle S \rangle$, la impedancia del vacío $\eta_0 = 376.73\,\Omega$, el campo eléctrico $E_{\text{rms}}$ ($\text{V/m}$), el efecto pelicular $\delta$ en la Jaula de Faraday y la discretización en Diferencias Finitas.
+   - **Desarrollo de las 5 preguntas de sustentación oral** de la guía oficial de la Feria de la Física.
 
 4. **[`04_Guion_Presentacion_y_Diapositivas.md`](./04_Guion_Presentacion_y_Diapositivas.md)**  
-   Guion estructurado minuto a minuto ($5\text{ minutos}$), diccionario completo de términos físicos/matemáticos/computacionales y explicación paso a paso de los 6 procesos internos del software.
+   Compendio de las 10 fórmulas físicas, numéricas y computacionales del proyecto (origen, deducción, resolución e implementación en el código fuente) junto con el guion cronometrado ($5\text{ minutos}$) de sustentación oral.
 
 5. **[`05_Presentacion_Interactiva_Feria_Fisica.html`](./05_Presentacion_Interactiva_Feria_Fisica.html)**  
-   Presentación interactiva de 12 diapositivas en formato web (con ecuaciones renderizadas en $\LaTeX$/KaTeX y gráficas de alta resolución). Ábrela con doble clic en cualquier navegador y usa las flechas `⬅` / `➡` para navegar.
+   Presentación interactiva de 15 diapositivas en formato web (con ecuaciones renderizadas en $\LaTeX$/KaTeX y gráficas de alta resolución). Navegable mediante teclado (`⬅` / `➡`) o selector inferior.
 
 6. **Carpeta [`poster/`](./poster/) (Versiones completas en Español e Inglés)**  
    - **En Español:**
@@ -45,5 +45,5 @@
      - [`Poster_Texto_Completo_ES_EN.md`](./poster/Poster_Texto_Completo_ES_EN.md): Texto íntegro estructurado del póster tanto en español como en inglés.
 
 7. **Soportes Oficiales de Pago de Inscripción (Incluidos en esta carpeta):**
-   - **[`06_Soporte_Pago_Inscripcion_ZonaPagos_162327.pdf`](./06_Soporte_Pago_Inscripcion_ZonaPagos_162327.pdf):** Comprobante oficial de pago aprobado por ZonaPAGOS / Universidad de Pamplona (`\$30,000.00 COP`, No. pago `162327`, ID pago `2001022977651`, Ticket `200102297765162327`, Cód. Transacción PSE `762304788`).
+   - **[`06_Soporte_Pago_Inscripcion_ZonaPagos_162327.pdf`](./06_Soporte_Pago_Inscripcion_ZonaPagos_162327.pdf):** Comprobante oficial de pago aprobado por ZonaPAGOS / Universidad de Pamplona (`$30,000.00 COP`, No. pago `162327`, ID pago `2001022977651`, Ticket `200102297765162327`, Cód. Transacción PSE `762304788`).
    - **[`07_Liquidacion_Inscripcion_Unipamplona.pdf`](./07_Liquidacion_Inscripcion_Unipamplona.pdf):** Recibo de liquidación de inscripción de la Universidad de Pamplona.
