@@ -159,7 +159,70 @@ $$Y_{i,j} = 0.299\,R_{i,j} + 0.587\,G_{i,j} + 0.114\,B_{i,j} < T_{\text{umbral}}
 
 ---
 
-## Parte 2: Guion Cronometrado de 5 Minutos para la Defensa Oral frente al Póster y la App
+## Parte 2: Diccionario Maestro de Cada Letra, Símbolo y Variable del Proyecto
+
+Para comprender y explicar de inmediato qué significa cada letra de cada ecuación, a continuación se detallan **todas las letras griegas, letras latinas, subíndices y operadores matemáticos** utilizados en el proyecto, indicando cómo se leen, su nombre físico/matemático, su significado exacto, su unidad en el Sistema Internacional (SI) y su nombre en el código fuente.
+
+### 2.1 Todas las Letras Griegas Usadas en las Fórmulas
+
+| Letra / Símbolo | Cómo se lee (Nombre de la letra) | Nombre Físico o Matemático | Significado Detallado en el Proyecto | Unidad (SI) | Variable en el Código |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| $\alpha$, $\alpha_{i,j}$ | **Alfa** (minúscula) | Constante de atenuación / Coeficiente de absorción | Fracción de energía que absorbe un muro dieléctrico o conductor al paso de la onda. | $\text{Np/m}$ o adimensional | `attenuation` |
+| $\beta$ | **Beta** (minúscula) | Constante de fase | Cambio de fase en radianes por cada metro recorrido dentro de un material ($\gamma = \alpha + i\beta$). | $\text{rad/m}$ | — |
+| $\gamma$ | **Gamma** (minúscula) | Constante de propagación compleja | Combina la atenuación ($\alpha$) y la fase ($\beta$) en un medio con pérdidas: $\gamma = \alpha + i\beta$. | $\text{m}^{-1}$ | — |
+| $\delta$ | **Delta** (minúscula) | Profundidad pelicular (*Skin Depth*) | Distancia ($\delta = 1/\alpha \approx 1.3\,\mu\text{m}$ en metal) donde el campo cae al $36.8\%$, originando la **Jaula de Faraday**. | $\text{m}$ ($\mu\text{m}$) | — |
+| $\Delta x, \Delta y, \Delta u$ | **Delta** (mayúscula) | Incremento o diferencia discreta | Paso espacial entre nodos ($\Delta x = \Delta y = h = 0.5\text{ m}$) o salto de potencial entre iteraciones ($\Delta u$). | $\text{m}$ o adimensional | `cellSize`, `diff` |
+| $\varepsilon_0$ | **Épsilon sub cero** | Permitividad eléctrica del vacío | Capacidad intrínseca del vacío para permitir y polarizar campos eléctricos ($8.854\times 10^{-12}\text{ F/m}$). | $\text{F/m}$ | — |
+| $\varepsilon_r$ | **Épsilon sub r** | Permitividad relativa (Constante dieléctrica) | Cuántas veces más se polariza un material ($\varepsilon = \varepsilon_r\varepsilon_0$) respecto al vacío (concreto: $6.5$). | Adimensional | `relativePermittivity` |
+| $\varepsilon$ | **Épsilon** (minúscula) | Tolerancia de convergencia numérica | Umbral mínimo de error ($10^{-3}$ o $10^{-4}$) para detener las iteraciones cuando la malla se estabiliza. | Adimensional | `tolerance` |
+| $\eta_0$ | **Eta sub cero** | Impedancia intrínseca del espacio libre | Razón entre campo eléctrico y magnético en el aire ($\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega$). | $\Omega$ (Ohmios) | `ETA_0` |
+| $\kappa(x,y)$ | **Kappa** (minúscula) | Coeficiente espacial de absorción | Término sumidero continuo en la EDP estacionaria ($\nabla^2 u - \kappa^2 u = 0$). | $\text{m}^{-1}$ | — |
+| $\lambda$ | **Lambda** (minúscula) | Longitud de onda | Distancia física entre dos crestas consecutivas de la onda ($\lambda = c/f$: $12.5\text{ cm}$ en $2.4\text{ GHz}$; $6.0\text{ cm}$ en $5.0\text{ GHz}$). | $\text{m}$ o $\text{cm}$ | `wavelengthM`, `wavelengthCm` |
+| $\mu_0$ | **Mu sub cero** | Permeabilidad magnética del vacío | Capacidad del espacio libre para sostener campos magnéticos ($4\pi \times 10^{-7}\text{ H/m}$). | $\text{H/m}$ | — |
+| $\mu_k = (\mu_k^x, \mu_k^y)$ | **Mu sub k** | Centroide espacial del clúster $k$ | Coordenada promedio del grupo de celdas $C_k$ donde el algoritmo K-Means ubica el router $k$. | Coordenada de malla | `centroids[k]` |
+| $\pi$ | **Pi** (minúscula) | Constante geométrica circular | Razón entre circunferencia y diámetro ($\approx 3.14159$); aparece en $4\pi$ por la propagación esférica. | Adimensional | `Math.PI` |
+| $\rho(\mathcal{L}_\omega), \rho_{\text{J}}$ | **Rho** (minúscula) | Radio espectral de la matriz de iteración | Mayor valor propio de la matriz iterativa. Si $\rho < 1$, el método converge; cuanto menor es $\rho$, más rápido converge. | Adimensional | — |
+| $\sigma$ | **Sigma** (minúscula) | Conductividad eléctrica del material | Facilidad con la que el muro conduce corrientes que disipan la onda en calor por efecto Joule ($\sigma E^2$). | $\text{S/m}$ (Siemens/m) | `conductivitySm` |
+| $\sum$ | **Sigma** (mayúscula) | Operador sumatoria | Suma ordenada de términos (pérdidas de varios muros $\sum L_{\text{muro},k}$ o suma de errores cuadráticos). | Operador | `reduce` / bucle `for` |
+| $\omega, \omega_{\text{ópt}}$ | **Omega** (minúscula) | Factor de relajación (SOR) / Frecuencia angular | En SOR: peso de extrapolación $\omega \in (1,2)$ ($\omega_{\text{ópt}} \approx 1.45$). En ondas: $\omega = 2\pi f$ ($\text{rad/s}$). | Adimensional / $\text{rad/s}$ | `omega`, `optimalOmega` |
+| $\Omega, \partial\Omega$ | **Omega** (mayúscula) | Dominio espacial ($\Omega$) / Borde ($\partial\Omega$) / Ohmio | Representa el área 2D de la habitación ($\Omega$), sus paredes exteriores ($\partial\Omega$) o la unidad de impedancia ($\Omega$). | $\text{m}^2$ / $\Omega$ | `isBoundary` |
+
+---
+
+### 2.2 Todas las Letras Latinas, Subíndices y Operadores Matemáticos
+
+| Variable / Símbolo | Cómo se lee | Nombre Físico o Matemático | Significado Detallado en el Proyecto | Unidad (SI) | Variable en el Código |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| $A_{\text{eff}}$ | **A mayúscula sub eff** | Apertura o área efectiva isotrópica | Área equivalente con la que una antena receptora ideal intercepta el flujo de Poynting ($A_{\text{eff}} = \lambda^2 / 4\pi$). | $\text{m}^2$ | `aEff` |
+| $\vec{B}$ | **Vector B mayúscula** | Densidad de flujo magnético (Inducción) | Campo magnético total vinculado a $\vec{H}$ mediante $\vec{B} = \mu\vec{H}$ en las leyes de Faraday y Ampère-Maxwell. | $\text{T}$ (Teslas) | — |
+| $c$ | **c minúscula** | Velocidad de la luz en el vacío | Velocidad de propagación de toda onda electromagnética en el vacío ($c = 1/\sqrt{\mu_0\varepsilon_0} \approx 2.9979\times 10^8\text{ m/s}$). | $\text{m/s}$ | `C_LIGHT` |
+| $C_k, \|C_k\|$ | **C mayúscula sub k** | Clúster espacial $k$ y su cardinalidad | Conjunto de celdas libres asignadas al router $k$ en K-Means, y número total de celdas en dicho grupo ($\|C_k\|$). | Celdas | `clusters[k]` |
+| $d, d_0, d_m$ | **d minúscula / d sub cero** | Distancia radial euclidiana | Distancia en línea recta desde el router hasta la celda ($d$), distancia de referencia ($d_0 = 0.5\text{ m}$) y anillo radial $m$. | $\text{m}$ | `distM`, `d0` |
+| $\vec{E}, E_0, E_{\text{rms}}$ | **E mayúscula / E sub rms** | Campo eléctrico (vector, pico y eficaz) | Fuerza eléctrica de la onda por unidad de carga; $E_{\text{rms}} = E_0/\sqrt{2} = \sqrt{\eta_0\langle S\rangle}$ es el valor eficaz medible. | $\text{V/m}$ | `electricFieldVm` |
+| $e$ | **e minúscula** | Número de Euler ($\approx 2.71828$) | Base del decaimiento exponencial de la onda al atravesar un espesor $x$ de material ($E(x) = E_0 e^{-\alpha x}$). | Adimensional | `Math.exp` |
+| $f, T$ | **f minúscula / T mayúscula** | Frecuencia de oscilación y Periodo | Ciclos por segundo de la onda ($2.4\text{ GHz}$ ó $5.0\text{ GHz}$) y tiempo que dura un ciclo ($T = 1/f$). | $\text{Hz}$ ($\text{s}^{-1}$) y $\text{s}$ | `frequency`, `freqHz` |
+| $G$ | **G mayúscula** | Ganancia directiva de la antena | Capacidad de la antena para concentrar la potencia radiada respecto a un radiador isotrópico ideal. | $\text{dBi}$ | `antennaGainDbi` |
+| $\vec{H}, H_0, H_{\text{rms}}$ | **H mayúscula / H sub rms** | Intensidad de campo magnético (vector y eficaz) | Componente magnética de la onda electromagnética; su valor eficaz es $H_{\text{rms}} = E_{\text{rms}}/\eta_0$. | $\text{A/m}$ o $\text{mA/m}$ | `magneticFieldMam` |
+| $h$ | **h minúscula** | Tamaño de paso espacial de la malla | Longitud física del lado de cada celda cuadrada en la discretización en Diferencias Finitas ($0.5\text{ m}$). | $\text{m}$ | `cellSize` |
+| $i, j$ | **i, j minúsculas** | Índices discretos de fila y columna | Posición entera de una celda en la matriz ($i$ recorre las filas verticales, $j$ recorre las columnas horizontales). | Enteros | `i, j` o `r, c` |
+| $(k), (k+1)$ | **Superíndice k entre paréntesis** | Índice del paso de iteración numérica | Indica si el valor de la celda corresponde al barrido anterior $(k)$ (`currentGrid`) o al barrido nuevo $(k+1)$ (`nextGrid`). | Iteración | `iterations` |
+| $L_{\text{muro},k}, L_{\text{borde}}$ | **L mayúscula sub muro / borde** | Pérdida por penetración en muros y borde | Caída de potencia en decibelios ($\text{dB}$) al atravesar la pared $k$ ($3\text{ dB}$ yeso, $8\text{ dB}$ ladrillo, $15\text{ dB}$ concreto). | $\text{dB}$ | `totalWallLossDb` |
+| $N, M$ | **N y M mayúsculas** | Tamaño de la malla ($N$) y muestras radiales ($M$) | $N$: cantidad de celdas por lado ($24\times 24$); $M$: cantidad de distancias radiales evaluadas en la validación ITU-R. | Enteros | `gridSize`, `points.length` |
+| $n$ | **n minúscula** | Exponente de pérdida de propagación | Velocidad con que decae la potencia con la distancia en interiores ($n = 2.25$ en $2.4\text{ GHz}$; $n = 2.45$ en $5.0\text{ GHz}$). | Adimensional | `pathLossExponent` |
+| $\text{PIRE}$ ($\text{EIRP}$) | **Sigla PIRE** | Potencia Isotrópica Radiada Equivalente | Suma de la potencia del transmisor más la ganancia de su antena ($\text{PIRE} = P_{\text{tx}} + G$). | $\text{dBm}$ | — |
+| $P_{\text{tx}}, P_{\text{rx}}, P_0$ | **P mayúscula sub tx / rx / 0** | Potencia transmitida, recibida y de referencia | Energía por unidad de tiempo emitida por el router ($P_{\text{tx}}$), captada en una celda ($P_{\text{rx}}$) o medida a $d_0$ ($P_0$). | $\text{dBm}$, $\text{mW}$, $\text{W}$ | `dbm`, `powerMw`, `powerW` |
+| $P_{\text{num}}, P_{\text{ana}}, \bar{P}_{\text{num}}$ | **P sub num, sub ana y P barra** | Potencia numérica, analítica y media | Nivel en $\text{dBm}$ calculado por nuestra malla FD-SOR ($P_{\text{num}}$), por la ecuación ITU-R ($P_{\text{ana}}$) y su promedio ($\bar{P}_{\text{num}}$). | $\text{dBm}$ | `numericalDbm`, `analyticalDbm` |
+| $\text{RMSE}, R^2$ | **Sigla RMSE y R cuadrado** | Error cuadrático medio y Coeficiente de determinación | Miden la desviación media en decibelios ($\text{RMSE} = 1.84\text{ dB}$) y el ajuste estadístico ($R^2 = 0.978$) frente al modelo ITU-R. | $\text{dB}$ y $[0,1]$ | `rmseDb`, `rSquared` |
+| $\vec{S}, \langle S \rangle$ | **Vector S y S entre corchetes** | Vector de Poynting instantáneo y medio temporal | Flujo superficial de potencia electromagnética ($\vec{S} = \vec{E}\times\vec{H}$) y su promedio por ciclo ($\langle S \rangle = 4\pi P_{\text{rx}}/\lambda^2$). | $\text{W/m}^2$ ($\mu\text{W/m}^2$) | `poyntingWm2`, `poyntingUwM2` |
+| $u(x,y), u_{i,j}, u_{i,j}^{\text{GS}}$ | **u minúscula / u superíndice GS** | Potencial normalizado de intensidad energética | Variable adimensional ($0$ a $100$) que resuelve la EDP en cada celda $(i,j)$, y su estimación intermedia de Gauss-Seidel ($u^{\text{GS}}$). | Escala $[0, 100]$ | `cell.val`, `uGS` |
+| $x, y, t$ | **x, y, t minúsculas** | Coordenadas espaciales 2D y tiempo | Posición horizontal ($x$), vertical ($y$) en metros dentro del recinto, e instante de tiempo ($t$) en segundos. | $\text{m}$ y $\text{s}$ | `x, y` |
+| $Y_{i,j}, R_{i,j}, G_{i,j}, B_{i,j}$ | **Letras Y, R, G, B mayúsculas** | Luminancia perceptual y canales Rojo, Verde, Azul | Brillo en escala de grises ($Y = 0.299R + 0.587G + 0.114B$, de $0$ a $255$) usado para detectar muros en imágenes de planos. | $[0, 255]$ | `brightness`, `red`, `green`, `blue` |
+| $\nabla, \nabla\cdot, \nabla\times, \nabla^2$ | **Operador Nabla y Laplaciano** | Gradiente ($\nabla$), Divergencia ($\nabla\cdot$), Rotacional ($\nabla\times$) y Laplaciano ($\nabla^2$) | Operadores de derivadas espaciales; $\nabla^2 u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}$ mide la difusión espacial 2D de la energía. | $\text{m}^{-1}$ / $\text{m}^{-2}$ | Esténcil de 4 vecinos |
+| $\|r^{(k)}\|_\infty$ | **Norma infinito de r superíndice k** | Norma infinito (máximo) del vector residuo | El mayor cambio absoluto $\max_{i,j}|u_{i,j}^{(k+1)} - u_{i,j}^{(k)}|$ observado en toda la malla durante la iteración $k$. | Escala $[0, 100]$ | `maxError`, `finalError` |
+
+---
+
+## Parte 3: Guion Cronometrado de 5 Minutos para la Defensa Oral frente al Póster y la App
 
 ### Minuto 0:00 – 0:50 | Apertura y Fenómeno Físico Central
 > «Buenos días, estimado jurado. Mi nombre es **Juan David Conde Duarte**, y presento el proyecto titulado **“Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos”**, asesorado por la profesora **Gladys Liliana Bautista Wilches** en la asignatura de Electromagnetismo.  

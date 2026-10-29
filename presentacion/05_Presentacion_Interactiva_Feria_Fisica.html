@@ -116,10 +116,10 @@
         </div>
       </div>
 
-      <!-- Índice interactivo de las 15 diapositivas -->
+      <!-- Índice interactivo de las 16 diapositivas -->
       <div class="p-4 rounded-2xl bg-slate-900/70 border border-slate-800">
-        <p class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-2">Mapa Completo de las 15 Diapositivas (Haz clic en cualquiera para ir directamente):</p>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-[11px]">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-2">Mapa Completo de las 16 Diapositivas (Haz clic en cualquiera para ir directamente):</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-[11px]">
           <button onclick="goToSlide(0)" class="p-2 rounded-xl bg-indigo-950/60 border border-indigo-700/60 text-left hover:bg-indigo-800/50 transition cursor-pointer"><strong class="text-amber-400">1.</strong> Portada y Arquitectura General</button>
           <button onclick="goToSlide(1)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">2.</strong> Ecuaciones de Maxwell, $c$ y $\lambda = c/f$</button>
           <button onclick="goToSlide(2)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">3.</strong> Fórmulas de Potencia: dBm, W y PIRE</button>
@@ -135,6 +135,7 @@
           <button onclick="goToSlide(12)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">13.</strong> Recorrido de la Interfaz y Capas del Código</button>
           <button onclick="goToSlide(13)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">14.</strong> Análisis Físico de Resultados 2D y Tablas</button>
           <button onclick="goToSlide(14)" class="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-left hover:bg-indigo-800/40 transition cursor-pointer"><strong class="text-indigo-400">15.</strong> Defensa ante el Jurado: Preguntas y Respuestas</button>
+          <button onclick="goToSlide(15)" class="p-2 rounded-xl bg-cyan-950/60 border border-cyan-600 text-left hover:bg-cyan-800/50 transition cursor-pointer"><strong class="text-cyan-300">16. 🔤</strong> Diccionario Maestro de Letras y Variables</button>
         </div>
       </div>
     </div>
@@ -212,6 +213,24 @@ const wavelengthM = C_LIGHT / freqHz; // λ = c / f (0.1249 m ó 0.0600 m)<br/>
 const wavelengthCm = Math.round(wavelengthM * 100 * 100) / 100; // 12.49 cm ó 6.00 cm
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 2 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada letra • Nombre físico • Qué significa • Unidad</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\vec{E}$</strong> — <em>Letra E mayúscula con vector</em><br/><span class="text-white font-semibold">Vector Campo Eléctrico:</span> Fuerza por unidad de carga que oscila en la onda. <strong>Unidad:</strong> $\text{V/m}$ (Voltios/metro).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\vec{B}$</strong> — <em>Letra B mayúscula con vector</em><br/><span class="text-white font-semibold">Densidad de Flujo Magnético:</span> Campo magnético acoplado perpendicularmente a $\vec{E}$. <strong>Unidad:</strong> $\text{T}$ (Teslas).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\nabla \cdot$ y $\nabla \times$</strong> — <em>Símbolo Nabla</em><br/><span class="text-white font-semibold">Divergencia ($\nabla\cdot$) y Rotacional ($\nabla\times$):</span> Miden cuánto sale un campo de un punto y cuánto gira en remolino.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\nabla^2$</strong> — <em>Nabla al cuadrado</em><br/><span class="text-white font-semibold">Operador Laplaciano:</span> Suma de segundas derivadas espaciales ($\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}+\frac{\partial^2}{\partial z^2}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\partial / \partial t$</strong> — <em>Letra d curva (Derivada parcial)</em><br/><span class="text-white font-semibold">Tasa de cambio temporal:</span> Qué tan rápido cambia el campo respecto al tiempo $t$ (segundos).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\mu_0$</strong> — <em>Letra griega Mu sub cero</em><br/><span class="text-white font-semibold">Permeabilidad magnética del vacío:</span> Capacidad del vacío para permitir campos magnéticos ($4\pi\times 10^{-7}\text{ H/m}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\varepsilon_0$</strong> — <em>Letra griega Épsilon sub cero</em><br/><span class="text-white font-semibold">Permitividad eléctrica del vacío:</span> Capacidad del vacío para polarizarse eléctricamente ($8.854\times 10^{-12}\text{ F/m}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$c, f, T, \lambda$</strong> — <em>Letras c, f, T y griega Lambda ($\lambda$)</em><br/><span class="text-white font-semibold">$c$: Velocidad de la luz ($\text{m/s}$)</span> (`C_LIGHT`) • <span class="text-white font-semibold">$f$: Frecuencia ($\text{Hz}$)</span> (`freqHz`) • <span class="text-white font-semibold">$T$: Periodo ($\text{s}$)</span> • <span class="text-white font-semibold">$\lambda$: Longitud de onda ($\text{m}$)</span> (`wavelengthM`).</div>
       </div>
     </div>
   </section>
@@ -295,6 +314,24 @@ const powerW = powerMw * 1e-3;
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 3 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Variable en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada variable • Nombre físico • Qué significa • Unidad</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\text{PIRE}$ (o $\text{EIRP}$)</strong> — <em>Sigla en español / inglés</em><br/><span class="text-white font-semibold">Potencia Isotrópica Radiada Equivalente:</span> Potencia total radiada por el emisor sumando su antena. <strong>Unidad:</strong> $\text{dBm}$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_{\text{tx}}$</strong> — <em>P mayúscula sub tx (transmisor)</em><br/><span class="text-white font-semibold">Potencia de Transmisión:</span> Energía inyectada por el circuito electrónico del router antes de la antena. <strong>Unidad:</strong> $\text{dBm}$ (`txPowerDbm`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$G$</strong> — <em>Letra G mayúscula</em><br/><span class="text-white font-semibold">Ganancia Directiva de Antena:</span> Cuánto concentra la antena la energía respecto a una esfera ideal. <strong>Unidad:</strong> $\text{dBi}$ (`antennaGainDbi`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u_{i,j}$ (o $u(x_r,y_r)$)</strong> — <em>Letra u minúscula sub i, j</em><br/><span class="text-white font-semibold">Potencial Normalizado de Señal:</span> Valor numérico adimensional ($0$ a $100$) en la fila $i$, columna $j$. <strong>Código:</strong> `cell.val`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$(x_r, y_r)$</strong> — <em>Coordenadas x, y sub r (router)</em><br/><span class="text-white font-semibold">Posición Discreta del Emisor:</span> Fila y columna donde se ubica el router sobre la malla. <strong>Código:</strong> `router.x, router.y`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_{\text{rx}\,[\text{dBm}]}$</strong> — <em>P sub rx (receptor) en dBm</em><br/><span class="text-white font-semibold">Potencia Recibida Logarítmica:</span> Nivel de señal captado en cada celda en decibelios-milivatio ($-85$ a $-25\text{ dBm}$). <strong>Código:</strong> `dbm`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_{\text{rx}\,[\text{mW}]}$ y $P_{\text{rx}\,[\text{W}]}$</strong> — <em>Potencia lineal en mW y W</em><br/><span class="text-white font-semibold">Potencia Recibida Lineal:</span> Flujo de energía por segundo en milivatios ($10^{-3}\text{ W}$) y vatios ($\text{J/s}$). <strong>Código:</strong> `powerMw`, `powerW`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\log_{10}$</strong> — <em>Logaritmo en base 10</em><br/><span class="text-white font-semibold">Operador Logarítmico Decimal:</span> Comprime escalas de millones de veces en sumas y restas simples de decibelios.</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -365,6 +402,24 @@ const poyntingUwM2 = poyntingWm2 * 1e6;
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 4 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada letra • Nombre físico • Qué significa • Unidad</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\vec{S}$</strong> — <em>Letra S mayúscula con vector</em><br/><span class="text-white font-semibold">Vector de Poynting Instantáneo:</span> Dirección y densidad superficial del flujo de potencia electromagnética. <strong>Unidad:</strong> $\text{W/m}^2$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\langle S \rangle$</strong> — <em>S entre corchetes angulares</em><br/><span class="text-white font-semibold">Magnitud Media Temporal de Poynting:</span> Promedio de energía por segundo que cruza $1\text{ m}^2$. <strong>Unidad:</strong> $\text{W/m}^2$ o $\mu\text{W/m}^2$ (`poyntingUwM2`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\vec{H}$</strong> — <em>Letra H mayúscula con vector</em><br/><span class="text-white font-semibold">Intensidad de Campo Magnético:</span> Campo magnético relacionado con $\vec{B}$ mediante $\vec{B}=\mu\vec{H}$. <strong>Unidad:</strong> $\text{A/m}$ (Amperios/metro).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\times$</strong> — <em>Cruz vectorial</em><br/><span class="text-white font-semibold">Producto Cruz (Vectorial):</span> Indica que $\vec{S}$ apunta perpendicular tanto a $\vec{E}$ como a $\vec{H}$ (regla de la mano derecha).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\varepsilon$ y $\mu$</strong> — <em>Letras griegas Épsilon y Mu</em><br/><span class="text-white font-semibold">Permitividad ($\text{F/m}$) y Permeabilidad ($\text{H/m}$):</span> Definen cuánta energía eléctrica ($\frac{1}{2}\varepsilon E^2$) y magnética ($\frac{1}{2}\mu H^2$) almacena el medio.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\sigma E^2$</strong> — <em>Letra griega Sigma por E al cuadrado</em><br/><span class="text-white font-semibold">Densidad de Disipación de Joule:</span> Potencia por unidad de volumen ($\text{W/m}^3$) que se transforma en calor dentro de un muro.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$A_{\text{eff}}$</strong> — <em>Letra A mayúscula sub eff (effective)</em><br/><span class="text-white font-semibold">Apertura o Área Efectiva Isotrópica:</span> Área equivalente de captura de la antena receptora ($\lambda^2/4\pi$). <strong>Unidad:</strong> $\text{m}^2$ (`aEff`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\pi$</strong> — <em>Letra griega Pi ($\approx 3.14159$)</em><br/><span class="text-white font-semibold">Constante Geométrica Esférica:</span> Aparece en $4\pi$ debido al área superficial de un frente de onda esférico ($4\pi r^2$).</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -430,6 +485,24 @@ const electricFieldVm = Math.sqrt(ETA_0 * poyntingWm2);<br/><br/>
 const magneticFieldMam = (electricFieldVm / ETA_0) * 1e3;
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 5 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada letra • Nombre físico • Qué significa • Unidad</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\eta_0$</strong> — <em>Letra griega Eta sub cero</em><br/><span class="text-white font-semibold">Impedancia Intrínseca del Vacío:</span> Oposición natural del espacio libre entre $\vec{E}$ y $\vec{H}$ ($\approx 376.73\,\Omega$). <strong>Código:</strong> `ETA_0`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\Omega$</strong> — <em>Letra griega Omega mayúscula</em><br/><span class="text-white font-semibold">Ohmio (Unidad de Impedancia):</span> Equivale a Voltio sobre Amperio ($1\,\Omega = 1\text{ V/A}$), por eso $E/H = (\text{V/m})/(\text{A/m}) = \Omega$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$E_0$ y $H_0$</strong> — <em>Letras E y H sub cero</em><br/><span class="text-white font-semibold">Amplitudes Pico de la Onda:</span> Valor máximo que alcanzan el campo eléctrico y magnético en la cresta de la sinusoide.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$E_{\text{rms}}$</strong> — <em>E mayúscula sub rms</em><br/><span class="text-white font-semibold">Campo Eléctrico Eficaz (Root Mean Square):</span> Valor cuadrático medio ($E_0/\sqrt{2}$) que transporta la potencia útil. <strong>Unidad:</strong> $\text{V/m}$ (`electricFieldVm`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$H_{\text{rms}}$</strong> — <em>H mayúscula sub rms</em><br/><span class="text-white font-semibold">Campo Magnético Eficaz:</span> Valor cuadrático medio magnético ($E_{\text{rms}}/\eta_0$). <strong>Unidad:</strong> $\text{A/m}$ o $\text{mA/m}$ (`magneticFieldMam`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$k$</strong> — <em>Letra k minúscula</em><br/><span class="text-white font-semibold">Número de Onda Espacial:</span> Cuántos radianes de fase cambia la onda por cada metro ($k = 2\pi/\lambda$). <strong>Unidad:</strong> $\text{rad/m}$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\omega$</strong> — <em>Letra griega Omega minúscula</em><br/><span class="text-white font-semibold">Frecuencia Angular Temporal:</span> Velocidad de oscilación en radianes por segundo ($\omega = 2\pi f$). <strong>Unidad:</strong> $\text{rad/s}$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\int_0^T dt$</strong> — <em>Integral definida en un periodo T</em><br/><span class="text-white font-semibold">Promedio en un Ciclo Completo:</span> Suma continua durante un periodo $T$ dividida por $T$ para obtener el valor medio.</div>
       </div>
     </div>
   </section>
@@ -511,6 +584,24 @@ attenuation = MATERIALS[wall.material].attenuation * multiplier * (cellSize / 0.
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 6 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada letra • Nombre físico • Qué significa • Unidad</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\varepsilon_r$</strong> — <em>Letra griega Épsilon sub r (relativa)</em><br/><span class="text-white font-semibold">Permitividad Relativa (Constante Dieléctrica):</span> Cuántas veces más se polariza un muro que el vacío ($\varepsilon / \varepsilon_0$). <strong>Sin unidad</strong> (`relativePermittivity`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\sigma$</strong> — <em>Letra griega Sigma minúscula</em><br/><span class="text-white font-semibold">Conductividad Eléctrica del Material:</span> Facilidad con que el material deja circular corrientes que disipan energía en calor. <strong>Unidad:</strong> $\text{S/m}$ (`conductivitySm`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\gamma = \alpha + i\beta$</strong> — <em>Letras griegas Gamma, Alfa y Beta</em><br/><span class="text-white font-semibold">Constante de Propagación Compleja:</span> $\alpha$ es la atenuación ($\text{Np/m}$), $\beta$ es el cambio de fase ($\text{rad/m}$) e $i = \sqrt{-1}$ es la unidad imaginaria.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\alpha$ y $\alpha_{i,j}$</strong> — <em>Letra griega Alfa minúscula</em><br/><span class="text-white font-semibold">Coeficiente de Atenuación / Absorción:</span> Fracción de energía que absorbe el material al ser atravesado por la onda. <strong>Código:</strong> `attenuation`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$e^{-\alpha x}$</strong> — <em>Número de Euler e elevado a $-\alpha x$</em><br/><span class="text-white font-semibold">Factor de Decaimiento de Beer-Lambert:</span> Describe cómo la amplitud $E(x)$ cae exponencialmente al penetrar un espesor $x$ (metros) dentro de un muro.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\delta$</strong> — <em>Letra griega Delta minúscula</em><br/><span class="text-white font-semibold">Profundidad Pelicular (Skin Depth):</span> Distancia ($\delta = 1/\alpha \approx 1.3\,\mu\text{m}$ en metal) a la que la onda cae al $36.8\%$ ($1/e$), creando la Jaula de Faraday.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$M_{\text{frecuencia}}$</strong> — <em>Letra M mayúscula sub frecuencia</em><br/><span class="text-white font-semibold">Multiplicador Espectral de Frecuencia:</span> Factor de escala ($0.20$ en $2.4\text{ GHz}$ y $0.50$ en $5.0\text{ GHz}$). <strong>Código:</strong> `multiplier`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$h$</strong> — <em>Letra h minúscula</em><br/><span class="text-white font-semibold">Paso Espacial o Tamaño de Celda:</span> Ancho físico en metros de cada cuadrito de la malla ($h = 0.5\text{ m}$ por defecto). <strong>Código:</strong> `cellSize`.</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -579,6 +670,24 @@ if (router) {<br/>
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 7 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada letra • Nombre matemático/físico • Qué significa</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u(x,y)$</strong> — <em>Letra u minúscula en función de x, y</em><br/><span class="text-white font-semibold">Función de Potencial de Intensidad:</span> Nivel estacionario de energía electromagnética en el punto $(x,y)$ del recinto ($0$ a $100$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\frac{\partial^2 u}{\partial x^2}$ y $\frac{\partial^2 u}{\partial y^2}$</strong> — <em>Segundas derivadas parciales</em><br/><span class="text-white font-semibold">Curvatura Espacial Horizontal y Vertical:</span> Miden cómo se difunde el campo en los ejes $x$ (ancho) e $y$ (alto) del plano 2D.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\kappa(x,y)$</strong> — <em>Letra griega Kappa minúscula</em><br/><span class="text-white font-semibold">Coeficiente Espacial de Absorción Continua:</span> Mide cuánta energía absorbe el medio por metro ($\text{m}^{-1}$) en el punto $(x,y)$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\Omega$</strong> — <em>Letra griega Omega mayúscula</em><br/><span class="text-white font-semibold">Dominio Espacial del Recinto:</span> El interior completo de la planta arquitectónica $[0, L_x] \times [0, L_y]$ ($12\text{ m} \times 12\text{ m}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\partial \Omega$</strong> — <em>Símbolo parcial junto a Omega</em><br/><span class="text-white font-semibold">Frontera o Borde Exterior del Dominio:</span> Todo el perímetro externo de la malla ($i=0, N-1$ o $j=0, N-1$) donde $u = 0$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u\big|_{\partial\Omega} = 0$</strong> — <em>u restringida a la frontera $\partial\Omega$</em><br/><span class="text-white font-semibold">Condición de Dirichlet Homogénea:</span> Indica que en el borde exterior la energía decae al piso de ruido ($u=0 \iff -85\text{ dBm}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_{\text{router}}$</strong> — <em>P mayúscula sub router</em><br/><span class="text-white font-semibold">Potencia Nominal del Emisor:</span> Valor base configurado para el router en el panel de control (`router.power`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs"><code>fixed = true</code></strong> — <em>Bandera booleana en código</em><br/><span class="text-white font-semibold">Indicador de Frontera de Dirichlet:</span> Impide que Jacobi, Gauss-Seidel o SOR sobrescriban el valor fijo del router o del borde.</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -631,6 +740,24 @@ if (router) {<br/>
             ¡Así demostramos rigurosamente por qué en el código se suman los 4 vecinos, se divide entre 4 y se multiplica por <code>(1.0 - cell.attenuation)</code>!
           </p>
         </div>
+      </div>
+    </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 8 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra, Subíndice y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo se lee cada índice • Significado geométrico en la malla</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$i$ y $j$</strong> — <em>Letras latinas i, j minúsculas (subíndices)</em><br/><span class="text-white font-semibold">Índices de Fila ($i$) y Columna ($j$):</span> Coordenadas enteras del nodo dentro de la matriz ($i, j \in \{0, 1, \dots, N-1\}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u_{i,j}$</strong> — <em>u sub i coma j</em><br/><span class="text-white font-semibold">Nodo Central Actual:</span> Valor del potencial electromagnético en la celda $(i,j)$ que estamos calculando.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u_{i+1,j}$ y $u_{i-1,j}$</strong> — <em>Vecinos verticales</em><br/><span class="text-white font-semibold">Vecinos Inferior ($i+1,j$) y Superior ($i-1,j$):</span> Celdas inmediatamente abajo y arriba del nodo central en la matriz.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u_{i,j+1}$ y $u_{i,j-1}$</strong> — <em>Vecinos horizontales</em><br/><span class="text-white font-semibold">Vecinos Derecho ($i,j+1$) e Izquierdo ($i,j-1$):</span> Celdas inmediatamente a la derecha e izquierda del nodo central.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$h$ ($=\Delta x = \Delta y$)</strong> — <em>Letra h minúscula (Delta x, Delta y)</em><br/><span class="text-white font-semibold">Tamaño de Paso de la Malla:</span> Distancia física entre los centros de dos celdas vecinas ($0.5\text{ m}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$2!$ y $3!$</strong> — <em>Dos factorial y Tres factorial</em><br/><span class="text-white font-semibold">Factoriales de la Serie de Taylor:</span> $2! = 2\times 1 = 2$ y $3! = 3\times 2\times 1 = 6$, denominadores del polinomio de Taylor.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$O(h^4)$ y $O(h^2)$</strong> — <em>Letra O mayúscula de Landau</em><br/><span class="text-white font-semibold">Orden del Error de Truncamiento:</span> Indica que al reducir el paso $h$ a la mitad, el error numérico se reduce $2^2 = 4$ veces.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$(1 - \alpha_{i,j})$</strong> — <em>Uno menos Alfa sub i, j</em><br/><span class="text-white font-semibold">Factor Local de Transmisión:</span> Fracción de energía que logra cruzar la celda sin ser absorbida por el material (`1.0 - cell.attenuation`).</div>
       </div>
     </div>
   </section>
@@ -713,6 +840,24 @@ nextGrid[i][j].val = newVal;
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 9 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Superíndice, Letra y Variable en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Cómo distinguir $(k)$, $(k+1)$, $u^{\text{GS}}$ y $\omega$</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$(k)$</strong> — <em>Superíndice k entre paréntesis</em><br/><span class="text-white font-semibold">Índice de Iteración Anterior:</span> No es un exponente; indica el valor que tenía la celda en el barrido anterior (`currentGrid`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$(k+1)$</strong> — <em>Superíndice k más 1 entre paréntesis</em><br/><span class="text-white font-semibold">Índice de la Nueva Iteración:</span> Valor recién actualizado de la celda en el barrido actual (`nextGrid`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$u_{i,j}^{\text{GS}}$</strong> — <em>u sub i,j superíndice GS</em><br/><span class="text-white font-semibold">Estimación Intermedia de Gauss-Seidel:</span> Promedio atenuado de los 4 vecinos usando los 2 vecinos ya actualizados (`uGS`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\omega$</strong> — <em>Letra griega Omega minúscula</em><br/><span class="text-white font-semibold">Factor de Relajación de SOR:</span> Número adimensional ($\omega \in (1, 2)$, óptimo $\approx 1.45$) que amplifica el paso de convergencia (`omega`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$(1 - \omega)$</strong> — <em>Uno menos Omega</em><br/><span class="text-white font-semibold">Peso de Memoria del Estado Previo:</span> Pondera cuánto conservamos del valor viejo $u_{i,j}^{(k)}$ al extrapolar hacia $u_{i,j}^{\text{GS}}$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\Delta u$</strong> — <em>Letra griega Delta mayúscula por u</em><br/><span class="text-white font-semibold">Corrección o Paso de Gauss-Seidel:</span> Diferencia $u_{i,j}^{\text{GS}} - u_{i,j}^{(k)}$ que indica hacia dónde se mueve el equilibrio.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\rho_{\text{J}}$ y $\rho_{\text{GS}}$</strong> — <em>Letra griega Rho sub J y sub GS</em><br/><span class="text-white font-semibold">Radios Espectrales de Jacobi y Gauss-Seidel:</span> Miden la tasa de reducción del error por iteración ($\rho_{\text{GS}} = \rho_{\text{J}}^2$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs"><code>sum</code></strong> — <em>Variable acumuladora en código</em><br/><span class="text-white font-semibold">Suma de los 4 Vecinos Ortogonales:</span> Representa el numerador $u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}$ antes de dividir entre $4$.</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -774,6 +919,24 @@ while (iterations &lt; maxIterations &amp;&amp; finalError &gt;= tolerance) {<br
 }
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 10 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo Matricial en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Álgebra Lineal Numérica • Criterio de Parada</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$A = D - L - U$</strong> — <em>Matrices A, D, L y U mayúsculas</em><br/><span class="text-white font-semibold">Descomposición de la Matriz del Sistema:</span> $D$ es la diagonal principal, $-L$ la parte triangular inferior y $-U$ la triangular superior.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\mathcal{L}_\omega$</strong> — <em>Letra L caligráfica sub Omega</em><br/><span class="text-white font-semibold">Matriz de Transición de SOR:</span> Operador matricial que transforma el vector de estado $\mathbf{u}^{(k)}$ en $\mathbf{u}^{(k+1)}$.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\rho(\mathcal{L}_\omega)$ y $\rho_{\text{Jacobi}}$</strong> — <em>Letra griega Rho minúscula</em><br/><span class="text-white font-semibold">Radio Espectral de la Matriz:</span> El mayor valor propio en valor absoluto ($|\lambda_{\max}|$). Si $\rho < 1$, el método converge.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\omega_{\text{ópt}}$</strong> — <em>Letra griega Omega sub ópt (óptimo)</em><br/><span class="text-white font-semibold">Factor de Relajación Óptimo:</span> Valor exacto de $\omega$ que hace mínimo el radio espectral y logra converger en menos pasos.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$N$</strong> — <em>Letra N mayúscula</em><br/><span class="text-white font-semibold">Dimensión Lateral de la Malla:</span> Número de filas y columnas de la cuadrícula ($N = 24$ nodos por lado).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\|r^{(k)}\|_\infty$</strong> — <em>Doble barra con subíndice infinito ($\infty$)</em><br/><span class="text-white font-semibold">Norma Infinito del Residuo:</span> El cambio máximo absoluto entre todas las celdas de la malla en la iteración $k$ (`maxError`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\max_{i,j} |\cdot|$</strong> — <em>Operador Máximo del Valor Absoluto</em><br/><span class="text-white font-semibold">Peor Error Puntual de la Malla:</span> Recorre todas las filas $i$ y columnas $j$ buscando la celda que aún no se ha estabilizado (`diff`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\varepsilon$</strong> — <em>Letra griega Épsilon minúscula</em><br/><span class="text-white font-semibold">Tolerancia de Convergencia Numérica:</span> Umbral de parada ($10^{-3}$ o $10^{-4}$) que define cuándo se alcanzó el equilibrio (`tolerance`).</div>
       </div>
     </div>
   </section>
@@ -840,6 +1003,24 @@ const rSquared = Number((1 - sqErrSum / (ssTot * 1.35)).toFixed(3));
         </div>
       </div>
     </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 11 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Variable Estadística en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Modelo ITU-R P.1238 • Métricas Estadísticas de Validación</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$d$ y $d_0$</strong> — <em>Letra d minúscula y d sub cero</em><br/><span class="text-white font-semibold">Distancia Radial ($d$) y Distancia de Referencia ($d_0$):</span> $d$ es la distancia en metros al router (`distM`); $d_0 = 0.5\text{ m}$ es la distancia inicial.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_0(d_0)$</strong> — <em>P sub cero evaluada en $d_0$</em><br/><span class="text-white font-semibold">Potencia de Referencia a Distancia $d_0$:</span> Nivel de señal medido a un paso del emisor (`pRefDbm`: $-27\text{ dBm}$ ó $-30.5\text{ dBm}$).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$n$</strong> — <em>Letra n minúscula</em><br/><span class="text-white font-semibold">Exponente de Pérdida de Propagación:</span> Velocidad con que cae la onda con la distancia ($n=2.25$ en UHF; $n=2.45$ en SHF). <strong>Código:</strong> `pathLossExponent`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\sum_{k=1}^{K} L_{\text{muro},k}$</strong> — <em>Sigma mayúscula (Sumatoria) de L</em><br/><span class="text-white font-semibold">Pérdida Acumulada Multi-Muro:</span> Suma de los decibelios que resta cada pared $k$ atravesada por el rayo (`totalWallLossDb`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$L_{\text{borde}}$</strong> — <em>Letra L mayúscula sub borde</em><br/><span class="text-white font-semibold">Corrección de Borde Absorbente:</span> Caída adicional cerca del perímetro exterior de Dirichlet (`boundaryDropDb`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$M$ y $d_m$</strong> — <em>Letra M mayúscula y d sub m</em><br/><span class="text-white font-semibold">Cantidad de Anillos Radiales ($M$):</span> Número total de distancias discretas $d_m$ evaluadas en el perfil radial (`points.length`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$P_{\text{num}}$, $P_{\text{ana}}$ y $\bar{P}_{\text{num}}$</strong> — <em>Potencias numérica, analítica y media</em><br/><span class="text-white font-semibold">Valores Comparados:</span> $P_{\text{num}}$ es nuestra malla FD-SOR, $P_{\text{ana}}$ es la fórmula ITU-R y $\bar{P}_{\text{num}}$ (con barra arriba) es su promedio.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\text{RMSE}$ y $R^2$</strong> — <em>Sigla RMSE y R al cuadrado</em><br/><span class="text-white font-semibold">Raíz del Error Cuadrático Medio ($\text{dB}$) y Coeficiente de Determinación:</span> Miden el error medio ($1.84\text{ dB}$) y la correlación ($0.978$).</div>
+      </div>
+    </div>
   </section>
 
   <!-- =========================================================================
@@ -890,6 +1071,24 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
             </li>
           </ul>
         </div>
+      </div>
+    </div>
+
+    <!-- DICCIONARIO LETRA POR LETRA DE LA DIAPOSITIVA 12 -->
+    <div class="max-w-7xl mx-auto w-full formula-card border-cyan-700/60 bg-cyan-950/15">
+      <div class="flex items-center justify-between mb-2">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔤 Significado y Nombre de Cada Letra y Símbolo en esta Diapositiva</span>
+        <span class="text-[11px] text-slate-400">Visión por Computador (ITU-R BT.601) • Clustering K-Means</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px]">
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$Y_{i,j}$</strong> — <em>Letra Y mayúscula sub i, j</em><br/><span class="text-white font-semibold">Luminancia Perceptual (Brillo):</span> Claridad en escala de grises ($0=$ negro a $255=$ blanco) del píxel $(i,j)$. <strong>Código:</strong> `brightness`.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$R_{i,j}, G_{i,j}, B_{i,j}$</strong> — <em>Letras R (Red), G (Green), B (Blue)</em><br/><span class="text-white font-semibold">Canales de Color Primarios:</span> Intensidad de rojo, verde y azul ($0$ a $255$) extraída del `<canvas>` (`red`, `green`, `blue`).</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$A_{i,j}$</strong> — <em>Letra A mayúscula (Canal Alpha)</em><br/><span class="text-white font-semibold">Opacidad del Píxel:</span> Indica si el píxel es transparente ($0$) o sólido ($255$). Si `alpha > 40`, el píxel es visible.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$T_{\text{umbral}}$</strong> — <em>Letra T mayúscula sub umbral</em><br/><span class="text-white font-semibold">Umbral de Binarización de Muros:</span> Límite de brillo (`thresh`). Si $Y_{i,j} < T_{\text{umbral}}$, el píxel oscuro se clasifica como muro.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\text{Score}(r,c)$</strong> — <em>Puntaje en fila r, columna c</em><br/><span class="text-white font-semibold">Función Objetivo de Ubicación:</span> Calificación total ($0$ a $100$) que evalúa qué tan buena es la celda $(r,c)$ para colocar un router.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\bar{u}_{\text{promedio}}$</strong> — <em>u con barra superior</em><br/><span class="text-white font-semibold">Potencial Promedio del Recinto:</span> Media aritmética de la intensidad $u_{i,j}$ en todas las celdas de aire de la habitación.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$K$ y $C_k$</strong> — <em>Letra K mayúscula y conjunto $C_k$</em><br/><span class="text-white font-semibold">Número de Routers ($K$) y Clúster ($C_k$):</span> $C_k$ es la zona de celdas asignadas al router $k$, y $|C_k|$ es cuántas celdas tiene esa zona.</div>
+        <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800"><strong class="text-cyan-300 text-xs">$\mu_k = (\mu_k^x, \mu_k^y)$ y $\arg\min$</strong> — <em>Letra griega Mu sub k</em><br/><span class="text-white font-semibold">Centroide Espacial del Clúster $k$:</span> Centro de gravedad geométrico donde se ubica el router $k$; $\arg\min$ elige el centroide más cercano.</div>
       </div>
     </div>
   </section>
@@ -1034,7 +1233,87 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
   </section>
 
   <!-- =========================================================================
-       BARRA DE NAVEGACIÓN FIJA INFERIOR CON SELECTOR DE LAS 15 DIAPOSITIVAS
+       DIAPOSITIVA 16: DICCIONARIO MAESTRO DE TODAS LAS LETRAS GRIEGAS, LATINAS Y SÍMBOLOS
+       ========================================================================= -->
+  <section class="slide" id="slide-16">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+      <h2 class="text-xl md:text-2xl font-black text-cyan-400">16. Diccionario Maestro de Todas las Letras y Variables del Proyecto (Griegas, Latinas y Operadores)</h2>
+      <span class="text-xs font-mono text-slate-400">Referencia Rápida: Letra • Cómo se pronuncia • Nombre Físico/Matemático • Significado y Unidad</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-7xl mx-auto w-full my-auto text-[11px]">
+      <!-- Tabla 1: Letras Griegas -->
+      <div class="formula-card border-cyan-700/60 bg-cyan-950/10">
+        <span class="term-badge bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 mb-2">1. Todas las Letras Griegas Usadas en las Fórmulas ($\alpha$ hasta $\Omega$)</span>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse border border-slate-800">
+            <thead>
+              <tr class="bg-slate-900 text-cyan-300">
+                <th class="p-1.5 border border-slate-800">Letra</th>
+                <th class="p-1.5 border border-slate-800">Nombre</th>
+                <th class="p-1.5 border border-slate-800">Qué significa en nuestro proyecto y Unidad</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-200 divide-y divide-slate-800">
+              <tr><td class="p-1.5 font-bold text-amber-300">$\alpha, \alpha_{i,j}$</td><td class="p-1.5">Alfa</td><td class="p-1.5">Constante de atenuación ($\text{Np/m}$) y coeficiente discreto de absorción del muro (`attenuation`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\beta$</td><td class="p-1.5">Beta</td><td class="p-1.5">Constante de fase de la onda en un medio ($\text{rad/m}$), parte imaginaria de $\gamma = \alpha + i\beta$.</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\gamma$</td><td class="p-1.5">Gamma</td><td class="p-1.5">Constante de propagación compleja del medio ($\gamma = \alpha + i\beta$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\delta$</td><td class="p-1.5">Delta minúscula</td><td class="p-1.5">Profundidad pelicular (*skin depth*, $\delta = 1/\alpha \approx 1.3\,\mu\text{m}$ en metal, Jaula de Faraday).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\Delta x, \Delta y, \Delta u$</td><td class="p-1.5">Delta mayúscula</td><td class="p-1.5">Incremento o diferencia: paso espacial ($\Delta x = h = 0.5\text{ m}$) o cambio de potencial ($\Delta u$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\varepsilon_0, \varepsilon_r, \varepsilon$</td><td class="p-1.5">Épsilon</td><td class="p-1.5">$\varepsilon_0$: Permitividad del vacío ($8.854\times 10^{-12}\text{ F/m}$); $\varepsilon_r$: Permitividad relativa del muro; $\varepsilon$: Tolerancia numérica (`tolerance`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\eta_0$</td><td class="p-1.5">Eta sub cero</td><td class="p-1.5">Impedancia intrínseca del espacio libre ($\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega$, `ETA_0`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\kappa(x,y)$</td><td class="p-1.5">Kappa</td><td class="p-1.5">Coeficiente espacial continuo de absorción en la EDP ($\nabla^2 u - \kappa^2 u = 0$, en $\text{m}^{-1}$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\lambda$</td><td class="p-1.5">Lambda</td><td class="p-1.5">Longitud de onda ($\lambda = c/f$: $12.5\text{ cm}$ en $2.4\text{ GHz}$ y $6.0\text{ cm}$ en $5.0\text{ GHz}$, `wavelengthM`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\mu_0, \mu_k$</td><td class="p-1.5">Mu</td><td class="p-1.5">$\mu_0$: Permeabilidad magnética del vacío ($4\pi\times 10^{-7}\text{ H/m}$); $\mu_k$: Centroide del clúster $k$ en K-Means.</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\pi$</td><td class="p-1.5">Pi</td><td class="p-1.5">Constante circular ($\approx 3.14159$), aparece en $A_{\text{eff}} = \lambda^2/(4\pi)$ por la geometría esférica.</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\rho$</td><td class="p-1.5">Rho</td><td class="p-1.5">Radio espectral de la matriz de iteración ($\rho < 1$ garantiza convergencia) o densidad de carga.</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\sigma$</td><td class="p-1.5">Sigma minúscula</td><td class="p-1.5">Conductividad eléctrica del material en Siemens por metro ($\text{S/m}$, `conductivitySm`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\sum$</td><td class="p-1.5">Sigma mayúscula</td><td class="p-1.5">Operador sumatoria (suma todas las pérdidas de muros $\sum L_{\text{muro}}$ o errores cuadráticos).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\omega, \omega_{\text{ópt}}$</td><td class="p-1.5">Omega minúscula</td><td class="p-1.5">En SOR: factor de sobre-relajación ($\omega \in (1,2)$, `omega`). En ondas: frecuencia angular ($\omega = 2\pi f$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-amber-300">$\Omega, \partial\Omega$</td><td class="p-1.5">Omega mayúscula</td><td class="p-1.5">En unidades: Ohmio ($\Omega$). En geometría: dominio 2D del recinto ($\Omega$) y su borde exterior ($\partial\Omega$).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabla 2: Letras Latinas y Operadores -->
+      <div class="formula-card border-indigo-700/60 bg-indigo-950/10">
+        <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 mb-2">2. Todas las Letras Latinas y Operadores Matemáticos ($A$ hasta $Y$)</span>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse border border-slate-800">
+            <thead>
+              <tr class="bg-slate-900 text-indigo-300">
+                <th class="p-1.5 border border-slate-800">Variable</th>
+                <th class="p-1.5 border border-slate-800">Nombre</th>
+                <th class="p-1.5 border border-slate-800">Qué significa en nuestro proyecto y Unidad</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-200 divide-y divide-slate-800">
+              <tr><td class="p-1.5 font-bold text-emerald-300">$A_{\text{eff}}$</td><td class="p-1.5">Apertura efectiva</td><td class="p-1.5">Área equivalente de captura de una antena receptora isotrópica ($\lambda^2/4\pi$, en $\text{m}^2$, `aEff`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$c$</td><td class="p-1.5">Velocidad de la luz</td><td class="p-1.5">Rapidez de propagación electromagnética en el vacío ($2.9979\times 10^8\text{ m/s}$, `C_LIGHT`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$d, d_0$</td><td class="p-1.5">Distancia radial</td><td class="p-1.5">Distancia euclidiana desde el router hasta la celda ($d$, en $\text{m}$) y referencia ($d_0 = 0.5\text{ m}$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$\vec{E}, E_{\text{rms}}$</td><td class="p-1.5">Campo eléctrico</td><td class="p-1.5">Vector campo eléctrico y su valor eficaz RMS ($E_{\text{rms}} = \sqrt{\eta_0\langle S\rangle}$, en $\text{V/m}$, `electricFieldVm`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$f, T$</td><td class="p-1.5">Frecuencia y Periodo</td><td class="p-1.5">Ciclos por segundo de la onda ($2.4\text{ GHz}$ ó $5.0\text{ GHz}$) y duración de un ciclo ($T = 1/f$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$G$</td><td class="p-1.5">Ganancia de antena</td><td class="p-1.5">Amplificación directiva de la antena emisora en decibelios isotrópicos ($\text{dBi}$, `antennaGainDbi`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$\vec{H}, H_{\text{rms}}$</td><td class="p-1.5">Campo magnético</td><td class="p-1.5">Intensidad de campo magnético y su valor eficaz ($H_{\text{rms}} = E_{\text{rms}}/\eta_0$, en $\text{mA/m}$, `magneticFieldMam`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$h$</td><td class="p-1.5">Paso de malla</td><td class="p-1.5">Tamaño físico del lado de cada celda cuadrada de la simulación ($h = 0.5\text{ m}$, `cellSize`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$i, j$</td><td class="p-1.5">Índices espaciales</td><td class="p-1.5">Coordenadas discretas de fila ($i$) y columna ($j$) de cada nodo dentro de la matriz $N\times N$.</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$(k), (k+1)$</td><td class="p-1.5">Índice de iteración</td><td class="p-1.5">Número de paso iterativo anterior $(k)$ y nuevo $(k+1)$ en Jacobi, Gauss-Seidel y SOR.</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$n$</td><td class="p-1.5">Exponente de pérdida</td><td class="p-1.5">Exponente de decaimiento con la distancia en el modelo ITU-R P.1238 ($2.25$ ó $2.45$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$P_{\text{tx}}, P_{\text{rx}}$</td><td class="p-1.5">Potencia TX / RX</td><td class="p-1.5">Potencia emitida por el router ($P_{\text{tx}}$) y potencia recibida en cada celda ($P_{\text{rx}}$, en $\text{dBm}, \text{mW}, \text{W}$).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$\vec{S}, \langle S \rangle$</td><td class="p-1.5">Vector de Poynting</td><td class="p-1.5">Flujo de potencia por unidad de área ($\vec{S} = \vec{E}\times\vec{H}$) y su media temporal ($\mu\text{W/m}^2$, `poyntingUwM2`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$u_{i,j}, u^{\text{GS}}$</td><td class="p-1.5">Potencial de señal</td><td class="p-1.5">Intensidad normalizada ($0$ a $100$) en el nodo $(i,j)$ (`cell.val`) y paso intermedio Gauss-Seidel (`uGS`).</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$Y, R, G, B$</td><td class="p-1.5">Luminancia y RGB</td><td class="p-1.5">Brillo perceptual ITU-R BT.601 ($Y = 0.299R + 0.587G + 0.114B$) para detectar muros en planos.</td></tr>
+              <tr><td class="p-1.5 font-bold text-emerald-300">$\nabla, \nabla^2, \|r\|_\infty$</td><td class="p-1.5">Operadores</td><td class="p-1.5">$\nabla$: Nabla; $\nabla^2$: Laplaciano ($\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}$); $\|r^{(k)}\|_\infty$: Norma infinito del residuo máximo (`maxError`).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       BARRA DE NAVEGACIÓN FIJA INFERIOR CON SELECTOR DE LAS 16 DIAPOSITIVAS
        ========================================================================= -->
   <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 z-50">
     <div class="flex items-center gap-2">
@@ -1060,17 +1339,66 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
         <option value="12">13. Arquitectura en 6 Capas del Código</option>
         <option value="13">14. Análisis Físico de Resultados y Gráficas</option>
         <option value="14">15. Defensa Oral: Preguntas del Jurado</option>
+        <option value="15">16. 🔤 Diccionario Maestro de Todas las Letras y Variables</option>
       </select>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
+      <button onclick="toggleSymbolModal()" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition cursor-pointer shadow-lg shadow-cyan-950/50">
+        🔍 Consultar Letra / Variable
+      </button>
+      <button onclick="goToSlide(15)" class="px-3 py-1.5 rounded-xl bg-cyan-900/60 border border-cyan-600 text-cyan-200 text-xs font-bold hover:bg-cyan-800/70 transition cursor-pointer">
+        🔤 Diapositiva 16 (Glosario)
+      </button>
       <a href="/presentacion/poster/Poster_Visual_80x120cm.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-900/50 border border-emerald-700 text-emerald-200 text-xs font-bold hover:bg-emerald-800/60 transition">
         🇪🇸 Ver Póster (ES)
       </a>
       <a href="/presentacion/poster/Poster_Visual_80x120cm_EN.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-amber-900/50 border border-amber-700 text-amber-200 text-xs font-bold hover:bg-amber-800/60 transition">
         🇬🇧 View Poster (EN)
       </a>
-      <span id="slide-counter" class="text-xs font-mono font-bold text-slate-300">Diapositiva 1 / 15</span>
+      <span id="slide-counter" class="text-xs font-mono font-bold text-slate-300">Diapositiva 1 / 16</span>
+    </div>
+  </div>
+
+  <!-- MODAL FLOTANTE CON BUSCADOR DE LETRAS Y VARIABLES (SE ABRE DESDE CUALQUIER DIAPOSITIVA) -->
+  <div id="symbol-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-cyan-700/70 rounded-2xl max-w-6xl w-full max-h-[86vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-950/70">
+        <div>
+          <h3 class="text-base font-black text-cyan-300">🔤 Buscador Rápido de Letras, Símbolos y Variables de las Fórmulas</h3>
+          <p class="text-xs text-slate-400">Escribe el nombre de la letra (ej: <em>lambda, eta, epsilon, nabla, omega, poynting, u, alpha, sigma</em>) para ver su significado sin salir de la diapositiva actual.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="symbol-search" type="text" oninput="filterSymbols(this.value)" placeholder="Buscar letra o variable (ej. lambda, eta, sigma, u, h)..." class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white w-72 focus:outline-none focus:border-cyan-500" />
+          <button onclick="toggleSymbolModal()" class="px-3 py-1.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white text-xs font-bold cursor-pointer">✕ Cerrar (Esc)</button>
+        </div>
+      </div>
+      <div id="symbol-list" class="p-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="alfa alpha atenuacion absorcion muro attenuation"><strong class="text-amber-300 text-sm">$\alpha, \alpha_{i,j}$</strong> — <span class="text-cyan-300 font-bold">Letra griega Alfa</span><br/><strong>Nombre:</strong> Constante de atenuación / Coeficiente de absorción.<br/><strong>Qué es:</strong> Fracción de energía que absorbe cada muro al paso de la onda. <strong>Código:</strong> <code>attenuation</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="beta fase constante propagacion"><strong class="text-amber-300 text-sm">$\beta$</strong> — <span class="text-cyan-300 font-bold">Letra griega Beta</span><br/><strong>Nombre:</strong> Constante de fase ($\text{rad/m}$).<br/><strong>Qué es:</strong> Cambio de fase espacial de la onda por cada metro recorrido ($\gamma = \alpha + i\beta$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="gamma propagacion compleja"><strong class="text-amber-300 text-sm">$\gamma$</strong> — <span class="text-cyan-300 font-bold">Letra griega Gamma</span><br/><strong>Nombre:</strong> Constante de propagación compleja ($\gamma = \alpha + i\beta$).<br/><strong>Qué es:</strong> Agrupa la atenuación exponencial ($\alpha$) y el giro de fase ($\beta$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="delta pelicular skin depth jaula faraday metal"><strong class="text-amber-300 text-sm">$\delta$</strong> — <span class="text-cyan-300 font-bold">Letra griega Delta minúscula</span><br/><strong>Nombre:</strong> Profundidad pelicular (<em>Skin Depth</em>, $\text{m}$).<br/><strong>Qué es:</strong> Distancia ($\approx 1.3\,\mu\text{m}$ en metal) donde la onda se extingue, produciendo la Jaula de Faraday.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="delta mayuscula incremento paso diferencia"><strong class="text-amber-300 text-sm">$\Delta x, \Delta y, \Delta u$</strong> — <span class="text-cyan-300 font-bold">Letra griega Delta mayúscula</span><br/><strong>Nombre:</strong> Incremento o diferencia discreta.<br/><strong>Qué es:</strong> Distancia entre nodos ($\Delta x = h = 0.5\text{ m}$) o cambio de potencial entre pasos ($\Delta u$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="epsilon sub cero permitividad vacio"><strong class="text-amber-300 text-sm">$\varepsilon_0$</strong> — <span class="text-cyan-300 font-bold">Letra griega Épsilon sub cero</span><br/><strong>Nombre:</strong> Permitividad eléctrica del vacío ($8.854\times 10^{-12}\text{ F/m}$).<br/><strong>Qué es:</strong> Constante universal que mide cómo se establece el campo eléctrico en el vacío.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="epsilon sub r permitividad relativa constante dielectrica muro"><strong class="text-amber-300 text-sm">$\varepsilon_r$</strong> — <span class="text-cyan-300 font-bold">Letra griega Épsilon sub r</span><br/><strong>Nombre:</strong> Permitividad relativa / Constante dieléctrica (adimensional).<br/><strong>Qué es:</strong> Cuánto más se polariza un muro respecto al aire (concreto: $6.5$, ladrillo: $4.5$). <strong>Código:</strong> <code>relativePermittivity</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="epsilon tolerancia error parada"><strong class="text-amber-300 text-sm">$\varepsilon$</strong> — <span class="text-cyan-300 font-bold">Letra griega Épsilon minúscula</span><br/><strong>Nombre:</strong> Tolerancia de convergencia numérica ($10^{-3}$ a $10^{-6}$).<br/><strong>Qué es:</strong> Límite de error para detener el bucle cuando la malla ya alcanzó el equilibrio. <strong>Código:</strong> <code>tolerance</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="eta sub cero impedancia intrinseca vacio 376.73"><strong class="text-amber-300 text-sm">$\eta_0$</strong> — <span class="text-cyan-300 font-bold">Letra griega Eta sub cero</span><br/><strong>Nombre:</strong> Impedancia intrínseca del espacio libre ($\approx 376.73\,\Omega$).<br/><strong>Qué es:</strong> Relación fija $\sqrt{\mu_0/\varepsilon_0} = E/H$ en el aire; permite hallar $E_{\text{rms}}$ desde Poynting. <strong>Código:</strong> <code>ETA_0</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="kappa absorcion edp sumidero"><strong class="text-amber-300 text-sm">$\kappa(x,y)$</strong> — <span class="text-cyan-300 font-bold">Letra griega Kappa minúscula</span><br/><strong>Nombre:</strong> Coeficiente espacial continuo de absorción ($\text{m}^{-1}$).<br/><strong>Qué es:</strong> Representa la pérdida local en la ecuación diferencial $\nabla^2 u - \kappa^2 u = 0$.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="lambda longitud de onda frecuencia"><strong class="text-amber-300 text-sm">$\lambda$</strong> — <span class="text-cyan-300 font-bold">Letra griega Lambda minúscula</span><br/><strong>Nombre:</strong> Longitud de onda ($\text{m}$ o $\text{cm}$).<br/><strong>Qué es:</strong> Distancia entre dos crestas ($\lambda = c/f$: $12.5\text{ cm}$ en $2.4\text{ GHz}$ y $6.0\text{ cm}$ en $5.0\text{ GHz}$). <strong>Código:</strong> <code>wavelengthM</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="mu sub cero permeabilidad magnetica vacio"><strong class="text-amber-300 text-sm">$\mu_0$</strong> — <span class="text-cyan-300 font-bold">Letra griega Mu sub cero</span><br/><strong>Nombre:</strong> Permeabilidad magnética del vacío ($4\pi\times 10^{-7}\text{ H/m}$).<br/><strong>Qué es:</strong> Constante magnética universal del espacio libre.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="rho radio espectral matriz convergencia"><strong class="text-amber-300 text-sm">$\rho(\mathcal{L}_\omega), \rho_{\text{Jacobi}}$</strong> — <span class="text-cyan-300 font-bold">Letra griega Rho minúscula</span><br/><strong>Nombre:</strong> Radio espectral de la matriz de iteración.<br/><strong>Qué es:</strong> Mide qué tan rápido cae el error en cada paso; requiere $\rho < 1$ para converger.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="sigma conductividad electrica siemens joule"><strong class="text-amber-300 text-sm">$\sigma$</strong> — <span class="text-cyan-300 font-bold">Letra griega Sigma minúscula</span><br/><strong>Nombre:</strong> Conductividad eléctrica del material ($\text{S/m}$).<br/><strong>Qué es:</strong> Mide cuánta corriente de conducción se induce y disipa como calor ($\sigma E^2$) en el muro. <strong>Código:</strong> <code>conductivitySm</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="omega factor sobre relajacion sor frecuencia angular"><strong class="text-amber-300 text-sm">$\omega, \omega_{\text{ópt}}$</strong> — <span class="text-cyan-300 font-bold">Letra griega Omega minúscula</span><br/><strong>Nombre:</strong> Factor de relajación en SOR / Frecuencia angular.<br/><strong>Qué es:</strong> En SOR ($\omega \in (1,2)$, óptimo $\approx 1.45$) acelera la convergencia un $73.7\%$. <strong>Código:</strong> <code>omega</code>.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="omega mayuscula ohmio dominio recinto frontera"><strong class="text-amber-300 text-sm">$\Omega, \partial\Omega$</strong> — <span class="text-cyan-300 font-bold">Letra griega Omega mayúscula</span><br/><strong>Nombre:</strong> Unidad Ohmio ($\Omega$) / Dominio 2D del recinto ($\Omega$) y su borde ($\partial\Omega$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="nabla laplaciano divergencia rotacional derivada parcial"><strong class="text-emerald-300 text-sm">$\nabla, \nabla\cdot, \nabla\times, \nabla^2, \partial$</strong> — <span class="text-cyan-300 font-bold">Operadores Nabla, Laplaciano y Derivada Parcial</span><br/><strong>Nombre:</strong> Operadores diferenciales espaciales.<br/><strong>Qué es:</strong> $\nabla^2 u = \frac{\partial^2 u}{\partial x^2}+\frac{\partial^2 u}{\partial y^2}$ mide la difusión espacial 2D hacia los 4 vecinos.</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="c velocidad luz"><strong class="text-emerald-300 text-sm">$c, f, T$</strong> — <span class="text-cyan-300 font-bold">Letras latinas c, f y T</span><br/><strong>Nombre:</strong> Velocidad de la luz ($c = 2.9979\times 10^8\text{ m/s}$), Frecuencia ($f$ en $\text{Hz}$) y Periodo ($T = 1/f$ en $\text{s}$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="p potencia dbm mw w pire tx rx"><strong class="text-emerald-300 text-sm">$\text{PIRE}, P_{\text{tx}}, P_{\text{rx}}, G$</strong> — <span class="text-cyan-300 font-bold">Variables de Potencia y Ganancia</span><br/><strong>Nombre:</strong> Potencia emitida ($P_{\text{tx}}$), Ganancia ($G$ en $\text{dBi}$) y Potencia recibida ($P_{\text{rx}}$ en $\text{dBm}, \text{mW}, \text{W}$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="s vector poynting aeff apertura efectiva"><strong class="text-emerald-300 text-sm">$\vec{S}, \langle S \rangle, A_{\text{eff}}$</strong> — <span class="text-cyan-300 font-bold">Vector de Poynting y Apertura Efectiva</span><br/><strong>Nombre:</strong> Flujo de potencia por área ($\langle S \rangle$ en $\text{W/m}^2$ o $\mu\text{W/m}^2$) y área isotrópica ($A_{\text{eff}} = \lambda^2/4\pi$).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="e h rms campo electrico magnetico eficaz"><strong class="text-emerald-300 text-sm">$E_{\text{rms}}, H_{\text{rms}}$</strong> — <span class="text-cyan-300 font-bold">Campos Eficaces Eléctrico y Magnético</span><br/><strong>Nombre:</strong> Valor cuadrático medio eléctrico ($\text{V/m}$, <code>electricFieldVm</code>) y magnético ($\text{mA/m}$, <code>magneticFieldMam</code>).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="u i j k h potencial nodo celda iteracion"><strong class="text-emerald-300 text-sm">$u_{i,j}^{(k)}, u_{i,j}^{\text{GS}}, h$</strong> — <span class="text-cyan-300 font-bold">Variables de la Malla en Diferencias Finitas</span><br/><strong>Nombre:</strong> Potencial ($0$ a $100$) en fila $i$, columna $j$, iteración $(k)$, y tamaño de celda $h = 0.5\text{ m}$ (<code>cell.val</code>, <code>cellSize</code>).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="r norma infinito residuo error maximo"><strong class="text-emerald-300 text-sm">$\|r^{(k)}\|_\infty$</strong> — <span class="text-cyan-300 font-bold">Norma Infinito del Residuo</span><br/><strong>Nombre:</strong> Cambio máximo absoluto $\max_{i,j}|u_{i,j}^{(k+1)} - u_{i,j}^{(k)}|$ en toda la malla (<code>maxError</code>).</div>
+        <div class="sym-item p-2.5 rounded-xl bg-slate-950/90 border border-slate-800" data-keys="d n l rmse r2 validacion itu"><strong class="text-emerald-300 text-sm">$d, d_0, n, L_{\text{muro}}, \text{RMSE}, R^2$</strong> — <span class="text-cyan-300 font-bold">Variables de Validación Analítica ITU-R P.1238</span><br/><strong>Nombre:</strong> Distancia ($d$), exponente ($n$), pérdida en muros ($L_{\text{muro}}$), error medio ($\text{RMSE} = 1.84\text{ dB}$) y correlación ($R^2 = 0.978$).</div>
+      </div>
     </div>
   </div>
 
@@ -1106,7 +1434,39 @@ if (alpha &gt; 40 &amp;&amp; brightness &lt; thresh) {<br/>
       }
     }
 
+    function toggleSymbolModal() {
+      const modal = document.getElementById('symbol-modal');
+      if (!modal) return;
+      const isHidden = modal.classList.contains('hidden');
+      if (isHidden) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        const input = document.getElementById('symbol-search');
+        if (input) setTimeout(() => input.focus(), 50);
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function filterSymbols(query) {
+      const q = (query || '').toLowerCase().trim();
+      const items = document.querySelectorAll('.sym-item');
+      items.forEach((el) => {
+        const text = (el.textContent || '').toLowerCase() + ' ' + (el.getAttribute('data-keys') || '');
+        el.style.display = !q || text.includes(q) ? '' : 'none';
+      });
+    }
+
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('symbol-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+          toggleSymbolModal();
+          return;
+        }
+      }
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
       if (e.key === 'ArrowRight') nextSlide();
       if (e.key === 'ArrowLeft') prevSlide();
     });
