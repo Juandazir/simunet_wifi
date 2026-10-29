@@ -145,7 +145,7 @@ export default function ControlPanel({
         // Barrido de omegas de 1.0 a 1.9 con paso de 0.05
         const omegasToTest = [1.0, 1.1, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9];
         const testTolerance = config.tolerance;
-        const testMaxIterations = 150;
+        const testMaxIterations = Math.max(config.maxIterations, 400);
 
         for (const w of omegasToTest) {
           const testInitialGrid = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
@@ -157,7 +157,7 @@ export default function ControlPanel({
             testMaxIterations
           );
 
-          const converged = solveResult.finalError < testTolerance && solveResult.iterations < testMaxIterations;
+          const converged = solveResult.finalError < testTolerance;
           results.push({
             omega: w,
             iterations: solveResult.iterations,
@@ -177,12 +177,13 @@ export default function ControlPanel({
         });
 
         const best = sorted[0];
-        setOmegaResults(results);
+        setOmegaResults(sorted);
         setBestOmegaFound(best.omega);
         
         // Aplicar el omega óptimo del SOR
         setConfig((prev) => ({
           ...prev,
+          method: "sor",
           omega: best.omega
         }));
       } catch (err) {
@@ -857,7 +858,7 @@ export default function ControlPanel({
                 >
                   <div className={`w-2.5 h-2.5 rounded border ${material.color.split(" ")[0]}`} />
                   <span className="text-[8px] font-black line-clamp-1 leading-none">{material.name}</span>
-                  <span className={`text-[7px] font-mono leading-none ${isSelected ? "text-indigo-400" : "text-slate-500"}`}>-{material.dbLoss}dB</span>
+                  <span className={`text-[7px] font-mono leading-none ${isSelected ? "text-indigo-400" : "text-slate-500"}`}>-{material.dbLoss}dB • εᵣ={material.relativePermittivity}</span>
                 </button>
               );
             })}
@@ -991,56 +992,63 @@ export default function ControlPanel({
         </div>
       </div>
 
-      {/* LAPLACE NUMERICAL EQUATORIAL PARAMETERS BLOCK */}
+      {/* DIFERENCIAS FINITAS Y PARÁMETROS NUMÉRICOS */}
       <div className={`space-y-3 rounded-2xl p-4 border transition-all ${formBgClass}`}>
         <div className="flex items-center justify-between">
           <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 flex items-center gap-1">
             <Cpu className="w-3.5 h-3.5 text-indigo-500" />
-            Parámetros de Resolución de Laplace
+            Esquema en Diferencias Finitas
           </h4>
-          {!isAdmin && (
-            <span className="inline-flex items-center gap-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-extrabold px-1.5 py-0.5 rounded">
-              <Lock className="w-2.5 h-2.5" />
-              Lectura
-            </span>
-          )}
+          <span className="inline-flex items-center gap-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[8px] font-extrabold px-1.5 py-0.5 rounded">
+            Interactivo
+          </span>
         </div>
 
         {/* Selección de Método */}
         <div className="flex flex-col gap-1.5 p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/40 dark:bg-slate-950/20">
           <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 flex justify-between">
-            <span>Método de Resolución:</span>
+            <span>Método Iterativo:</span>
           </label>
-          <div className="w-full px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-tight bg-indigo-550/5 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-between">
-            <span>Sobre-Relajación Sucesiva (SOR)</span>
-            <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 bg-indigo-500/10 rounded leading-none text-indigo-500 dark:text-indigo-400">Exclusivo</span>
-          </div>
+          <select
+            value={config.method}
+            onChange={(e) => setConfig((prev) => ({ ...prev, method: e.target.value as SolverMethod }))}
+            className={`w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold focus:outline-none transition ${selectClass}`}
+            id="select_solver_method"
+          >
+            <option value="sor">Sobre-Relajación Sucesiva (SOR, 1 &lt; ω &lt; 2)</option>
+            <option value="gauss-seidel">Gauss-Seidel (Relajación Estándar, ω = 1.0)</option>
+            <option value="jacobi">Jacobi (Actualización Simultánea)</option>
+          </select>
           <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-relaxed mt-1">
-            ✓ SOR: Extrapola activamente la dirección esperada del residuo con el parámetro de aceleración omega (ω &gt; 1).
+            {config.method === "sor"
+              ? "✓ SOR: Extrapola la dirección de Gauss-Seidel con el factor ω para acelerar la convergencia al estado estacionario."
+              : config.method === "gauss-seidel"
+              ? "✓ Gauss-Seidel: Usa inmediatamente los nodos recién calculados (equivale a SOR con ω = 1.0)."
+              : "✓ Jacobi: Actualiza toda la malla simultáneamente usando solo la iteración anterior k."}
           </p>
         </div>
 
         {/* Omega Slider (SOR) */}
         <div className="flex flex-col gap-0.5 pt-0.5">
           <div className="flex justify-between items-center text-[10px]">
-            <span className="font-semibold text-slate-605 dark:text-slate-300">Factor de Relajación Crítico (ω):</span>
+            <span className="font-semibold text-slate-605 dark:text-slate-300">Factor de Relajación (ω):</span>
             <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">{config.omega}</span>
           </div>
           <input
             type="range"
-            min="0.1"
+            min="0.5"
             max="1.9"
             step="0.05"
             value={config.omega}
-            disabled={!isAdmin}
+            disabled={config.method !== "sor"}
             onChange={(e) => setConfig((prev) => ({ ...prev, omega: parseFloat(e.target.value) }))}
-            className={`w-full accent-indigo-500 cursor-pointer my-1 ${!isAdmin ? "opacity-40 cursor-not-allowed" : ""}`}
+            className={`w-full accent-indigo-500 cursor-pointer my-1 ${config.method !== "sor" ? "opacity-40 cursor-not-allowed" : ""}`}
             id="slider_omega"
           />
           <div className="flex justify-between text-[8px] text-slate-500 dark:text-slate-400 font-mono leading-none">
-            <span>0.1 (Sub-convergencia)</span>
-            <span>1.0 (Sin Relajamiento)</span>
-            <span>1.9 (Sobre-convergencia)</span>
+            <span>0.5 (Sub-relajación)</span>
+            <span>1.0 (Gauss-Seidel)</span>
+            <span>1.9 (Sobre-relajación)</span>
           </div>
         </div>
 
@@ -1058,11 +1066,8 @@ export default function ControlPanel({
           ) : (
             <button
               type="button"
-              disabled={!isAdmin}
               onClick={handleOptimizeOmega}
-              className={`w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl font-bold bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 transition cursor-pointer text-[10.5px] ${
-                !isAdmin ? "opacity-35 cursor-not-allowed hover:bg-transparent" : "hover:scale-[1.01]"
-              }`}
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl font-bold bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 transition cursor-pointer text-[10.5px] hover:scale-[1.01]"
             >
               <Cpu className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
               Auto-calcular ω Óptimo (SOR)
@@ -1076,14 +1081,11 @@ export default function ControlPanel({
                 ¡Valor de ω Óptimo Encontrado!
               </span>
               <p className="text-[9px] text-slate-555 dark:text-slate-400 leading-normal">
-                El algoritmo de barrido rápido determinó que <strong className="text-emerald-600 dark:text-emerald-400">&omega; = {bestOmegaFound}</strong> requiere el menor número de iteraciones para estabilizar la señal de la matriz dada con respecto a muros y obstáculos.
+                El barrido espectral determinó que <strong className="text-emerald-600 dark:text-emerald-400">&omega; = {bestOmegaFound}</strong> minimiza el número de iteraciones para estabilizar el campo electromagnético.
               </p>
-              
               <div className="flex flex-col gap-1 mt-1 font-mono text-[8.5px] border-t border-emerald-500/10 pt-1.5">
                 <span className="text-[8px] uppercase font-black text-slate-550 dark:text-slate-400 tracking-wider mb-0.5">Velocidad de Convergencia:</span>
                 {omegaResults
-                  .filter(r => r.converged)
-                  .sort((a, b) => a.iterations - b.iterations)
                   .slice(0, 3)
                   .map((r, i) => (
                     <div key={r.omega} className="flex justify-between items-center text-slate-500 dark:text-slate-455 px-1 hover:bg-slate-500/5 rounded">
@@ -1106,19 +1108,14 @@ export default function ControlPanel({
             <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">Tolerancia Límite (ε):</label>
             <select
               value={config.tolerance}
-              onChange={(e) => isAdmin && setConfig((prev) => ({ ...prev, tolerance: parseFloat(e.target.value) }))}
-              disabled={!isAdmin}
-              className={`w-full px-2 py-1 rounded-xl text-[11px] focus:outline-none transition ${selectClass} ${!isAdmin ? "opacity-60 cursor-not-allowed" : ""}`}
+              onChange={(e) => setConfig((prev) => ({ ...prev, tolerance: parseFloat(e.target.value) }))}
+              className={`w-full px-2 py-1 rounded-xl text-[11px] focus:outline-none transition ${selectClass}`}
               id="select_tolerance"
             >
               <option value="0.01">10⁻² (Rápida)</option>
               <option value="0.001">10⁻³ (Estándar)</option>
-              {isAdmin && (
-                <>
-                  <option value="0.0001">10⁻⁴ (Alta)</option>
-                  <option value="0.000001">10⁻⁶ (Laboratorio)</option>
-                </>
-              )}
+              <option value="0.0001">10⁻⁴ (Alta Precisión)</option>
+              <option value="0.000001">10⁻⁶ (Laboratorio)</option>
             </select>
           </div>
 

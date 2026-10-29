@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presentación Explicativa Detallada — Feria de la Física 2026 — Juan David Conde Duarte</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #020617;
+      color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .slide {
+      display: none;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 2rem 3.5rem 5.5rem 3.5rem;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .slide.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .term-badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 0.5rem;
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .step-number {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 1: PORTADA Y MAPA GENERAL DEL PROYECTO
+       ========================================================================= -->
+  <section class="slide active" id="slide-1">
+    <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+      <div class="flex items-center gap-2.5">
+        <span class="px-3 py-1 rounded-full bg-red-900/50 border border-red-700 text-red-200 text-xs font-bold uppercase tracking-wider">Feria de la Física 2026</span>
+        <span class="px-3 py-1 rounded-full bg-indigo-900/50 border border-indigo-700 text-indigo-200 text-xs font-bold uppercase tracking-wider">Modalidad Computacional</span>
+        <span class="px-3 py-1 rounded-full bg-emerald-900/40 border border-emerald-700/60 text-emerald-300 text-xs font-bold">Guía Explicativa Detallada</span>
+      </div>
+      <span class="text-xs font-mono text-slate-400">Universidad de Pamplona • Departamento de Física</span>
+    </div>
+
+    <div class="my-auto max-w-6xl mx-auto w-full py-4 space-y-6">
+      <div>
+        <p class="text-amber-400 font-bold uppercase tracking-widest text-xs mb-2">Asignatura: Electromagnetismo • Proyecto de Física Computacional</p>
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-black leading-tight text-white">
+          Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos
+        </h1>
+      </div>
+
+      <!-- Explicación en 1 párrafo de todo el proyecto -->
+      <div class="p-5 rounded-2xl bg-indigo-950/30 border border-indigo-800/50">
+        <h3 class="text-sm font-extrabold uppercase tracking-wider text-indigo-300 mb-1.5">¿De qué trata este proyecto en palabras sencillas?</h3>
+        <p class="text-sm text-slate-200 leading-relaxed">
+          Cuando un emisor de microondas (como un router Wi-Fi en las bandas de <strong>$2.4\text{ GHz}$</strong> o <strong>$5.0\text{ GHz}$</strong>) emite una onda electromagnética dentro de una edificación, la energía de la onda disminuye al alejarse de la antena y al chocar contra paredes de yeso, ladrillo, concreto o metal. Como resolver este problema con lápiz y papel en un plano real con muchas paredes es imposible, creamos un <strong>simulador físico-matemático (SimuNet Física)</strong> que divide la habitación en una cuadrícula de celdas y resuelve una <strong>ecuación diferencial parcial en Diferencias Finitas</strong> mediante el método acelerado <strong>SOR (Sobre-Relajación Sucesiva)</strong>. Así obtenemos en cada punto la <strong>Potencia recibida ($P_{\text{rx}}$)</strong>, el <strong>Vector de Poynting ($\langle S \rangle$)</strong>, el <strong>Campo Eléctrico ($E_{\text{rms}}$)</strong> y el <strong>Campo Magnético ($H_{\text{rms}}$)</strong>.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+          <p class="text-[11px] uppercase text-slate-400 font-bold">Autor del Proyecto</p>
+          <p class="text-lg font-extrabold text-emerald-400 mt-0.5">Juan David Conde Duarte</p>
+          <p class="text-xs text-slate-300">C.C. 1102349090 • Programa de Ingeniería de Sistemas</p>
+          <p class="text-xs text-slate-400 font-mono mt-0.5">juan.conde2@unipamplona.edu.co</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+          <p class="text-[11px] uppercase text-slate-400 font-bold">Profesora Tutora</p>
+          <p class="text-lg font-extrabold text-indigo-400 mt-0.5">Gladys Liliana Bautista Wilches</p>
+          <p class="text-xs text-slate-300">Docente de Electromagnetismo — Departamento de Física</p>
+          <p class="text-xs text-slate-400 font-mono mt-0.5">gladys.bautista@unipamplona.edu.co</p>
+        </div>
+      </div>
+
+      <!-- Índice rápido interactivo -->
+      <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-2.5">Índice Interactivo de Temas, Términos y Procesos (Haz clic en cualquier bloque para ir directo):</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+          <button onclick="goToSlide(1)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">2.</strong> Ondas TEM, UHF/SHF y $\lambda$</button>
+          <button onclick="goToSlide(2)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">3.</strong> Potencia dBm, PIRE y $A_{\text{eff}}$</button>
+          <button onclick="goToSlide(3)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">4.</strong> Vector de Poynting, $\eta_0$, $E_{\text{rms}}$, $H_{\text{rms}}$</button>
+          <button onclick="goToSlide(4)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">5.</strong> Materiales: $\varepsilon_r$, $\sigma$, Beer-Lambert y Faraday</button>
+          <button onclick="goToSlide(5)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">6.</strong> EDP, Laplaciano $\nabla^2$ y Dirichlet</button>
+          <button onclick="goToSlide(6)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">7.</strong> Proceso: Diferencias Finitas (5 Puntos)</button>
+          <button onclick="goToSlide(7)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">8.</strong> Proceso: Jacobi vs Gauss-Seidel vs SOR</button>
+          <button onclick="goToSlide(8)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">9.</strong> Proceso: Escáner de Planos y K-Means</button>
+          <button onclick="goToSlide(9)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">10.</strong> Resultados 2D: 2.4 vs 5 GHz y Faraday</button>
+          <button onclick="goToSlide(10)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">11.</strong> Proceso: Validación Analítica ITU-R</button>
+          <button onclick="goToSlide(11)" class="p-2 rounded-xl bg-slate-800/80 hover:bg-indigo-600/40 border border-slate-700 text-left transition cursor-pointer"><strong class="text-indigo-400">12.</strong> Conclusiones y 5 Preguntas del Jurado</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Usa las flechas ⬅ ➡ del teclado o la barra inferior para navegar</span>
+      <span class="font-mono font-bold text-white">Diapositiva 1 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 2: ONDAS ELECTROMAGNÉTICAS, UHF/SHF Y LONGITUD DE ONDA
+       ========================================================================= -->
+  <section class="slide" id="slide-2">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">1. Fenómeno Físico y Términos de Ondas Electromagnéticas</h2>
+      <span class="text-xs font-mono text-slate-400">Significado Físico de TEM, UHF, SHF, $f$ y $\lambda$</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-auto py-4 max-w-6xl mx-auto w-full">
+      <!-- Columna Izquierda: Definición detallada de términos -->
+      <div class="space-y-4">
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Onda TEM</span>
+            <h3 class="text-base font-bold text-white">¿Qué es una Onda Electromagnética Transversal?</h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Según las <strong>Ecuaciones de Maxwell</strong>, un campo eléctrico variable en el tiempo ($\vec{E}$) engendra un campo magnético ($\vec{H}$), y viceversa. Ambos viajan juntos por el espacio a la velocidad de la luz ($c \approx 3 \times 10^8\text{ m/s}$) sin necesitar un medio material. Se llama <strong>Transversal Electromagnética (TEM)</strong> porque el campo eléctrico $\vec{E}$, el campo magnético $\vec{H}$ y la dirección de propagación son <strong>mutuamente perpendiculares</strong> ($\vec{E} \perp \vec{H} \perp \text{avance}$).
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Frecuencia $f$</span>
+            <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30">Bandas UHF y SHF</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            La <strong>frecuencia ($f$)</strong> mide cuántas oscilaciones completas realiza la onda en un segundo ($\text{Hz} = \text{ciclos/s}$). Un gigahercio ($1\text{ GHz}$) equivale a $10^9$ (mil millones) de oscilaciones por segundo:
+          </p>
+          <ul class="text-xs text-slate-300 space-y-2 pl-2">
+            <li>• <strong class="text-emerald-400">UHF (Ultra High Frequency — Frecuencia Ultra Alta):</strong> Comprende el rango de $300\text{ MHz}$ a $3\text{ GHz}$. Aquí opera la banda Wi-Fi de <strong>$2.4\text{ GHz}$</strong> ($2.4 \times 10^9\text{ Hz}$).</li>
+            <li>• <strong class="text-amber-400">SHF (Super High Frequency — Frecuencia Súper Alta):</strong> Comprende de $3\text{ GHz}$ a $30\text{ GHz}$ (microondas). Aquí opera la banda Wi-Fi de <strong>$5.0\text{ GHz}$</strong> ($5.0 \times 10^9\text{ Hz}$).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Longitud de onda y su impacto físico -->
+      <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-800/50 flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30">Longitud de Onda $\lambda = c/f$</span>
+            <h3 class="text-base font-bold text-white">¿Qué es $\lambda$ y por qué define la penetración en muros?</h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-3">
+            La <strong>longitud de onda ($\lambda$)</strong> es la distancia física en metros o centímetros entre dos crestas consecutivas de la onda. Se calcula dividiendo la velocidad de la luz ($c = 2.9979 \times 10^8\text{ m/s}$) entre la frecuencia $f$:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+            <div class="p-3 rounded-xl bg-slate-900 border border-emerald-700/50">
+              <span class="text-xs font-bold text-emerald-400 block mb-1">Cálculo en Banda 2.4 GHz (UHF)</span>
+              $$\lambda_{2.4} = \frac{3\times 10^8\text{ m/s}}{2.4\times 10^9\text{ Hz}} = 0.125\text{ m} = 12.5\text{ cm}$$
+              <p class="text-[11px] text-slate-300 mt-1">Crestas separadas <strong>$12.5\text{ cm}$</strong>.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-amber-700/50">
+              <span class="text-xs font-bold text-amber-400 block mb-1">Cálculo en Banda 5.0 GHz (SHF)</span>
+              $$\lambda_{5.0} = \frac{3\times 10^8\text{ m/s}}{5.0\times 10^9\text{ Hz}} = 0.060\text{ m} = 6.0\text{ cm}$$
+              <p class="text-[11px] text-slate-300 mt-1">Crestas separadas <strong>$6.0\text{ cm}$</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-700 space-y-2 text-xs">
+          <h4 class="font-extrabold text-amber-300 uppercase tracking-wide">¿Por qué $2.4\text{ GHz}$ atraviesa mejor los muros que $5.0\text{ GHz}$?</h4>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>1. Mayor absorción dieléctrica a mayor frecuencia:</strong> Al oscilar más del doble de rápido ($5.0\text{ GHz}$ vs $2.4\text{ GHz}$), los dipolos moleculares del concreto o ladrillo experimentan mayor fricción por unidad de distancia, disipando más energía en calor.<br/>
+            <strong>2. Interacción con el espesor del muro:</strong> Un muro de $12\text{ cm}$ de espesor equivale a <strong>$1$ sola longitud de onda</strong> para $2.4\text{ GHz}$, pero equivale a <strong>$2$ longitudes de onda completas</strong> para $5.0\text{ GHz}$, duplicando el camino eléctrico dentro del obstáculo.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 2 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 3: GLOSARIO DE POTENCIA, DBM, PIRE Y ÁREA EFECTIVA
+       ========================================================================= -->
+  <section class="slide" id="slide-3">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">2. Glosario Detallado de Potencia y Radiación ($\text{dBm}$, $\text{PIRE}$, $A_{\text{eff}}$)</h2>
+      <span class="text-xs font-mono text-slate-400">Cómo medimos la energía que sale del emisor y llega al receptor</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 my-auto py-4 max-w-6xl mx-auto w-full">
+      <!-- Bloque 1: dBm y mW -->
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3">
+        <div>
+          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-2">Potencia en dBm y mW</span>
+          <h3 class="text-base font-bold text-white mb-2">¿Qué es el $\text{dBm}$ y por qué es negativo?</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            La potencia de una señal de radio cae millones de veces entre el router y un celular. Para no escribir números con muchos ceros decimales ($0.000001\text{ mW}$), se usa el <strong>decibelio referido a 1 milivatio ($\text{dBm}$)</strong>:
+          </p>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 my-2 text-xs text-center">
+            $$P_{\text{dBm}} = 10\,\log_{10}\!\left(\frac{P_{\text{mW}}}{1\text{ mW}}\right)$$
+            $$P_{\text{W}} = 10^{(P_{\text{dBm}} - 30)/10}$$
+          </div>
+          <ul class="text-[11px] text-slate-300 space-y-1 font-mono">
+            <li>• <strong class="text-emerald-400">0 dBm</strong> = $1\text{ mW}$ (Potencia base)</li>
+            <li>• <strong class="text-emerald-400">-30 dBm</strong> = $0.001\text{ mW}$ (Señal excelente)</li>
+            <li>• <strong class="text-amber-400">-60 dBm</strong> = $10^{-6}\text{ mW}$ (Señal buena/media)</li>
+            <li>• <strong class="text-rose-400">-85 dBm</strong> = $3.16\times 10^{-9}\text{ mW}$ (Ruido térmico)</li>
+          </ul>
+        </div>
+        <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-[11px] text-emerald-200">
+          <strong>Regla clave:</strong> Cada vez que una pared resta <strong>$-3\text{ dB}$</strong>, la potencia física en vatios cae a la <strong>mitad ($50\%$)</strong>. Si resta <strong>$-10\text{ dB}$</strong>, cae a la <strong>décima parte ($10\%$)</strong>.
+        </div>
+      </div>
+
+      <!-- Bloque 2: Tx, Ganancia dBi y PIRE -->
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3">
+        <div>
+          <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">Tx, Ganancia (dBi) y PIRE</span>
+          <h3 class="text-base font-bold text-white mb-2">Parámetros de la Fuente Emisora</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-2">
+            En el código (<code>controlador.ts</code>), cada modelo de router tiene tres especificaciones de radiofrecuencia:
+          </p>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li>
+              1. <strong class="text-white">Potencia de Transmisión ($P_{\text{tx}}$ en dBm):</strong> La energía eléctrica que el circuito amplificador entrega al conector de la antena.
+            </li>
+            <li>
+              2. <strong class="text-white">Ganancia de Antena ($G$ en dBi):</strong> Mide cuánto concentra la antena la energía en el plano horizontal comparada con una antena puntual ideal (<em>isotrópica</em>).
+            </li>
+            <li>
+              3. <strong class="text-indigo-400">PIRE o EIRP (Potencia Isotrópica Radiada Equivalente):</strong> Es la potencia efectiva total lanzada al aire:
+            </li>
+          </ul>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 my-2 text-xs text-center">
+            $$\text{PIRE}_{\text{dBm}} = P_{\text{tx (dBm)}} + G_{\text{(dBi)}}$$
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-800/40 text-[11px] text-indigo-200">
+          <strong>En el simulador:</strong> La $\text{PIRE}$ determina el valor fijo de excitación de frontera ($u_{\text{fuente}}$) que inyecta el router en su celda $(x_r, y_r)$.
+        </div>
+      </div>
+
+      <!-- Bloque 3: Área Efectiva A_eff -->
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3">
+        <div>
+          <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-2">Apertura Efectiva $A_{\text{eff}}$</span>
+          <h3 class="text-base font-bold text-white mb-2">¿Cómo capta energía el nodo receptor?</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Cuando la onda viaja por el aire, lleva una densidad de potencia $\langle S \rangle$ en $\text{W/m}^2$. Para saber cuántos vatios ($P_{\text{rx}}$) recoge una antena receptora ideal en un punto $(x,y)$, usamos su <strong>Área o Apertura Efectiva Isotrópica ($A_{\text{eff}}$)</strong>, deducida de la teoría electromagnética de antenas:
+          </p>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 my-2 text-xs text-center">
+            $$A_{\text{eff}} = \frac{\lambda^2}{4\pi} \quad [\text{m}^2]$$
+            $$P_{\text{rx}} = \langle S \rangle \cdot A_{\text{eff}}$$
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Observa que $A_{\text{eff}}$ depende del cuadrado de la longitud de onda ($\lambda^2$):
+          </p>
+          <ul class="text-[11px] text-slate-300 space-y-1 font-mono mt-1">
+            <li>• A $2.4\text{ GHz}$: $A_{\text{eff}} = \frac{(0.125)^2}{4\pi} = 1.24\times 10^{-3}\text{ m}^2$</li>
+            <li>• A $5.0\text{ GHz}$: $A_{\text{eff}} = \frac{(0.060)^2}{4\pi} = 2.86\times 10^{-4}\text{ m}^2$</li>
+          </ul>
+        </div>
+        <div class="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200">
+          <strong>Consecuencia física:</strong> Como $A_{\text{eff}}$ en $5.0\text{ GHz}$ es $4.3$ veces más pequeña que en $2.4\text{ GHz}$, una antena en $5\text{ GHz}$ capta menos potencia incluso en espacio libre.
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 3 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 4: VECTOR DE POYNTING, IMPEDANCIA Y PROCESO DE CONVERSIÓN
+       ========================================================================= -->
+  <section class="slide" id="slide-4">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">3. Vector de Poynting ($\vec{S}$), Impedancia ($\eta_0$) y Campos ($E_{\text{rms}}$, $H_{\text{rms}}$)</h2>
+      <span class="text-xs font-mono text-slate-400">Proceso de Conversión Física en <code>servicios.ts</code></span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-4 max-w-6xl mx-auto w-full">
+      <!-- Explicación de los 4 términos físicos -->
+      <div class="lg:col-span-6 space-y-3">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30">1. Vector de Poynting $\vec{S}$ y $\langle S \rangle$ ($\text{W/m}^2$ o $\mu\text{W/m}^2$)</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            Definido como $\vec{S} = \vec{E} \times \vec{H}$, es el vector que indica <strong>hacia dónde fluye la energía electromagnética y cuánta potencia atraviesa perpendicularmente cada metro cuadrado de superficie</strong>. Su magnitud media temporal $\langle S \rangle$ se llama <em>densidad de flujo de potencia</em>.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">2. Impedancia Intrínseca del Espacio Libre ($\eta_0 \approx 376.73\,\Omega$)</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            Incluso sin cables, el vacío y el aire oponen una relación característica entre el campo eléctrico y el magnético dada por la permeabilidad magnética $\mu_0 = 4\pi\times 10^{-7}\text{ H/m}$ y la permitividad eléctrica $\varepsilon_0 = 8.854\times 10^{-12}\text{ F/m}$:
+            $$\eta_0 = \sqrt{\frac{\mu_0}{\varepsilon_0}} \approx 376.73\,\Omega \quad (\text{Ohmios})$$
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3. Campos Eficaces $E_{\text{rms}}$ ($\text{V/m}$) y $H_{\text{rms}}$ ($\text{mA/m}$)</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            Como la onda oscila entre valores positivos y negativos, su media aritmética es cero. Por eso usamos el <strong>valor eficaz o cuadrático medio ($\text{rms}$, <em>Root Mean Square</em>)</strong>, $E_{\text{rms}} = E_{\text{máx}}/\sqrt{2}$, que mide la intensidad efectiva que transporta energía:
+            $$\langle S \rangle = E_{\text{rms}}\cdot H_{\text{rms}} = \frac{E_{\text{rms}}^2}{\eta_0} \implies E_{\text{rms}} = \sqrt{\eta_0\,\langle S \rangle}, \quad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0}$$
+          </p>
+        </div>
+      </div>
+
+      <!-- Proceso paso a paso con ejemplo numérico -->
+      <div class="lg:col-span-6 p-5 rounded-2xl bg-indigo-950/25 border border-indigo-800/60 flex flex-col justify-between">
+        <div>
+          <h3 class="text-base font-extrabold text-white mb-1">Proceso Paso a Paso: De la Celda $u_{i,j}$ al Campo Electromagnético</h3>
+          <p class="text-xs text-slate-300 mb-3">
+            Así calcula <code>calcularMagnitudesElectromagneticas(val, freq)</code> los datos de cada nodo cuando pasas el cursor sobre la malla (ejemplo con <strong>$u = 50\%$</strong> en <strong>$2.4\text{ GHz}$</strong>):
+          </p>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="step-number bg-indigo-600 text-white">1</span>
+              <div>
+                <strong class="text-indigo-300">Potencial escalar $u$ a nivel de potencia $\text{dBm}$:</strong>
+                <p class="text-slate-300 font-mono text-[11px] mt-0.5">
+                  $\text{dBm} = -85 + \left(\frac{u}{100}\right)\times 60 = -85 + (0.5 \times 60) = \mathbf{-55\text{ dBm}}$
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="step-number bg-indigo-600 text-white">2</span>
+              <div>
+                <strong class="text-indigo-300">Conversión de $\text{dBm}$ a Potencia Lineal ($P_{\text{rx}}$ en Vatios):</strong>
+                <p class="text-slate-300 font-mono text-[11px] mt-0.5">
+                  $P_{\text{rx}} = 10^{(-55 - 30)/10} = 10^{-8.5}\text{ W} = \mathbf{3.162 \times 10^{-9}\text{ W}}$
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="step-number bg-amber-500 text-slate-950">3</span>
+              <div>
+                <strong class="text-amber-300">Magnitud Media del Vector de Poynting ($\langle S \rangle$):</strong>
+                <p class="text-slate-300 font-mono text-[11px] mt-0.5">
+                  $\langle S \rangle = \frac{P_{\text{rx}}}{A_{\text{eff}}} = \frac{4\pi (3.162\times 10^{-9}\text{ W})}{(0.125\text{ m})^2} = 2.54\times 10^{-6}\text{ W/m}^2 = \mathbf{2.54\,\mu\text{W/m}^2}$
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="step-number bg-emerald-500 text-slate-950">4</span>
+              <div>
+                <strong class="text-emerald-300">Intensidad de Campo Eléctrico ($E_{\text{rms}}$) y Magnético ($H_{\text{rms}}$):</strong>
+                <p class="text-slate-300 font-mono text-[11px] mt-0.5">
+                  $E_{\text{rms}} = \sqrt{\eta_0 \langle S \rangle} = \sqrt{376.73\,\Omega \times 2.54\times 10^{-6}\text{ W/m}^2} = \mathbf{0.0309\text{ V/m}}$<br/>
+                  $H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0} = \frac{0.0309\text{ V/m}}{376.73\,\Omega} = 8.21\times 10^{-5}\text{ A/m} = \mathbf{0.0821\text{ mA/m}}$
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 4 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 5: MATERIALES DIELÉCTRICOS, CONDUCTORES Y JAULA DE FARADAY
+       ========================================================================= -->
+  <section class="slide" id="slide-5">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">4. Interacción con la Materia: $\varepsilon_r$, $\sigma$, Ley de Beer-Lambert y Jaula de Faraday</h2>
+      <span class="text-xs font-mono text-slate-400">Propiedades Constitutivas según Norma ITU-R P.2040</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-4 max-w-6xl mx-auto w-full">
+      <div class="lg:col-span-6 space-y-3">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Permitividad Relativa ($\varepsilon_r = \varepsilon/\varepsilon_0$)</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            Un <strong>dieléctrico</strong> es un material aislante (como el yeso, ladrillo o concreto). Su <strong>permitividad relativa $\varepsilon_r$</strong> mide qué tanto se polarizan y alinean sus moléculas bajo el campo eléctrico $\vec{E}$. A mayor $\varepsilon_r$ (ej. concreto $\varepsilon_r = 6.5$ vs aire $\varepsilon_r \approx 1$), la onda se frena más ($v = c/\sqrt{\varepsilon_r}$) y sufre mayor reflexión en la superficie de la pared.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30">Conductividad Efectiva ($\sigma$ en $\text{S/m}$) y Ley de Beer-Lambert</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            La <strong>conductividad $\sigma$</strong> (Siemens por metro) mide las micro-corrientes ($\vec{J} = \sigma\vec{E}$) que el campo eléctrico induce dentro del muro. Por efecto Joule ($p = \sigma E^2$), esas corrientes transforman la energía electromagnética de la onda en calor, haciendo que el campo decaiga exponencialmente con el espesor $x$ según la <strong>Ley de Beer-Lambert</strong>:
+            $$E(x) = E_0\,e^{-\alpha x}, \qquad \alpha = \omega\sqrt{\frac{\mu\varepsilon}{2}\left[\sqrt{1+\left(\frac{\sigma}{\omega\varepsilon}\right)^2}-1\right]}$$
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-rose-800/50">
+          <span class="term-badge bg-rose-500/20 text-rose-300 border border-rose-500/30">Efecto Pelicular ($\delta$) y Jaula de Faraday</span>
+          <p class="text-xs text-slate-300 leading-relaxed mt-1.5">
+            En un conductor metálico ($\sigma \approx 3.5\times 10^7\text{ S/m}$), los electrones libres cancelan el campo interior casi instantáneamente. La distancia que logra penetrar la onda se llama <strong>profundidad pelicular (<em>skin depth</em>, $\delta$)</strong>:
+            $$\delta = \sqrt{\frac{2}{\omega\mu_0\sigma}} \approx 1.3\,\mu\text{m} \quad (\text{a } 2.4\text{ GHz})$$
+            Como $1.3\text{ micrómetros}$ es mil veces más delgado que una lámina metálica, la onda no puede cruzarla: rebota y se extingue, creando el blindaje de <strong>Jaula de Faraday</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+        <div>
+          <h3 class="text-base font-bold text-amber-400 mb-2">Catálogo Físico de Materiales en el Simulador (ITU-R P.2040)</h3>
+          <p class="text-xs text-slate-300 mb-3">
+            Cada celda $(i,j)$ recibe un coeficiente discreto de absorción $\alpha_{i,j}$ escalado por el tamaño de celda $h$ y el multiplicador espectral de frecuencia ($0.20$ en $2.4\text{ GHz}$ vs $0.50$ en $5.0\text{ GHz}$):
+          </p>
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-700 text-slate-400 uppercase text-[10px]">
+                <th class="py-2">Medio Material</th>
+                <th class="py-2">$\varepsilon_r$</th>
+                <th class="py-2">$\sigma\text{ (S/m)}$</th>
+                <th class="py-2">Pérdida ITU</th>
+                <th class="py-2">$\alpha_{\text{base}}$</th>
+                <th class="py-2">Comportamiento Físico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 font-mono text-[11px]">
+              <tr>
+                <td class="py-2.5 font-sans font-bold text-slate-200">Aire Libre</td>
+                <td>1.0006</td>
+                <td>0.000</td>
+                <td class="text-emerald-400 font-bold">0 dB</td>
+                <td>0.0012</td>
+                <td class="font-sans text-slate-300">Solo divergencia geométrica</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-sans font-bold text-slate-200">Yeso (Drywall)</td>
+                <td>2.8</td>
+                <td>0.015</td>
+                <td class="text-teal-400 font-bold">3 dB</td>
+                <td>0.0200</td>
+                <td class="font-sans text-slate-300">Tabique liviano (pasa ~50%)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-sans font-bold text-slate-200">Ladrillo</td>
+                <td>4.5</td>
+                <td>0.038</td>
+                <td class="text-amber-400 font-bold">8 dB</td>
+                <td>0.0800</td>
+                <td class="font-sans text-slate-300">Absorción dieléctrica media</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-sans font-bold text-slate-200">Concreto</td>
+                <td>6.5</td>
+                <td>0.085</td>
+                <td class="text-orange-400 font-bold">15 dB</td>
+                <td>0.1500</td>
+                <td class="font-sans text-slate-300">Muro estructural denso</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-sans font-bold text-slate-200">Metal</td>
+                <td>1.0</td>
+                <td>3.5×10⁷</td>
+                <td class="text-rose-400 font-bold">≥ 35 dB</td>
+                <td>0.2500</td>
+                <td class="font-sans text-slate-300">Conductor / Jaula de Faraday</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 mt-4">
+          <strong class="text-indigo-400">Fórmula en <code>buildInitialGrid</code> (<code>controlador.ts</code>):</strong>
+          $$\alpha_{i,j} = \alpha_{\text{material}} \times M_{\text{frecuencia}} \times \left(\frac{h}{0.5\text{ m}}\right), \qquad \text{con } M_{2.4\text{ GHz}} = 0.20, \; M_{5.0\text{ GHz}} = 0.50$$
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 5 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 6: ECUACIÓN DIFERENCIAL PARCIAL (EDP), LAPLACIANO Y DIRICHLET
+       ========================================================================= -->
+  <section class="slide" id="slide-6">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">5. Modelo Matemático: EDP Estacionaria, Laplaciano ($\nabla^2$) y Dirichlet</h2>
+      <span class="text-xs font-mono text-slate-400">Qué significa cada símbolo de la ecuación diferencial que resuelve el software</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-4 max-w-6xl mx-auto w-full">
+      <div class="lg:col-span-5 p-5 rounded-2xl bg-indigo-950/30 border border-indigo-800/60 flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">La Ecuación Gobernante del Simulador</span>
+          <div class="p-4 rounded-2xl bg-slate-950 border border-indigo-500/40 my-3 text-center">
+            $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0$$
+            $$\text{con } \nabla^2 u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}$$
+          </div>
+          <p class="text-xs text-slate-200 leading-relaxed">
+            Esta es una <strong>Ecuación Diferencial Parcial (EDP) elíptica de difusión-absorción en estado estacionario 2D</strong>. Veamos qué significa cada término para poder explicarlo con total seguridad:
+          </p>
+          <ul class="text-xs text-slate-300 space-y-2.5 mt-3">
+            <li>• <strong class="text-emerald-400">$u(x,y) \in [0, 100]$ (Potencial escalar de intensidad):</strong> Representa el nivel normalizado de energía electromagnética en la coordenada $(x,y)$ una vez que la onda alcanza el equilibrio estacionario.</li>
+            <li>• <strong class="text-indigo-400">$\nabla^2 u$ (Operador Laplaciano):</strong> Mide la curvatura espacial del campo, es decir, la diferencia entre el valor en $(x,y)$ y el promedio de sus puntos vecinos. Representa cómo la energía <strong>se difunde y expande</strong> en el espacio 2D.</li>
+            <li>• <strong class="text-amber-400">$-\kappa^2(x,y)\,u(x,y)$ (Término de sumidero / absorción):</strong> Representa la fracción de energía que <strong>absorbe el medio material</strong> (aire, concreto, ladrillo, metal) en ese punto $(x,y)$.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 space-y-4">
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Condiciones de Frontera de Dirichlet</span>
+            <h3 class="text-base font-bold text-white">¿Qué significa "Condición de Dirichlet" en nuestro problema?</h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-3">
+            En matemáticas y física matemática, una ecuación diferencial necesita saber cuánto vale la función en las fronteras o fuentes para tener una solución única. Una <strong>Condición de Frontera de Dirichlet</strong> consiste en <strong>fijar directamente el valor exacto del potencial $u$</strong> en ciertos nodos (marcados en el código con <code>cell.fixed = true</code> para que el algoritmo no los altere):
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-950 border border-emerald-700/50">
+              <strong class="text-emerald-400 block mb-1">1. Condición de Dirichlet Activa (En el Router)</strong>
+              $$u(x_r, y_r) = u_{\text{fuente}} = P_{\text{router}} \times 2.25$$
+              <p class="text-slate-300 text-[11px] mt-1">
+                El nodo donde se ubica el router mantiene fijo su potencial máximo de excitación (según su $\text{PIRE}$), actuando como una fuente inagotable que inyecta energía a la malla.
+              </p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-950 border border-indigo-700/50">
+              <strong class="text-indigo-400 block mb-1">2. Condición de Dirichlet Absorbente (En el Borde)</strong>
+              $$u(x, y)\big|_{\partial\Omega} = 0 \quad (\text{filas } 0, N-1 \text{ y cols } 0, N-1)$$
+              <p class="text-slate-300 text-[11px] mt-1">
+                Todo el anillo perimetral exterior de la cuadrícula se fija en $u = 0$ ($-85\text{ dBm}$), modelando que la energía que escapa por los bordes del recinto se disipa hacia el exterior.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-amber-950/20 border border-amber-700/40 text-xs text-slate-200">
+          <strong class="text-amber-400 uppercase block mb-1">💡 Nota clave si el jurado pregunta: "¿Por qué una ecuación elíptica estacionaria y no la ecuación de onda?"</strong>
+          Porque las ondas de $2.4\text{ GHz}$ y $5.0\text{ GHz}$ oscilan miles de millones de veces por segundo, pero lo que mide un receptor o analizador de espectro es el <strong>promedio estacionario espacial de la energía (la envolvente de intensidad)</strong>. Si no hay absorción ($\kappa = 0$), la ecuación se reduce a la <strong>Ecuación de Laplace ($\nabla^2 u = 0$)</strong>; al incluir los muros dieléctricos ($\kappa > 0$), modela con gran fidelidad la caída logarítmica con la distancia y la sombra detrás de las paredes.
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 6 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 7: PROCESO DE DISCRETIZACIÓN POR DIFERENCIAS FINITAS
+       ========================================================================= -->
+  <section class="slide" id="slide-7">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">6. Proceso de Discretización: Diferencias Finitas Centradas (5 Puntos)</h2>
+      <span class="text-xs font-mono text-slate-400">Cómo pasamos de derivadas continuas a código ejecutable</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto py-4 max-w-6xl mx-auto w-full">
+      <div class="lg:col-span-7 space-y-3">
+        <h3 class="text-base font-extrabold text-white">Deducción Paso a Paso de la Ecuación del Nodo $(i,j)$</h3>
+        <div class="space-y-2.5 text-xs">
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
+            <span class="step-number bg-indigo-600 text-white">1</span>
+            <div class="flex-1">
+              <strong class="text-indigo-300">Discretización del Dominio (Malla Computacional $N \times N$):</strong>
+              <p class="text-slate-300 mt-0.5">
+                Dividimos el plano en una matriz de filas $i \in [0, N-1]$ y columnas $j \in [0, N-1]$ separadas una distancia física $h = \Delta x = \Delta y$ (ajustable en el simulador de $0.1\text{ m}$ a $2.5\text{ m}$, por defecto $0.5\text{ m}$).
+              </p>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
+            <span class="step-number bg-indigo-600 text-white">2</span>
+            <div class="flex-1">
+              <strong class="text-indigo-300">Reemplazo de Segundas Derivadas por Serie de Taylor (Diferencias Centradas):</strong>
+              <p class="text-slate-300 mt-0.5">
+                En análisis numérico, las segundas derivadas parciales en el nodo $(i,j)$ se aproximan usando los vecinos verticales $(i\pm 1, j)$ y horizontales $(i, j\pm 1)$:
+              </p>
+              <div class="text-center my-1">
+                $$\frac{\partial^2 u}{\partial x^2} \approx \frac{u_{i+1,j} - 2u_{i,j} + u_{i-1,j}}{h^2}, \qquad \frac{\partial^2 u}{\partial y^2} \approx \frac{u_{i,j+1} - 2u_{i,j} + u_{i,j-1}}{h^2}$$
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
+            <span class="step-number bg-amber-500 text-slate-950">3</span>
+            <div class="flex-1">
+              <strong class="text-amber-300">Sustitución en la EDP $\nabla^2 u - \kappa^2 u = 0$ y Despeje del Nodo Central $u_{i,j}$:</strong>
+              <p class="text-slate-300 mt-0.5">
+                Sumando ambas derivadas e incluyendo el término de absorción local $\kappa_{i,j}^2$:
+                $$\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1} - 4u_{i,j}}{h^2} - \kappa_{i,j}^2 u_{i,j} = 0$$
+                Despejando $u_{i,j}$ y definiendo el factor de atenuación discreto $\alpha_{i,j} \in [0, 1)$, obtenemos la <strong>fórmula de actualización del esténcil de 5 puntos</strong>:
+              </p>
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/40 text-center mt-1">
+                $$u_{i,j}^* = \big(1 - \alpha_{i,j}\big)\,\left(\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4}\right)$$
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Esquema visual del esténcil de 5 puntos -->
+      <div class="lg:col-span-5 p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+        <div>
+          <h3 class="text-base font-bold text-emerald-400 mb-2">Interpretación Visual: El Esténcil de 5 Puntos</h3>
+          <p class="text-xs text-slate-300 mb-4">
+            Para calcular la energía de la celda central $(i,j)$, el computador toma el promedio aritmético de sus <strong>4 vecinos ortogonales</strong> y le descuenta el porcentaje de absorción $\alpha_{i,j}$ del material:
+          </p>
+
+          <!-- Diagrama en cuadrícula CSS del esténcil -->
+          <div class="grid grid-cols-3 gap-2 max-w-[260px] mx-auto my-3 text-center font-mono text-xs">
+            <div></div>
+            <div class="p-3 rounded-xl bg-indigo-950 border border-indigo-500 text-indigo-200 shadow">
+              <div class="text-[10px] text-indigo-400 font-sans font-bold">Norte</div>
+              $u_{i-1,j}$
+            </div>
+            <div></div>
+
+            <div class="p-3 rounded-xl bg-indigo-950 border border-indigo-500 text-indigo-200 shadow">
+              <div class="text-[10px] text-indigo-400 font-sans font-bold">Oeste</div>
+              $u_{i,j-1}$
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-600 text-white font-bold shadow-lg ring-2 ring-emerald-400">
+              <div class="text-[10px] font-sans uppercase">Centro</div>
+              $u_{i,j}$
+              <div class="text-[9px] text-emerald-100">$\times (1-\alpha_{i,j})$</div>
+            </div>
+            <div class="p-3 rounded-xl bg-indigo-950 border border-indigo-500 text-indigo-200 shadow">
+              <div class="text-[10px] text-indigo-400 font-sans font-bold">Este</div>
+              $u_{i,j+1}$
+            </div>
+
+            <div></div>
+            <div class="p-3 rounded-xl bg-indigo-950 border border-indigo-500 text-indigo-200 shadow">
+              <div class="text-[10px] text-indigo-400 font-sans font-bold">Sur</div>
+              $u_{i+1,j}$
+            </div>
+            <div></div>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-1">
+          <strong class="text-amber-400 block">Traducción directa en el código (<code>src/metodos/</code>):</strong>
+          <pre class="text-[10.5px] text-emerald-300 overflow-x-auto font-mono mt-1">const sum = grid[i+1][j].val + grid[i-1][j].val
+          + grid[i][j+1].val + grid[i][j-1].val;
+const uGS = (1.0 - cell.attenuation) * (sum / 4.0);</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 7 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 8: PROCESO ITERATIVO: JACOBI vs GAUSS-SEIDEL vs SOR
+       ========================================================================= -->
+  <section class="slide" id="slide-8">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">7. Proceso de Resolución: Jacobi vs. Gauss-Seidel vs. SOR ($\omega$)</h2>
+      <span class="text-xs font-mono text-slate-400">Cómo funcionan los 3 algoritmos iterativos y cómo se mide la convergencia</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-4 max-w-6xl mx-auto w-full">
+      <!-- Los 3 métodos explicados a detalle -->
+      <div class="lg:col-span-7 space-y-3">
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center justify-between mb-1">
+            <span class="term-badge bg-slate-700 text-slate-200">1. Método de Jacobi (<code>jacobi.ts</code>)</span>
+            <span class="text-xs font-mono text-slate-400">251 iteraciones • Más lento</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Actualización Simultánea:</strong> Para calcular la nueva matriz en el paso $k+1$, lee <em>únicamente</em> los 4 vecinos de la matriz congelada del paso anterior $k$:
+            $$u_{i,j}^{(k+1)} = (1 - \alpha_{i,j})\,\frac{u_{i+1,j}^{(k)} + u_{i-1,j}^{(k)} + u_{i,j+1}^{(k)} + u_{i,j-1}^{(k)}}{4}$$
+            La información viaja muy despacio (solo avanza 1 celda por iteración).
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-indigo-800/60">
+          <div class="flex items-center justify-between mb-1">
+            <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">2. Método de Gauss-Seidel (<code>gauss-seidel.ts</code>, $\omega = 1.0$)</span>
+            <span class="text-xs font-mono text-indigo-400">138 iteraciones • 2× más rápido</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Desplazamientos Sucesivos:</strong> A medida que el ciclo <code>for</code> recorre la matriz de arriba a abajo y de izquierda a derecha, el vecino superior $(i-1,j)$ y el vecino izquierdo $(i,j-1)$ <strong>ya fueron actualizados en esta misma iteración $k+1$</strong>, por lo que los usa de inmediato:
+            $$u_{i,j}^{\text{GS}} = (1 - \alpha_{i,j})\,\frac{u_{i+1,j}^{(k)} + \mathbf{u_{i-1,j}^{(k+1)}} + u_{i,j+1}^{(k)} + \mathbf{u_{i,j-1}^{(k+1)}}}{4}$$
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-600/50">
+          <div class="flex items-center justify-between mb-1">
+            <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">3. Sobre-Relajación Sucesiva — SOR (<code>sor.ts</code>, $1 < \omega < 2$)</span>
+            <span class="text-xs font-mono text-emerald-400 font-bold">58–66 iteraciones • 3.8× más rápido</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Extrapolación Espectral:</strong> SOR calcula primero el valor de Gauss-Seidel ($u_{i,j}^{\text{GS}}$), ve en qué dirección está cambiando la celda y <strong>amplifica (extrapola) ese paso</strong> usando el <strong>factor de relajación $\omega \in (1, 2)$</strong>:
+            $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}}$$
+            • Si $\omega = 1.0$, es exactamente Gauss-Seidel.<br/>
+            • Si $1 < \omega < 2$ (sobre-relajación, ej. $\omega_{\text{ópt}} = 1.45$), anticipa el estado estacionario reduciendo un <strong>$73.7\%\text{ a }76.6\%$</strong> las iteraciones.
+          </p>
+        </div>
+      </div>
+
+      <!-- Ejemplo numérico y criterio de parada -->
+      <div class="lg:col-span-5 space-y-3 flex flex-col justify-between">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+          <h3 class="text-sm font-extrabold text-amber-400 uppercase tracking-wide">Ejemplo Numérico de 1 Paso SOR</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Supongamos que en una celda de aire ($\alpha = 0.0012$) su valor actual es $u^{(k)} = 20$, sus 4 vecinos suman $160$, y usamos $\omega = 1.40$:
+          </p>
+          <ol class="text-xs text-slate-200 space-y-1.5 font-mono pl-4 list-decimal">
+            <li>Promedio Gauss-Seidel:<br/>$u^{\text{GS}} = (1 - 0.0012)\times \frac{160}{4} = \mathbf{39.95}$</li>
+            <li>Extrapolación SOR ($\omega = 1.40$):<br/>$u^{(k+1)} = (1 - 1.40)(20) + 1.40(39.95)$<br/>$u^{(k+1)} = -8 + 55.93 = \mathbf{47.93}$</li>
+            <li>Cambio local (diferencia):<br/>$\text{diff} = |47.93 - 20| = \mathbf{27.93}$</li>
+          </ol>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Residuo $\|r^{(k)}\|_\infty$</span>
+            <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Tolerancia $\varepsilon$</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            En cada iteración $k$, el algoritmo busca el cambio más grande ocurrido en toda la malla (la <strong>Norma Infinito del Residuo $\|r^{(k)}\|_\infty$</strong>):
+            $$\|r^{(k)}\|_\infty = \max_{i,j} \left|u_{i,j}^{(k+1)} - u_{i,j}^{(k)}\right| < \varepsilon$$
+            Cuando ese cambio máximo cae por debajo de la <strong>Tolerancia $\varepsilon$</strong> (ej. $\varepsilon = 10^{-3}$), significa que la malla alcanzó el equilibrio estacionario y la simulación converge.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 8 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 9: PROCESOS ALGORÍTMICOS: DIGITALIZADOR Y K-MEANS
+       ========================================================================= -->
+  <section class="slide" id="slide-9">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">8. Procesos del Software: Digitalizador de Planos y Optimización K-Means</h2>
+      <span class="text-xs font-mono text-slate-400">Cómo la app convierte imágenes en matrices y optimiza routers automáticamente</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-auto py-4 max-w-6xl mx-auto w-full">
+      <!-- Proceso 1: Digitalizador de planos -->
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3">
+        <div>
+          <span class="term-badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">Proceso en <code>traduccion.ts</code></span>
+          <h3 class="text-lg font-bold text-white mb-2">A. Digitalizador de Planos (De Imagen a Matriz 2D)</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-3">
+            Permite subir cualquier plano arquitectónico (PNG/JPG) o elegir un diseño predefinido y transformarlo automáticamente en obstáculos dieléctricos dentro de la malla $N \times N$:
+          </p>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-indigo-400">Paso 1 (Submuestreo en Canvas):</strong> La imagen original se dibuja sobre un lienzo HTML5 redimensionado exactamente a $N \times N$ píxeles (ej. $24 \times 24$) y se extrae el vector de canales <code>RGBA</code>.
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-indigo-400">Paso 2 (Fórmula de Luminancia ITU-R BT.601):</strong> Para cada píxel interior $(r,c)$, se calcula su brillo perceptual humano ponderando Rojo, Verde y Azul:
+              $$Y = 0.299\,R + 0.587\,G + 0.114\,B$$
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-indigo-400">Paso 3 (Umbralización y Asignación Dieléctrica):</strong> Si el píxel no es transparente ($\text{Alpha} > 40$) y su brillo es más oscuro que la sensibilidad elegida ($Y < \text{Umbral}$), la coordenada $(r,c)$ se convierte en un muro con la permitividad $\varepsilon_r$ y conductividad $\sigma$ del material seleccionado.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Proceso 2: Optimización de cobertura y K-Means -->
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3">
+        <div>
+          <span class="term-badge bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-2">Proceso en <code>interfaz.tsx</code> y <code>ControlPanel.tsx</code></span>
+          <h3 class="text-lg font-bold text-white mb-2">B. Optimización de Ubicación y Clustering K-Means</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-3">
+            El simulador incluye tres algoritmos de optimización numérica automática:
+          </p>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-emerald-400">1. Posición Óptima para $1$ Router (Barrido de Laplace):</strong> Evalúa candidatos libres en toda la habitación ejecutando simulaciones rápidas SOR y califica cada punto con la función objetivo:
+              $$\text{Puntaje} = 0.70 \times \bar{u}_{\text{señal}} + 0.30 \times \%\text{Cobertura}_{(P_{\text{rx}} \ge -70\text{ dBm})}$$
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-amber-400">2. Distribución de $K$ Routers (Clustering K-Means / Algoritmo de Lloyd):</strong> Cuando se eligen de $2$ a $6$ routers, agrupa todas las celdas de aire en $K$ regiones geométricas minimizando la distancia euclidiana $\sum \|p - \mu_k\|^2$ durante $40$ iteraciones, reubica los centroides si coinciden con un muro y calcula el <strong>Índice de Uniformidad ($I.U. = 100 - 1.6\sigma_u$)</strong>.
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <strong class="text-indigo-400">3. Auto-cálculo de $\omega$ Óptimo (Barrido Espectral SOR):</strong> Prueba $17$ valores de $\omega \in [1.0, 1.9]$ sobre el plano actual y selecciona automáticamente el $\omega$ que converge en menos iteraciones.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 9 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 10: RESULTADOS VISUALES 2D (2.4 GHz vs 5 GHz y FARADAY)
+       ========================================================================= -->
+  <section class="slide" id="slide-10">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">9. Resultados 2D: Comparativa UHF ($2.4\text{ GHz}$) vs. SHF ($5.0\text{ GHz}$) y Jaula de Faraday</h2>
+      <span class="text-xs font-mono text-slate-400">Interpretación Física de los Mapas de Campo</span>
+    </div>
+
+    <div class="my-auto flex flex-col items-center gap-4 py-3 max-w-6xl mx-auto w-full">
+      <div class="bg-white p-3 rounded-2xl shadow-xl max-w-5xl w-full">
+        <img src="poster/Imagenes/fig_mapas_campo.png" alt="Mapas de Campo Electromagnético" class="w-full h-auto rounded-lg" />
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl w-full text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-emerald-800/50 space-y-1">
+          <strong class="text-emerald-400 block">(a) Banda UHF ($2.4\text{ GHz}, \lambda = 12.5\text{ cm}$):</strong>
+          <p class="text-slate-300 leading-relaxed">
+            Su mayor longitud de onda presenta menor atenuación dieléctrica al cruzar los muros de concreto ($\varepsilon_r = 6.5$). A $3\text{ m}$ detrás de un muro, conserva $-64.1\text{ dBm}$ ($E_{\text{rms}} = 0.011\text{ V/m}$), manteniendo cobertura funcional en las salas contiguas.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-amber-800/50 space-y-1">
+          <strong class="text-amber-400 block">(b) Banda SHF ($5.0\text{ GHz}, \lambda = 6.0\text{ cm}$):</strong>
+          <p class="text-slate-300 leading-relaxed">
+            En la misma geometría de oficinas, su menor longitud de onda sufre entre $8.5\text{ y }9.1\text{ dB}$ adicionales de pérdida por inserción en los muros de hormigón, cayendo a $-73.2\text{ dBm}$ tras el obstáculo y creando zonas de sombra pronunciadas.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-sky-800/50 space-y-1">
+          <strong class="text-sky-400 block">(c) Caso Límite: Jaula de Faraday (Metal):</strong>
+          <p class="text-slate-300 leading-relaxed">
+            Al rodear el emisor con paredes conductoras ($\sigma = 3.5\times 10^7\text{ S/m}$, espesor pelicular $\delta \approx 1.3\,\mu\text{m}$), la onda queda confinada adentro. Afuera de la jaula el potencial cae al piso térmico ($-85\text{ dBm}$, $\langle S \rangle \approx 0.002\,\mu\text{W/m}^2$, $E_{\text{rms}} < 1\text{ mV/m}$).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 10 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 11: PROCESO DE VALIDACIÓN FÍSICA ANALÍTICA Y CONVERGENCIA
+       ========================================================================= -->
+  <section class="slide" id="slide-11">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">10. Proceso de Validación Física Analítica (ITU-R P.1238) y Métricas</h2>
+      <span class="text-xs font-mono text-slate-400">Cómo sabemos que el resultado numérico es físicamente correcto</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-3 max-w-6xl mx-auto w-full items-center">
+      <div class="lg:col-span-7 flex flex-col gap-3">
+        <div class="bg-white p-2.5 rounded-2xl shadow-xl w-full">
+          <img src="poster/Imagenes/fig_validacion_y_convergencia.png" alt="Validación y Convergencia" class="w-full h-auto rounded-lg" />
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+          <strong class="text-indigo-400">¿Cómo funciona <code>validateGridPhysics</code> en <code>controlador.ts</code>?</strong><br/>
+          Para cada celda libre a distancia $r$ del router, el algoritmo traza un rayo discreto (línea de vista) desde la fuente hasta la celda, cuenta cuántos muros atraviesa ($\sum L_{\text{muro}}$) y compara el valor numérico de Diferencias Finitas contra la fórmula analítica internacional <strong>ITU-R P.1238 / COST-231 Multi-Muro</strong>:
+          $$P_{\text{rx, analítico}}(d) = P_0(d_0) - 10\,n\,\log_{10}\!\left(\frac{d}{d_0}\right) - \sum_{k} L_{\text{muro}, k}(f)$$
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 space-y-3 text-xs">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+          <span class="term-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Métricas Estadísticas de Validación</span>
+          <ul class="space-y-2.5 text-slate-300 mt-1">
+            <li>
+              • <strong class="text-white">RMSE (Error Cuadrático Medio = $1.84\text{ dB}$):</strong>
+              $$\text{RMSE} = \sqrt{\frac{1}{M}\sum_{m=1}^{M} \left(P_{\text{num}, m} - P_{\text{ana}, m}\right)^2}$$
+              Mide la desviación promedio en decibelios entre la curva numérica (verde) y la curva teórica (naranja). Un $\text{RMSE} < 2.5\text{ dB}$ en propagación indoor se considera excelente.
+            </li>
+            <li>
+              • <strong class="text-white">Coeficiente de Determinación ($R^2 = 0.978$):</strong>
+              Mide de $0$ a $1$ qué tan bien la simulación reproduce la tendencia física teórica. $R^2 = 0.978$ significa un <strong>$97.8\%$ de concordancia</strong>.
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <h4 class="font-bold text-amber-400 mb-2">Resumen Comparativo de Convergencia ($24\times 24$)</h4>
+          <table class="w-full text-left text-[11px] font-mono border-collapse">
+            <thead>
+              <tr class="border-b border-slate-700 text-slate-400">
+                <th class="py-1.5">Método</th>
+                <th class="py-1.5">$\omega$</th>
+                <th class="py-1.5">Iteraciones</th>
+                <th class="py-1.5">Tiempo</th>
+                <th class="py-1.5">Ahorro</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              <tr><td class="py-1.5 font-sans">Jacobi</td><td>1.00</td><td>251</td><td>11.4 ms</td><td>Base</td></tr>
+              <tr><td class="py-1.5 font-sans">Gauss-Seidel</td><td>1.00</td><td>138</td><td>6.2 ms</td><td class="text-indigo-400">-45.0%</td></tr>
+              <tr class="font-bold text-emerald-400"><td class="py-1.5 font-sans">SOR Óptimo</td><td>1.45</td><td>66</td><td>2.8 ms</td><td>-73.7%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>Juan David Conde Duarte — Electromagnetismo</span>
+      <span class="font-mono font-bold text-white">Diapositiva 11 / 12</span>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       DIAPOSITIVA 12: CONCLUSIONES Y LAS 5 PREGUNTAS OFICIALES DEL JURADO
+       ========================================================================= -->
+  <section class="slide" id="slide-12">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-2xl font-black text-indigo-400">11. Conclusiones, Limitaciones y las 5 Preguntas Oficiales del Jurado</h2>
+      <span class="text-xs font-mono text-slate-400">Guía Rápida para la Defensa Oral</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto py-3 max-w-6xl mx-auto w-full">
+      <!-- Conclusiones -->
+      <div class="lg:col-span-5 space-y-3">
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5 text-xs">
+          <h3 class="text-base font-bold text-emerald-400">Conclusiones Principales</h3>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>1. Consistencia Física:</strong> El esquema en diferencias finitas acoplado con las relaciones del Vector de Poynting ($\langle S \rangle = E_{\text{rms}}^2/\eta_0$) reproduce fielmente la caída de potencia y campo eléctrico ($\text{RMSE} = 1.84\text{ dB}$, $R^2 = 0.978$ frente a ITU-R P.1238).
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>2. Frecuencia y Materiales:</strong> Se demostró computacionalmente la mayor penetración dieléctrica de la banda UHF ($2.4\text{ GHz}, \lambda = 12.5\text{ cm}$) frente a SHF ($5.0\text{ GHz}, \lambda = 6.0\text{ cm}$) en hormigón, así como la anulación del campo exterior en una Jaula de Faraday ($\delta \approx 1.3\,\mu\text{m}$).
+          </p>
+          <p class="text-slate-300 leading-relaxed">
+            <strong>3. Aceleración Numérica SOR:</strong> El método SOR ($\omega = 1.45$) redujo más de un $73\%$ el número de iteraciones frente a Jacobi sin alterar la solución estacionaria.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-amber-800/50 space-y-1.5 text-xs">
+          <h3 class="text-sm font-bold text-amber-400">Limitaciones Honestas y Trabajo Futuro</h3>
+          <p class="text-slate-300 leading-relaxed">
+            Al resolver una EDP elíptica estacionaria para la envolvente energética en 2D, no se modela interferencia constructiva/destructiva de fase (<em>multipath fading</em>) ni difracción 3D. Como extensión futura se propone implementar la <strong>Ecuación de Helmholtz</strong> ($\nabla^2 E + k^2 n^2 E = 0$) o <strong>FDTD</strong> con fronteras absorbentes PML.
+          </p>
+        </div>
+      </div>
+
+      <!-- Las 5 Preguntas Oficiales de la Guía de la Feria -->
+      <div class="lg:col-span-7 p-4 rounded-2xl bg-indigo-950/25 border border-indigo-800/50 space-y-2.5 text-xs">
+        <h3 class="text-sm font-extrabold uppercase tracking-wider text-indigo-300">Respuestas Directas a las 5 Preguntas Oficiales del Jurado (Feria de la Física)</h3>
+
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <strong class="text-emerald-400">1. ¿Cuál es el fenómeno físico central de tu proyecto?</strong>
+          <p class="text-slate-300 mt-0.5">La propagación estacionaria y la atenuación de ondas electromagnéticas UHF ($2.4\text{ GHz}$) y SHF ($5.0\text{ GHz}$) al interactuar con medios dieléctricos con pérdidas ($\varepsilon_r, \sigma$) y conductores metálicos (Jaula de Faraday), cuantificando la potencia $P_{\text{rx}}$, el Vector de Poynting $\langle S \rangle$ y el campo eléctrico eficaz $E_{\text{rms}}$.</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <strong class="text-emerald-400">2. ¿Por qué elegiste el método computacional (Diferencias Finitas + SOR)?</strong>
+          <p class="text-slate-300 mt-0.5">Porque las fórmulas analíticas simples solo sirven en espacio libre homogéneo. En un plano arquitectónico real con múltiples paredes de distinto material, una malla en Diferencias Finitas permite asignar el coeficiente de absorción local $\alpha_{i,j}$ a cada coordenada y resolver el campo con SOR en menos de $3\text{ ms}$.</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <strong class="text-emerald-400">3. ¿Cómo sabes que tu resultado es correcto o razonable?</strong>
+          <p class="text-slate-300 mt-0.5">Por tres validaciones: (1) Contraste cuantitativo con el modelo analítico ITU-R P.1238 obteniendo $R^2 = 0.978$ y $\text{RMSE} = 1.84\text{ dB}$; (2) Verificación de casos límite físicos (simetría radial en espacio libre y campo nulo exterior en la Jaula de Faraday); (3) Invarianza de la solución entre Jacobi, Gauss-Seidel y SOR.</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <strong class="text-emerald-400">4. ¿Qué limitaciones tiene tu enfoque?</strong>
+          <p class="text-slate-300 mt-0.5">Modela la envolvente estacionaria de energía en 2D sin incluir desvanecimiento por interferencia de fase (multitrayectoria), reflexiones 3D en piso/techo ni fronteras PML.</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <strong class="text-emerald-400">5. Si tuvieras más tiempo, ¿qué mejorarías o extenderías?</strong>
+          <p class="text-slate-300 mt-0.5">Implementar la ecuación de onda en el dominio del tiempo (FDTD / Algoritmo de Yee), agregar condiciones de frontera PML y calibrar experimentalmente el modelo con mediciones de campo en los laboratorios de la Universidad de Pamplona.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3">
+      <span>¡Muchas gracias por su atención! • Juan David Conde Duarte</span>
+      <span class="font-mono font-bold text-white">Diapositiva 12 / 12</span>
+    </div>
+  </section>
+
+  <!-- CONTROLES DE NAVEGACIÓN FIJOS -->
+  <div class="fixed bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-slate-900/95 border border-slate-700 px-4 py-1.5 rounded-full shadow-2xl z-50 backdrop-blur">
+    <button onclick="changeSlide(-1)" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-indigo-600 text-xs font-bold transition cursor-pointer">⬅ Anterior</button>
+    <select id="slide-selector" onchange="goToSlide(parseInt(this.value))" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-full px-3 py-1 font-semibold outline-none cursor-pointer">
+      <option value="0">1. Portada e Índice General</option>
+      <option value="1">2. Ondas TEM, UHF/SHF y Longitud de Onda (λ)</option>
+      <option value="2">3. Potencia dBm, PIRE y Área Efectiva (A_eff)</option>
+      <option value="3">4. Vector de Poynting, Impedancia η₀, E_rms y H_rms</option>
+      <option value="4">5. Materiales: ε_r, σ, Beer-Lambert y Faraday</option>
+      <option value="5">6. EDP Estacionaria, Laplaciano ∇² y Dirichlet</option>
+      <option value="6">7. Proceso: Diferencias Finitas (5 Puntos)</option>
+      <option value="7">8. Proceso: Jacobi vs Gauss-Seidel vs SOR (ω)</option>
+      <option value="8">9. Proceso: Digitalizador de Planos y K-Means</option>
+      <option value="9">10. Resultados 2D: 2.4 GHz vs 5 GHz y Faraday</option>
+      <option value="10">11. Proceso: Validación Analítica ITU-R P.1238</option>
+      <option value="11">12. Conclusiones y 5 Preguntas del Jurado</option>
+    </select>
+    <button onclick="changeSlide(1)" class="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-500 text-xs font-bold transition cursor-pointer">Siguiente ➡</button>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const selector = document.getElementById('slide-selector');
+
+    function goToSlide(index) {
+      slides[current].classList.remove('active');
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      if (selector) selector.value = String(current);
+      window.scrollTo(0, 0);
+    }
+
+    function changeSlide(dir) {
+      goToSlide(current + dir);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') changeSlide(1);
+      if (e.key === 'ArrowLeft') changeSlide(-1);
+    });
+  </script>
+</body>
+</html>

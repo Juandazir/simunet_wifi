@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Póster 80x120 cm — Feria de la Física 2026 — Juan David Conde Duarte</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    @page { size: 80cm 120cm; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #e2e8f0;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .poster { box-shadow: none !important; width: 80cm !important; height: 120cm !important; }
+      .lang-switcher { display: none !important; }
+    }
+    .lang-switcher {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      gap: 8px;
+      background: rgba(10, 25, 60, 0.92);
+      padding: 8px 12px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .lang-switcher a {
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+    .lang-switcher a.active {
+      background: #d4af37;
+      color: #0a193c;
+    }
+    .lang-switcher a.inactive {
+      color: #e2e8f0;
+      background: rgba(255,255,255,0.1);
+    }
+    .lang-switcher a.inactive:hover {
+      background: rgba(255,255,255,0.22);
+    }
+    .poster {
+      width: 1200px;
+      min-height: 1800px;
+      background: #ffffff;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-banner img {
+      width: 100%;
+      display: block;
+    }
+    .title-section {
+      text-align: center;
+      padding: 18px 36px 12px 36px;
+    }
+    .title-section h1 {
+      font-size: 28px;
+      line-height: 1.22;
+      color: #0a193c;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .title-section .authors {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+    .title-section .affil {
+      font-size: 13px;
+      font-style: italic;
+      color: #334155;
+      line-height: 1.35;
+    }
+    .content-wrapper {
+      padding: 0 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .block {
+      background: #f5f5f5;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+    }
+    .block-title {
+      background: #0a193c;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 800;
+      padding: 7px 14px;
+    }
+    .block-body {
+      padding: 11px 14px;
+      font-size: 13.2px;
+      line-height: 1.42;
+      color: #0f172a;
+      text-align: justify;
+    }
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 11.8px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #64748b;
+      padding: 4px 6px;
+      text-align: center;
+    }
+    th {
+      background: #d0d7e6;
+      color: #0a193c;
+      font-weight: 800;
+    }
+    .caption {
+      font-size: 11.5px;
+      text-align: center;
+      margin: 4px 0;
+      color: #1e293b;
+    }
+    .fig-box {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 6px;
+      border-radius: 4px;
+      margin: 6px 0;
+      text-align: center;
+    }
+    .fig-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .footer-bar {
+      background: #8b0000;
+      color: white;
+      text-align: center;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 10px;
+      margin-top: 14px;
+    }
+    ul { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="lang-switcher">
+    <a href="Poster_Visual_80x120cm.html" class="active">🇪🇸 Póster en Español</a>
+    <a href="Poster_Visual_80x120cm_EN.html" class="inactive">🇬🇧 English Poster</a>
+  </div>
+  <div class="poster">
+    <div>
+      <!-- ENCABEZADO OFICIAL -->
+      <div class="header-banner">
+        <img src="Imagenes/logos.png" alt="Encabezado Feria de la Física 2026 Universidad de Pamplona" />
+      </div>
+
+      <!-- TÍTULO Y AUTORES -->
+      <div class="title-section">
+        <h1>Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos</h1>
+        <div class="authors">
+          Juan David Conde Duarte<sup>1</sup> &nbsp;|&nbsp; Profesora Tutora: Gladys Liliana Bautista Wilches<sup>2</sup>
+        </div>
+        <div class="affil">
+          <sup>1</sup>Programa de Ingeniería de Sistemas, Facultad de Ingenierías y Arquitectura, Universidad de Pamplona, Pamplona, Colombia (C.C. 1102349090, juan.conde2@unipamplona.edu.co)<br/>
+          <sup>2</sup>Asignatura: Electromagnetismo, Departamento de Física, Facultad de Ciencias Básicas, Universidad de Pamplona (gladys.bautista@unipamplona.edu.co)
+        </div>
+      </div>
+
+      <div class="content-wrapper">
+        <!-- RESUMEN -->
+        <div class="block">
+          <div class="block-title">Resumen</div>
+          <div class="block-body">
+            El estudio de la distribución espacial de ondas electromagnéticas en interiores constituye un problema fundamental del electromagnetismo aplicado, debido a los fenómenos de atenuación, absorción dieléctrica y apantallamiento producidos por las estructuras constructivas. En este trabajo se desarrolla un modelo computacional bidimensional para simular la propagación estacionaria y la intensidad de campo electromagnético en las bandas UHF ($2.4\text{ GHz}$, $\lambda = 12.5\text{ cm}$) y SHF ($5.0\text{ GHz}$, $\lambda = 6.0\text{ cm}$) dentro de recintos con materiales dieléctricos y conductores. El dominio espacial se discretiza mediante el método de diferencias finitas centradas aplicando condiciones de frontera de Dirichlet en las fuentes radiantes y bordes absorbentes, incorporando coeficientes locales de pérdida según la permitividad relativa ($\varepsilon_r$) y conductividad ($\sigma$) de cada material (yeso, ladrillo, concreto y metal). El sistema algebraico resultante se resuelve iterativamente mediante Sobre-Relajación Sucesiva (SOR), determinando en cada nodo la potencia recibida ($\text{dBm}$), la magnitud media del vector de Poynting ($\mu\text{W/m}^2$) y el campo eléctrico eficaz $E_{\text{rms}}$ ($\text{V/m}$). La validación frente al modelo analítico log-distancia e ITU-R P.1238 arroja una alta correlación ($R^2 = 0.978$) y un error cuadrático medio de $1.84\text{ dB}$, confirmando la mayor penetración dieléctrica de la banda de $2.4\text{ GHz}$ y el efecto de Jaula de Faraday en recintos metálicos.
+            <div style="margin-top:6px;">
+              <strong>Palabras clave:</strong> <em>Ondas Electromagnéticas; Atenuación Dieléctrica; Vector de Poynting; Diferencias Finitas; Sobre-Relajación Sucesiva (SOR).</em> &nbsp;|&nbsp;
+              <strong>Modalidad:</strong> <em>Computacional.</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 COLUMNAS -->
+        <div class="columns">
+          <!-- COLUMNA IZQUIERDA -->
+          <div class="col">
+            <div class="block">
+              <div class="block-title">Introducción y motivación</div>
+              <div class="block-body">
+                Cuando una onda electromagnética de microondas se propaga en un recinto cerrado, su densidad de flujo de energía disminuye por la divergencia geométrica del frente de onda y por la disipación en muros con permitividad relativa $\varepsilon_r$ y conductividad efectiva $\sigma > 0$ [1, 2]. Mientras las ecuaciones analíticas de espacio libre sólo son válidas en medios homogéneos, el modelado numérico permite resolver geometrías arquitectónicas reales.<br/><br/>
+                <strong>Objetivo general:</strong> Modelar y validar numéricamente la distribución espacial de potencia ($P_{\text{rx}}$), magnitud del vector de Poynting ($\langle S \rangle$) e intensidad de campo eléctrico eficaz ($E_{\text{rms}}$) en las bandas de $2.4\text{ GHz}$ y $5.0\text{ GHz}$ en recintos 2D con materiales dieléctricos y conductores mediante diferencias finitas y relajación SOR.
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">Marco teórico / Modelo físico</div>
+              <div class="block-body">
+                En el aire (impedancia intrínseca $\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$), la magnitud media temporal del <strong>vector de Poynting</strong> $\langle S \rangle$ ($\text{W/m}^2$) se relaciona con el campo eléctrico eficaz $E_{\text{rms}}$ ($\text{V/m}$), el campo magnético $H_{\text{rms}}$ ($\text{A/m}$) y la potencia captada $P_{\text{rx}}$ por una apertura efectiva isotrópica $A_{\text{eff}} = \lambda^2/(4\pi)$ mediante [1]:
+                $$\langle S \rangle = \frac{E_{\text{rms}}^2}{\eta_0} = \frac{4\pi\,P_{\text{rx}}}{\lambda^2} \implies E_{\text{rms}} = \sqrt{\frac{4\pi\,\eta_0\,P_{\text{rx}}}{\lambda^2}}, \quad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0} \quad (1)$$
+                Al atravesar un obstáculo dieléctrico con pérdidas o un conductor, el campo se atenúa según la ley de Beer-Lambert $E(x) = E_0 e^{-\alpha x}$. En régimen estacionario 2D, la envolvente normalizada de intensidad energética $u(x,y) \in [0, 100]$ sobre el dominio $\Omega$ con absorción espacial $\kappa^2(x,y)$ se modela mediante la ecuación diferencial parcial elíptica [3]:
+                $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{en } \Omega \quad (2)$$
+                sujeta a condiciones de frontera de <strong>Dirichlet</strong> fijas en la fuente radiante $u(x_0,y_0) = u_{\text{PIRE}}$ y fronteras absorbentes nulas en los bordes exteriores $u|_{\partial\Omega} = 0$.
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">Descripción del sistema modelado</div>
+              <div class="block-body">
+                El aplicativo desarrollado (<em>SimuNet Física</em>) discretiza recintos de $12\text{ m} \times 12\text{ m}$ en mallas de $24 \times 24$ nodos ($h = 0.5\text{ m}$), permitiendo ubicar fuentes en $2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$) y $5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$) e insertar muros con las propiedades constitutivas de la Tabla 1 [4].
+                <div class="caption"><strong>Tabla 1.</strong> Propiedades electromagnéticas y pérdidas de los medios modelados (ITU-R P.2040).</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Material / Medio</th>
+                      <th>Permitividad $\varepsilon_r$</th>
+                      <th>Conductividad $\sigma$ (S/m)</th>
+                      <th>Pérdida (dB)</th>
+                      <th>Coef. $\alpha_{i,j}$ Base</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="text-align:left;font-weight:bold;">Aire (Espacio libre)</td><td>1.0006</td><td>0.000</td><td>0 dB</td><td>0.0012</td></tr>
+                    <tr><td style="text-align:left;font-weight:bold;">Yeso (Drywall)</td><td>2.8</td><td>0.015</td><td>3 dB</td><td>0.0200</td></tr>
+                    <tr><td style="text-align:left;font-weight:bold;">Ladrillo</td><td>4.5</td><td>0.038</td><td>8 dB</td><td>0.0800</td></tr>
+                    <tr><td style="text-align:left;font-weight:bold;">Concreto (Hormigón)</td><td>6.5</td><td>0.085</td><td>15 dB</td><td>0.1500</td></tr>
+                    <tr><td style="text-align:left;font-weight:bold;">Metal (Jaula Faraday)</td><td>—</td><td>$3.5 \times 10^7$</td><td>$\ge 35$ dB</td><td>0.2500</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">Metodología computacional</div>
+              <div class="block-body">
+                <ul>
+                  <li><strong>Discretización en Diferencias Finitas (5 puntos):</strong> Aproximando el operador laplaciano en la malla con el factor local de absorción dieléctrica $\alpha_{i,j}(f, \varepsilon_r, \sigma)$:
+                    $$u_{i,j}^{\text{GS}} = \big(1 - \alpha_{i,j}\big)\,\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4} \quad (3)$$
+                  </li>
+                  <li><strong>Resolución mediante Sobre-Relajación Sucesiva (SOR):</strong> Se extrapola el paso de Gauss-Seidel ($\omega = 1$) mediante el factor óptimo $\omega \in (1, 2)$ hasta cumplir $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$ [3]:
+                    $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}} \quad (4)$$
+                  </li>
+                  <li><strong>Validación analítica:</strong> Se contrasta el perfil radial numérico frente al modelo log-distancia e ITU-R P.1238: $P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{muro}}$ [5].</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUMNA DERECHA -->
+          <div class="col">
+            <div class="block">
+              <div class="block-title">Resultados y discusión</div>
+              <div class="block-body">
+                En la Figura 1 se presenta la distribución bidimensional de potencia $P_{\text{rx}}$ y campo eléctrico obtenida numéricamente. Se comprueba que la banda UHF ($2.4\text{ GHz}$, $\lambda = 12.5\text{ cm}$) logra mayor penetración a través de los muros de concreto que la banda SHF ($5.0\text{ GHz}$, $\lambda = 6.0\text{ cm}$), cuya menor longitud de onda incrementa la absorción dieléctrica en $8.5\text{ dB}$ adicionales. En la Figura 1(c), el recinto metálico reproduce el caso límite de <strong>Jaula de Faraday</strong> (espesor pelicular $\delta = \sqrt{2/(\omega\mu\sigma)} \approx 1.3\,\mu\text{m}$), anulando el campo exterior ($< 1\text{ mV/m}$).
+
+                <div class="fig-box">
+                  <img src="Imagenes/fig_mapas_campo.png" alt="Figura 1. Mapas de campo 2D" />
+                  <div class="caption"><strong>Figura 1.</strong> Simulación 2D en diferencias finitas: (a) $2.4\text{ GHz}$ en concreto, (b) $5.0\text{ GHz}$ en concreto, (c) blindaje metálico (Jaula de Faraday).</div>
+                </div>
+
+                En la Figura 2(a) se valida el perfil radial numérico contra el modelo analítico ITU-R P.1238, alcanzando un error cuadrático medio $\text{RMSE} = 1.84\text{ dB}$ y $R^2 = 0.978$. En la Figura 2(b) y la Tabla 2 se demuestra que el método <strong>SOR ($\omega = 1.45$)</strong> reduce en un <strong>73.7%</strong> las iteraciones frente a Jacobi.
+
+                <div class="fig-box">
+                  <img src="Imagenes/fig_validacion_y_convergencia.png" alt="Figura 2. Validación y convergencia" />
+                  <div class="caption"><strong>Figura 2.</strong> (a) Validación del perfil radial numérico frente al modelo analítico ITU-R P.1238. (b) Curvas de convergencia de Jacobi, Gauss-Seidel y SOR.</div>
+                </div>
+
+                <div class="caption"><strong>Tabla 2.</strong> Desempeño de métodos numéricos (malla $24\times 24$) y magnitudes electromagnéticas a $r = 3.0\text{ m}$.</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Método / Escenario a $3\text{ m}$</th>
+                      <th>Iteraciones</th>
+                      <th>Tiempo</th>
+                      <th>$P_{\text{rx}}$ (dBm)</th>
+                      <th>$\langle S \rangle$ ($\mu\text{W/m}^2$)</th>
+                      <th>$E_{\text{rms}}$ (V/m)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="text-align:left;">Jacobi ($\omega = 1.00$, simultáneo)</td><td>251</td><td>11.4 ms</td><td>-56.5</td><td>1.80</td><td>0.0260</td></tr>
+                    <tr><td style="text-align:left;">Gauss-Seidel ($\omega = 1.00$, sucesivo)</td><td>138</td><td>6.2 ms</td><td>-56.5</td><td>1.80</td><td>0.0260</td></tr>
+                    <tr style="font-weight:bold;background:#eef2ff;"><td style="text-align:left;">SOR Óptimo ($\omega = 1.45$)</td><td>66 (-73.7%)</td><td>2.8 ms</td><td>-56.5</td><td>1.80</td><td>0.0260</td></tr>
+                    <tr><td style="text-align:left;">Espacio libre ($2.4\text{ GHz}$, sin muros)</td><td>66</td><td>2.8 ms</td><td>-42.5</td><td>45.30</td><td>0.1306</td></tr>
+                    <tr><td style="text-align:left;">Exterior Jaula Faraday ($\sigma = 3.5\times 10^7$)</td><td>66</td><td>2.8 ms</td><td>-85.0</td><td>0.002</td><td>0.0009</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">Conclusiones</div>
+              <div class="block-body">
+                <ul>
+                  <li>Se formuló e implementó satisfactoriamente un modelo en diferencias finitas que cuantifica la potencia recibida, el vector de Poynting $\langle S \rangle$ y el campo eléctrico eficaz $E_{\text{rms}}$ en recintos 2D con materiales dieléctricos, validado frente al modelo analítico ITU-R P.1238 con $R^2 = 0.978$ y $\text{RMSE} = 1.84\text{ dB}$.</li>
+                  <li>El método de Sobre-Relajación Sucesiva ($\text{SOR}, \omega = 1.45$) aceleró la convergencia $3.8$ veces respecto a Jacobi sin alterar la solución física estacionaria.</li>
+                  <li><strong>Limitaciones y proyección:</strong> El modelo estacionario 2D describe la envolvente media de energía sin efectos de fase por multitrayectoria; como extensión futura se plantea incorporar la ecuación de Helmholtz y fronteras absorbentes PML.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block-title">Referencias</div>
+              <div class="block-body" style="font-size:11.5px; line-height:1.35;">
+                [1] Sadiku, M. N. O. <em>Elementos de Electromagnetismo</em>, 7.ª ed. Oxford University Press, 2018.<br/>
+                [2] Griffiths, D. J. <em>Introduction to Electrodynamics</em>, 4th ed. Cambridge University Press, 2017.<br/>
+                [3] Burden, R. L., &amp; Faires, J. D. <em>Análisis Numérico</em>, 10.ª ed. Cengage Learning, 2017.<br/>
+                [4] ITU-R Recommendation P.2040-3. <em>Effects of building materials and structures on radiowave propagation above about 100 MHz</em>. UIT, 2023.<br/>
+                [5] ITU-R Recommendation P.1238-12. <em>Propagation data and prediction methods for the planning of indoor radiocommunication systems</em>. UIT, 2023.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <div class="footer-bar">
+      Programa de Física, Universidad de Pamplona
+    </div>
+  </div>
+</body>
+</html>

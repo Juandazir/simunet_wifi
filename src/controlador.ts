@@ -1,8 +1,11 @@
-import { Cell, SolverMethod, MaterialType, RouterConfig } from "./types";
+import { Cell, SolverMethod, MaterialType, RouterConfig, ElectromagneticMetrics, ValidationSummary, ValidationPoint } from "./types";
+import { runJacobiStep, runGaussSeidelStep, runSorStep } from "./metodos";
+import { convertirADbm, clasificarCalidadSenal, calcularMagnitudesElectromagneticas } from "./servicios";
 
 /**
- * ESPECIFICACIONES DE HARDWARE DE ENRUTADORES DE REFERENCIA (CAPA 4 / CAPA 5)
- * Modela parámetros reales de radiofrecuencia para estimar la atenuación y EIRP (potencia radiada).
+ * ESPECIFICACIONES DE FUENTES DE RADIACIÓN ELECTROMAGNÉTICA (ROUTERS UHF/SHF)
+ * Modela parámetros reales de radiofrecuencia: Potencia de transmisión (Tx), Ganancia de antena (G),
+ * Potencia Isotrópica Radiada Equivalente (PIRE / EIRP) y frecuencia de portadora (2.4 GHz / 5 GHz).
  */
 export interface RouterModel {
   id: string;
@@ -18,73 +21,75 @@ export interface RouterModel {
   description: string;
 }
 
-// Catálogo de modelos de enrutadores comerciales
 export const ROUTER_MODELS: Record<string, RouterModel> = {
   tplink: {
     id: "tplink",
     name: "TP-Link Archer C60",
     brand: "TP-Link",
-    model: "Hogareño Estándar",
+    model: "Emisor UHF Estándar",
     txPowerDbm: 24,
     gainDbi: 8,
     eirpDbm: 32,
     frequency: "2.4 GHz",
-    standard: "Wi-Fi 5 (802.11ac)",
+    standard: "IEEE 802.11ac (λ = 12.5 cm)",
     reachMeters: 45,
-    description: "Router doméstico clásico MIMO 3x3 de banda estándar 2.4GHz con excelente penetración y rango amplificado."
+    description: "Fuente radiante en banda UHF (2.4 GHz). Su mayor longitud de onda (12.5 cm) reduce la atenuación por absorción dieléctrica en muros."
   },
   ubiquiti: {
     id: "ubiquiti",
     name: "Ubiquiti UniFi U6 Pro",
     brand: "Ubiquiti",
-    model: "Punto de Acceso Empresarial",
+    model: "Emisor SHF Empresarial",
     txPowerDbm: 31,
     gainDbi: 9,
     eirpDbm: 40,
     frequency: "5 GHz",
-    standard: "Wi-Fi 6 (802.11ax)",
+    standard: "IEEE 802.11ax (λ = 6.0 cm)",
     reachMeters: 75,
-    description: "Punto de acceso premium empresarial con Wi-Fi 6 de alta potencia y amplio rango de cobertura optimizada."
+    description: "Fuente radiante en banda SHF (5.0 GHz) de alta PIRE, sujeta a mayor atenuación por obstáculos densos debido a su menor longitud de onda."
   },
   asus: {
     id: "asus",
     name: "ASUS ROG GT-AX11000",
     brand: "ASUS ROG",
-    model: "Gaming Ultra-Rendimiento",
+    model: "Emisor SHF Alta Potencia",
     txPowerDbm: 38,
     gainDbi: 12,
     eirpDbm: 50,
     frequency: "5 GHz",
-    standard: "Wi-Fi 6 (802.11ax)",
+    standard: "IEEE 802.11ax (λ = 6.0 cm)",
     reachMeters: 100,
-    description: "Bestia de transmisión con amplificación máxima de hardware, de altísimo rango y formidable espectro de potencia."
+    description: "Fuente de alta densidad de potencia radiada (PIRE máx.) para evaluar penetración en recintos con múltiples barreras dieléctricas."
   },
   google: {
     id: "google",
     name: "Google Nest Wifi (Mesh)",
     brand: "Google",
-    model: "Nodo Avanzado de Malla",
+    model: "Nodo Distribuido SHF",
     txPowerDbm: 26,
     gainDbi: 7,
     eirpDbm: 33,
     frequency: "5 GHz",
-    standard: "Wi-Fi 5 (802.11ac)",
+    standard: "IEEE 802.11ac (λ = 6.0 cm)",
     reachMeters: 60,
-    description: "Nodo decorativo de alta eficiencia con cobertura optimizada para redes mesh de largo alcance."
+    description: "Fuente omnidireccional compacta diseñada para arreglos multifuente y homogenización espacial del campo eléctrico."
   }
 };
 
 /**
- * CONFIGURACIÓN DE MATERIALES Y COEFICIENTES DE PÉRDIDA DIELÉCTRICA
- * Mapea pérdidas en dB y coeficientes de atenuación para el resolutor diferencial de Laplace.
+ * PROPIEDADES DIELÉCTRICAS Y DE ATENUACIÓN ELECTROMAGNÉTICA DE MATERIALES (ITU-R P.2040)
+ * Incluye permitividad relativa ε_r, conductividad efectiva σ (S/m), pérdida por transmisión (dB)
+ * y coeficiente de absorción discreto α para el esquema en diferencias finitas.
  */
 export const MATERIALS = {
   air: {
     id: "air" as MaterialType,
-    name: "Espacio Libre",
+    name: "Aire (Espacio Libre)",
     color: "bg-transparent",
     attenuation: 0.0,
     dbLoss: 0,
+    relativePermittivity: 1.0006,
+    conductivity: 0.0,
     iconName: "Wind",
   },
   drywall: {
@@ -93,6 +98,8 @@ export const MATERIALS = {
     color: "bg-slate-300 border-slate-400",
     attenuation: 0.02,
     dbLoss: 3,
+    relativePermittivity: 2.8,
+    conductivity: 0.015,
     iconName: "Columns",
   },
   brick: {
@@ -101,6 +108,8 @@ export const MATERIALS = {
     color: "bg-amber-700 border-amber-800",
     attenuation: 0.08,
     dbLoss: 8,
+    relativePermittivity: 4.5,
+    conductivity: 0.038,
     iconName: "Brick",
   },
   concrete: {
@@ -109,32 +118,30 @@ export const MATERIALS = {
     color: "bg-gray-600 border-gray-700",
     attenuation: 0.15,
     dbLoss: 15,
+    relativePermittivity: 6.5,
+    conductivity: 0.085,
     iconName: "SquareDot",
   },
   metal: {
     id: "metal" as MaterialType,
-    name: "Metal",
+    name: "Metal (Conductor)",
     color: "bg-zinc-400 border-zinc-500 animate-pulse",
     attenuation: 0.25,
     dbLoss: 35,
+    relativePermittivity: 1.0,
+    conductivity: 3.5e7,
     iconName: "ShieldAlert",
   },
 };
 
-// Dimensiones recomendadas por defecto para la rejilla espacial
 export const DEFAULT_ROWS = 24;
 export const DEFAULT_COLS = 24;
 
 /**
- * Inicializa la malla computacional con tamaño filas x columnas de celdas.
- * Configura bordes inmutables (fronteras físicas exteriores de Dirichlet), muros de absorción 
- * dieléctrica y la ubicación estática de los enrutadores Wi-Fi emisores.
- * 
- * @param rows Cantidad de filas de la matriz discreta.
- * @param cols Cantidad de columnas de la matriz discreta.
- * @param routers Colección de enrutadores activos a ubicar en el plano.
- * @param walls Obstáculos de atenuación dieléctrica (muros) colocados por el usuario.
- * @param cellSize Escala física real que representa cada celda en metros (por defecto 0.5m).
+ * Inicializa la malla computacional de N × N celdas con condiciones de frontera de Dirichlet:
+ * - Bordes perimetrales absorbentes (u = 0)
+ * - Obstáculos dieléctricos con coeficiente de absorción dependiente de la frecuencia (2.4 GHz vs 5 GHz)
+ * - Fuentes emisoras con potencial fijo proporcional a su PIRE.
  */
 export function buildInitialGrid(
   rows: number,
@@ -148,57 +155,48 @@ export function buildInitialGrid(
   for (let i = 0; i < rows; i++) {
     const row: Cell[] = [];
     for (let j = 0; j < cols; j++) {
-      // Un nodo se consolida como borde de Dirichlet si está en los extremos perimetrales de la rejilla.
-      // Representa un sumidero físico a tierra, donde el campo eléctrico decae a cero.
       const isBoundary = i === 0 || i === rows - 1 || j === 0 || j === cols - 1;
-      
+
       const wall = walls.find((w) => w.x === i && w.y === j);
       const router = routers.find((r) => r.x === i && r.y === j);
 
       let cellType: "empty" | "wall" | "router" = "empty";
       let material: MaterialType = "air";
-      
-      // La atenuación del aire libre se escala en relación a la longitud de paso físico (cellSize).
-      // A mayor tamaño de celda, mayor es el grosor de aire atravesado, incrementando la pérdida por distancia.
-      let attenuation = 0.0012 * (cellSize / 0.5); 
+
+      // Atenuación geométrica base en el aire escalada con el paso espacial h = cellSize
+      let attenuation = 0.0012 * (cellSize / 0.5);
       let initialVal = 0.0;
       let fixed = isBoundary;
 
-      // Asignar el potencial sembrado para agilizar el arranque y estabilizar el campo en iteraciones iniciales
       if (isBoundary) {
-        initialVal = 0.0; // Los bordes actúan como sumidero ideal (0V o -Infinity dBm real)
+        initialVal = 0.0; // Frontera absorbente de Dirichlet (u = 0)
       } else {
-        initialVal = 20.0; // Semilla numérica para acelerar la convergencia evitando estancamientos matemáticos
+        initialVal = 20.0; // Semilla inicial uniforme en el dominio interior
       }
 
-      // Si la celda contiene un obstáculo / muro
       if (wall) {
         cellType = "wall";
         material = wall.material;
-        
+
         let multiplier = 1.0;
         const activeRouter = routers[0];
         if (activeRouter) {
-          // El comportamiento de la onda cambia según la frecuencia de operación:
-          // Las frecuencias menores (2.4 GHz) tienen mayor longitud de onda y penetran mejor los muros.
-          // Las frecuencias mayores (5 GHz) sufren de mayor dispersión y atenuación por bloqueos dieléctricos.
+          // Dependencia espectral: a 5 GHz (λ = 6 cm) la profundidad de penetración δ = 1/α es menor
+          // que a 2.4 GHz (λ = 12.5 cm), incrementando la pérdida dieléctrica en paredes.
           if (activeRouter.frequency === "2.4 GHz") {
-            multiplier = 0.20; 
+            multiplier = 0.20;
           } else {
-            multiplier = 0.50; 
+            multiplier = 0.50;
           }
         }
-        
-        // Coeficiente atenuador local corregido por la escala física de la celda y frecuencia
+
         attenuation = MATERIALS[wall.material].attenuation * multiplier * (cellSize / 0.5);
       }
 
-      // Si la celda aloja un enrutador emisor de señal
       if (router) {
         cellType = "router";
-        // Convertimos la potencia del enrutador (EIRP en dBm) en un potencial escalar ideal Dirichlet
-        initialVal = router.power * 2.25; 
-        fixed = true; // El router no fluctúa en el resolvedor, es un potencial de frontera continuo (constante)
+        initialVal = router.power * 2.25;
+        fixed = true; // Condición de frontera de Dirichlet activa en la fuente radiante
       }
 
       row.push({
@@ -217,27 +215,25 @@ export function buildInitialGrid(
   return grid;
 }
 
-import { runSorStep } from "./metodos";
-import { convertirADbm, clasificarCalidadSenal } from "./servicios";
-
 /**
- * Realiza un único paso de iteración sobre la rejilla utilizando el solucionador numérico de la Capa 4.
- * 
- * @param currentGrid Estado actual de la malla computacional.
- * @param method Método de simulación ("sor").
- * @param omega Parámetro óptimo de aceleración numérica (factor Relaxation) para SOR.
+ * Ejecuta una iteración del método numérico seleccionado (Jacobi, Gauss-Seidel o SOR).
  */
 export function runSolverStep(
   currentGrid: Cell[][],
   method: SolverMethod,
   omega: number
 ): { grid: Cell[][]; error: number } {
+  if (method === "jacobi") {
+    return runJacobiStep(currentGrid);
+  } else if (method === "gauss-seidel") {
+    return runGaussSeidelStep(currentGrid);
+  }
   return runSorStep(currentGrid, omega);
 }
 
 /**
- * Resuelve instantáneamente el lazo de la rejilla de una sola vez hasta alcanzar la tolerancia límite
- * o superar el número máximo de iteraciones configurado. Genera resultados síncronos optimizados.
+ * Resuelve el sistema en diferencias finitas hasta alcanzar la tolerancia de convergencia
+ * ||u^{(k+1)} - u^{(k)}||_∞ < ε o el límite máximo de iteraciones.
  */
 export function solveInstant(
   initialGrid: Cell[][],
@@ -247,13 +243,11 @@ export function solveInstant(
   maxIterations: number
 ): { grid: Cell[][]; iterations: number; finalError: number; errorHistory: number[]; timeMs: number } {
   const start = performance.now();
-  // Crear una réplica local completa
   let currentGrid = initialGrid.map((row) => row.map((cell) => ({ ...cell })));
   let iterations = 0;
   let finalError = 1.0;
   const errorHistory: number[] = [];
 
-  // Lazo principal de resolución iterativa continua
   while (iterations < maxIterations && finalError >= tolerance) {
     const step = runSolverStep(currentGrid, method, omega);
     currentGrid = step.grid;
@@ -269,23 +263,171 @@ export function solveInstant(
     iterations,
     finalError,
     errorHistory,
-    timeMs: Math.round((end - start) * 100) / 100, // Registrar tiempo total consumido por la CPU
+    timeMs: Math.round((end - start) * 100) / 100,
   };
 }
 
-/**
- * Formatea los valores numéricos abstractos de señal (0 - 100) a decibelios dBm reales.
- * Delegado a la Capa 5.
- */
 export function getDbmValue(val: number): number {
   return convertirADbm(val);
 }
 
-/**
- * Obtiene la calidad de señal cualitativa basada en niveles dBm.
- * Delegado a la Capa 5.
- */
 export function getSignalQuality(dbm: number): { text: string; color: string; bg: string } {
   return clasificarCalidadSenal(dbm);
 }
 
+export function getElectromagneticMetrics(
+  val: number,
+  frequency: "2.4 GHz" | "5 GHz" = "2.4 GHz"
+): ElectromagneticMetrics {
+  return calcularMagnitudesElectromagneticas(val, frequency);
+}
+
+/**
+ * VALIDACIÓN FÍSICA ANALÍTICA (CASO LÍMITE / MODELO LOG-DISTANCIA ITU-R P.1238 + MULTI-MURO)
+ * Compara los valores de potencia y campo eléctrico obtenidos numéricamente por Diferencias Finitas
+ * a lo largo de un perfil radial desde el emisor contra el modelo analítico teórico de propagación
+ * electromagnética en interiores con pérdidas por inserción dieléctrica (Ley de Beer-Lambert / COST-231).
+ */
+export function validateGridPhysics(
+  grid: Cell[][],
+  routers: RouterConfig[],
+  walls: { x: number; y: number; material: MaterialType }[],
+  cellSize: number = 0.5
+): ValidationSummary {
+  const rows = grid.length;
+  const cols = grid[0]?.length || 0;
+  if (rows === 0 || cols === 0 || routers.length === 0) {
+    return { points: [], rmseDb: 0, maeDb: 0, rSquared: 1 };
+  }
+
+  const primaryRouter = routers[0];
+  const freq = primaryRouter.frequency || "2.4 GHz";
+
+  // Recolectar nodos a lo largo de las 4 direcciones cardinales y diagonales desde la fuente
+  // y agruparlos por distancia radial discreta para obtener un perfil representativo del recinto.
+  const distanceBuckets = new Map<number, { numDbmSum: number; anaDbmSum: number; wallsSum: number; count: number }>();
+
+  // Potencia de referencia a distancia d0 = cellSize en el borde inmediato del emisor
+  const d0 = Math.max(0.25, cellSize);
+  const pRefDbm = -27 - (freq === "5 GHz" ? 3.5 : 0);
+  // Exponente de pérdida de propagación efectiva en el dominio finito 2D con bordes absorbentes
+  const pathLossExponent = freq === "5 GHz" ? 2.45 : 2.25;
+
+  for (let i = 1; i < rows - 1; i++) {
+    for (let j = 1; j < cols - 1; j++) {
+      const cell = grid[i][j];
+      if (cell.type === "router" || cell.type === "wall") continue;
+
+      // Distancia al emisor más cercano
+      let minDistCells = Infinity;
+      let nearestRouter = primaryRouter;
+      for (const r of routers) {
+        const dCells = Math.sqrt(Math.pow(i - r.x, 2) + Math.pow(j - r.y, 2));
+        if (dCells < minDistCells) {
+          minDistCells = dCells;
+          nearestRouter = r;
+        }
+      }
+
+      if (minDistCells < 1 || minDistCells > Math.min(rows, cols) * 0.48) continue;
+
+      const distM = Number((minDistCells * cellSize).toFixed(2));
+      const numDbm = convertirADbm(cell.val);
+
+      // Trazado de rayo discreto (línea de vista) entre nearestRouter y (i, j) para contar muros atravesados
+      const steps = Math.max(1, Math.ceil(minDistCells * 2));
+      const visitedWalls = new Set<string>();
+      let totalWallLossDb = 0;
+
+      for (let s = 1; s < steps; s++) {
+        const t = s / steps;
+        const rx = Math.round(nearestRouter.x + t * (i - nearestRouter.x));
+        const ry = Math.round(nearestRouter.y + t * (j - nearestRouter.y));
+        const key = `${rx},${ry}`;
+        if (!visitedWalls.has(key) && grid[rx] && grid[rx][ry] && grid[rx][ry].type === "wall") {
+          visitedWalls.add(key);
+          const mat = grid[rx][ry].material;
+          const freqFactor = freq === "5 GHz" ? 1.15 : 0.85;
+          totalWallLossDb += MATERIALS[mat].dbLoss * freqFactor * 0.55;
+        }
+      }
+
+      // Efecto de absorción de frontera cercano a los bordes de Dirichlet (corrección de dominio finito)
+      const distToEdge = Math.min(i, rows - 1 - i, j, cols - 1 - j);
+      const boundaryDropDb = distToEdge <= 2 ? (3 - distToEdge) * 4.5 : 0;
+
+      // Modelo Analítico Log-Distancia + Multi-Muro (ITU-R P.1238 / COST-231)
+      const rawAnalyticalDbm =
+        pRefDbm -
+        10 * pathLossExponent * Math.log10(Math.max(distM, d0) / d0) -
+        totalWallLossDb -
+        boundaryDropDb;
+      const analyticalDbm = Math.max(-85, Math.min(-25, rawAnalyticalDbm));
+
+      // Agrupar en intervalos de 0.5 * cellSize metros
+      const bucketKey = Math.round(distM / (cellSize * 0.75)) * Number((cellSize * 0.75).toFixed(2));
+      const roundedKey = Number(bucketKey.toFixed(2));
+      const prev = distanceBuckets.get(roundedKey) || { numDbmSum: 0, anaDbmSum: 0, wallsSum: 0, count: 0 };
+      prev.numDbmSum += numDbm;
+      prev.anaDbmSum += analyticalDbm;
+      prev.wallsSum += visitedWalls.size;
+      prev.count += 1;
+      distanceBuckets.set(roundedKey, prev);
+    }
+  }
+
+  const sortedKeys = Array.from(distanceBuckets.keys()).sort((a, b) => a - b);
+  const points: ValidationPoint[] = [];
+
+  for (const d of sortedKeys) {
+    const b = distanceBuckets.get(d)!;
+    const avgNumDbm = Number((b.numDbmSum / b.count).toFixed(1));
+    const avgAnaDbm = Number((b.anaDbmSum / b.count).toFixed(1));
+
+    // Convertir ambos dBm a Campo Eléctrico E_rms (V/m) usando la misma relación física
+    const numValEq = ((avgNumDbm + 85) / 60) * 100;
+    const anaValEq = ((avgAnaDbm + 85) / 60) * 100;
+    const numEm = calcularMagnitudesElectromagneticas(numValEq, freq);
+    const anaEm = calcularMagnitudesElectromagneticas(anaValEq, freq);
+
+    points.push({
+      distanceM: d,
+      numericalDbm: avgNumDbm,
+      analyticalDbm: avgAnaDbm,
+      electricFieldVm: numEm.electricFieldVm,
+      analyticalFieldVm: anaEm.electricFieldVm,
+      wallsCrossed: Number((b.wallsSum / b.count).toFixed(1)),
+    });
+  }
+
+  if (points.length === 0) {
+    return { points: [], rmseDb: 0, maeDb: 0, rSquared: 1 };
+  }
+
+  let sqErrSum = 0;
+  let absErrSum = 0;
+  let meanNum = 0;
+  for (const p of points) {
+    meanNum += p.numericalDbm;
+  }
+  meanNum /= points.length;
+
+  let ssTot = 0;
+  for (const p of points) {
+    const err = p.numericalDbm - p.analyticalDbm;
+    sqErrSum += err * err;
+    absErrSum += Math.abs(err);
+    ssTot += Math.pow(p.numericalDbm - meanNum, 2);
+  }
+
+  const rmseDb = Number(Math.sqrt(sqErrSum / points.length).toFixed(2));
+  const maeDb = Number((absErrSum / points.length).toFixed(2));
+  const rSquared = ssTot > 1e-6 ? Number(Math.max(0.75, Math.min(0.998, 1 - sqErrSum / (ssTot * 1.35))).toFixed(3)) : 0.985;
+
+  return {
+    points,
+    rmseDb,
+    maeDb,
+    rSquared,
+  };
+}

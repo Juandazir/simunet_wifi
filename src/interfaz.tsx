@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Cell, SolverMethod, MaterialType, RouterConfig, SimulationConfig, RunHistory, UserProfile, UserSavedNetwork } from "./types";
-import { buildInitialGrid, runSolverStep, solveInstant, MATERIALS, getDbmValue, getSignalQuality, ROUTER_MODELS } from "./controlador";
+import { buildInitialGrid, runSolverStep, solveInstant, MATERIALS, getDbmValue, getSignalQuality, getElectromagneticMetrics, validateGridPhysics, ROUTER_MODELS } from "./controlador";
 import NetworkGrid from "./components/NetworkGrid";
 import ControlPanel from "./components/ControlPanel";
 import GraphPanel from "./components/GraphPanel";
@@ -203,11 +203,19 @@ export default function Interfaz() {
   // Initialize/rebuild grid when dimensions, routers, walls, or cell physical size change
   // Inicializar o reconstruir la malla computacional cuando cambian las dimensiones, los routers, las paredes, o el tamaño físico de celda.
   useEffect(() => {
-    rebuildGrid();
+    const initial = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
+    const solved = solveInstant(initial, config.method, config.omega, config.tolerance, config.maxIterations);
+    setGrid(solved.grid);
+    setCurrentIteration(solved.iterations);
+    setCurrentError(solved.finalError);
+    setTimeMs(solved.timeMs);
+    setIsConverged(solved.finalError < config.tolerance);
+    setCurrentErrorHistory(solved.errorHistory);
   }, [gridSize, routers, walls, cellSize]);
 
-  // Función para re-configurar la malla con el potencial de Dirichlet incrustado
+  // Función para re-configurar la malla con el potencial de Dirichlet incrustado (para animar o iterar desde cero)
   const rebuildGrid = () => {
+    setIsRunning(false);
     const initial = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
     setGrid(initial);
     setCurrentIteration(0);
@@ -215,6 +223,49 @@ export default function Interfaz() {
     setTimeMs(0);
     setIsConverged(false);
     setCurrentErrorHistory([]);
+  };
+
+  // Inicia la animación paso a paso reiniciando la semilla si la malla ya estaba convergida
+  const handleStartAnimation = () => {
+    if (isConverged || (currentIteration > 0 && currentError < config.tolerance)) {
+      const initial = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
+      setGrid(initial);
+      setCurrentIteration(0);
+      setCurrentError(0);
+      setTimeMs(0);
+      setIsConverged(false);
+      setCurrentErrorHistory([]);
+    }
+    setIsRunning(true);
+  };
+
+  // Ajusta proporcionalmente las coordenadas de routers y muros cuando cambia la resolución de la malla (16x16, 24x24, 32x32)
+  const handleGridSizeUpdate = (newSize: { rows: number; cols: number }) => {
+    setIsRunning(false);
+    const scaleR = newSize.rows / gridSize.rows;
+    const scaleC = newSize.cols / gridSize.cols;
+    setRouters((prev) =>
+      prev.map((r) => ({
+        ...r,
+        x: Math.min(newSize.rows - 2, Math.max(1, Math.round(r.x * scaleR))),
+        y: Math.min(newSize.cols - 2, Math.max(1, Math.round(r.y * scaleC))),
+      }))
+    );
+    setWalls((prev) => {
+      const seen = new Set<string>();
+      const scaled: { x: number; y: number; material: MaterialType }[] = [];
+      for (const w of prev) {
+        const nx = Math.min(newSize.rows - 2, Math.max(1, Math.round(w.x * scaleR)));
+        const ny = Math.min(newSize.cols - 2, Math.max(1, Math.round(w.y * scaleC)));
+        const key = `${nx},${ny}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          scaled.push({ x: nx, y: ny, material: w.material });
+        }
+      }
+      return scaled;
+    });
+    setGridSize(newSize);
   };
 
   // CAPA 4: Bucle principal del resolvedor numérico iterativo estimulado mediante pulsos de tiempo (ticks)
@@ -232,7 +283,7 @@ export default function Interfaz() {
 
     // Configurar temporizador recursivo según el retardo de animación escogido por el usuario
     const timer = setTimeout(() => {
-      // Computar un paso iterativo individual en la malla con SOR
+      // Computar un paso iterativo individual en la malla con el método seleccionado
       const stepResult = runSolverStep(grid, config.method, config.omega);
       
       const newIteration = currentIteration + 1;
@@ -255,8 +306,7 @@ export default function Interfaz() {
       // Si converge o alcanza el límite máximo de iteraciones, detener simulación y archivar experimento
       if (achievedConvergence || hitLimit) {
         setIsRunning(false);
-        // Se considera "Estabilidad Alta" si converge rápido (dentro de las primeras 100 iteraciones)
-        setIsConverged(achievedConvergence && newIteration <= 100);
+        setIsConverged(achievedConvergence);
 
         // Registrar estadísticas consolidadas en el historial para análisis posteriores o descarga CSV
         const runId = Math.random().toString();
@@ -267,8 +317,8 @@ export default function Interfaz() {
           iterations: newIteration,
           executionTimeMs: elapsed,
           finalError: newError,
-          converged: achievedConvergence && newIteration <= 100,
-          omega: config.omega,
+          converged: achievedConvergence,
+          omega: config.method === "sor" ? config.omega : 1.0,
           tolerance: config.tolerance,
           gridSize: `${gridSize.rows}x${gridSize.cols}`,
           obstaclesCount: walls.length,
@@ -395,9 +445,18 @@ export default function Interfaz() {
   const handleLoadPreset = (presetName: string) => {
     setIsRunning(false);
     const model = ROUTER_MODELS[selectedRouterModelId];
+    const centerR = Math.floor(gridSize.rows / 2);
+    const centerC = Math.floor(gridSize.cols / 2);
+    const scaleR = gridSize.rows / 24;
+    const scaleC = gridSize.cols / 24;
+    const scaleCoord = (r: number, c: number) => ({
+      x: Math.min(gridSize.rows - 2, Math.max(1, Math.round(r * scaleR))),
+      y: Math.min(gridSize.cols - 2, Math.max(1, Math.round(c * scaleC))),
+    });
+
     const initialRouter = {
-      x: 12,
-      y: 12,
+      x: centerR,
+      y: centerC,
       power: Math.round(model.eirpDbm * (100 / 38)),
       ssid: `${model.brand}_${model.model}`.replace(/[\s\-\.]+/g, "_"),
       frequency: model.frequency,
@@ -408,35 +467,50 @@ export default function Interfaz() {
       setWalls([]);
       setRouters([initialRouter]);
     } else if (presetName === "office") {
-      const officeWalls: { x: number; y: number; material: MaterialType }[] = [];
+      const baseWalls: { x: number; y: number; material: MaterialType }[] = [];
       for (let i = 2; i < 22; i++) {
         if (i !== 7 && i !== 8 && i !== 15 && i !== 16) {
-          officeWalls.push({ x: i, y: 11, material: "concrete" });
+          baseWalls.push({ x: i, y: 11, material: "concrete" });
         }
       }
       for (let j = 2; j < 11; j++) {
         if (j !== 5) {
-          officeWalls.push({ x: 8, y: j, material: "concrete" });
-          officeWalls.push({ x: 15, y: j, material: "concrete" });
+          baseWalls.push({ x: 8, y: j, material: "concrete" });
+          baseWalls.push({ x: 15, y: j, material: "concrete" });
         }
       }
       for (let j = 12; j < 22; j++) {
         if (j !== 17) {
-          officeWalls.push({ x: 10, y: j, material: "concrete" });
-          officeWalls.push({ x: 18, y: j, material: "concrete" });
+          baseWalls.push({ x: 10, y: j, material: "concrete" });
+          baseWalls.push({ x: 18, y: j, material: "concrete" });
         }
       }
+      const seen = new Set<string>();
+      const officeWalls: { x: number; y: number; material: MaterialType }[] = [];
+      for (const w of baseWalls) {
+        const sc = scaleCoord(w.x, w.y);
+        const key = `${sc.x},${sc.y}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          officeWalls.push({ x: sc.x, y: sc.y, material: w.material });
+        }
+      }
+      const rPos = scaleCoord(4, 4);
       setWalls(officeWalls);
-      setRouters([{ ...initialRouter, x: 4, y: 4 }]);
+      setRouters([{ ...initialRouter, x: rPos.x, y: rPos.y }]);
     } else if (presetName === "metal-cage") {
       const cageWalls: { x: number; y: number; material: MaterialType }[] = [];
-      for (let i = 6; i <= 17; i++) {
-        cageWalls.push({ x: i, y: 6, material: "metal" });
-        cageWalls.push({ x: i, y: 17, material: "metal" });
+      const minR = Math.max(2, Math.round(6 * scaleR));
+      const maxR = Math.min(gridSize.rows - 3, Math.round(17 * scaleR));
+      const minC = Math.max(2, Math.round(6 * scaleC));
+      const maxC = Math.min(gridSize.cols - 3, Math.round(17 * scaleC));
+      for (let i = minR; i <= maxR; i++) {
+        cageWalls.push({ x: i, y: minC, material: "metal" });
+        cageWalls.push({ x: i, y: maxC, material: "metal" });
       }
-      for (let j = 7; j <= 16; j++) {
-        cageWalls.push({ x: 6, y: j, material: "metal" });
-        cageWalls.push({ x: 17, y: j, material: "metal" });
+      for (let j = minC + 1; j <= maxC - 1; j++) {
+        cageWalls.push({ x: minR, y: j, material: "metal" });
+        cageWalls.push({ x: maxR, y: j, material: "metal" });
       }
       setWalls(cageWalls);
       setRouters([initialRouter]);
@@ -445,8 +519,9 @@ export default function Interfaz() {
 
   const handleSolveInstant = () => {
     setIsRunning(false);
+    const initial = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
     const result = solveInstant(
-      grid,
+      initial,
       config.method,
       config.omega,
       config.tolerance,
@@ -457,7 +532,7 @@ export default function Interfaz() {
     setCurrentIteration(result.iterations);
     setCurrentError(result.finalError);
     setTimeMs(result.timeMs);
-    setIsConverged(result.finalError < config.tolerance && result.iterations <= 100);
+    setIsConverged(result.finalError < config.tolerance);
     setCurrentErrorHistory(result.errorHistory);
 
     const runId = Math.random().toString();
@@ -468,8 +543,8 @@ export default function Interfaz() {
       iterations: result.iterations,
       executionTimeMs: result.timeMs,
       finalError: result.finalError,
-      converged: (result.finalError < config.tolerance) && result.iterations <= 100,
-      omega: config.omega,
+      converged: result.finalError < config.tolerance,
+      omega: config.method === "sor" ? config.omega : 1.0,
       tolerance: config.tolerance,
       gridSize: `${gridSize.rows}x${gridSize.cols}`,
       obstaclesCount: walls.length,
@@ -478,12 +553,58 @@ export default function Interfaz() {
     setHistory((prev) => [newRun, ...prev]);
   };
 
+  const handleCompareMethods = () => {
+    setIsRunning(false);
+    const methodsToCompare: Array<{ method: SolverMethod; omega: number }> = [
+      { method: "jacobi", omega: 1.0 },
+      { method: "gauss-seidel", omega: 1.0 },
+      { method: "sor", omega: config.omega > 1.05 ? config.omega : 1.35 },
+    ];
+
+    const newRuns: RunHistory[] = [];
+    let bestResult = null;
+
+    for (const item of methodsToCompare) {
+      const initial = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
+      const res = solveInstant(initial, item.method, item.omega, config.tolerance, config.maxIterations);
+      newRuns.push({
+        id: Math.random().toString(),
+        timestamp: new Date().toLocaleTimeString(),
+        method: item.method,
+        iterations: res.iterations,
+        executionTimeMs: res.timeMs,
+        finalError: res.finalError,
+        converged: res.finalError < config.tolerance,
+        omega: item.omega,
+        tolerance: config.tolerance,
+        gridSize: `${gridSize.rows}x${gridSize.cols}`,
+        obstaclesCount: walls.length,
+        errorHistory: res.errorHistory,
+      });
+      if (item.method === "sor") {
+        bestResult = res;
+      }
+    }
+
+    if (bestResult) {
+      setGrid(bestResult.grid);
+      setCurrentIteration(bestResult.iterations);
+      setCurrentError(bestResult.finalError);
+      setTimeMs(bestResult.timeMs);
+      setIsConverged(bestResult.finalError < config.tolerance);
+      setCurrentErrorHistory(bestResult.errorHistory);
+    }
+
+    setHistory((prev) => [...newRuns.reverse(), ...prev]);
+  };
+
   const handleSingleStep = () => {
     setIsRunning(false);
     const stepResult = runSolverStep(grid, config.method, config.omega);
     setGrid(stepResult.grid);
     setCurrentIteration((prev) => prev + 1);
     setCurrentError(stepResult.error);
+    setIsConverged(stepResult.error < config.tolerance);
     setCurrentErrorHistory((prev) => [...prev, stepResult.error]);
   };
 
@@ -1061,10 +1182,16 @@ export default function Interfaz() {
     if (history.length === 0) {
       content += "No se registran experimentos anteriores guardados en esta sesión.\n\n";
     } else {
-      content += `ID | Método | Malla | Iteraciones | Tiempo CPU | Residuo Final | Estado de Convergencia\n`;
+      content += `ID | Método              | Malla | Iteraciones | Tiempo CPU | Residuo Final | Estado de Convergencia\n`;
       content += `--------------------------------------------------------------------------------\n`;
       history.forEach((run, index) => {
-        content += `${String(index + 1).padEnd(2)} | SOR (w=${run.omega})      | ${run.gridSize.padEnd(5)} | ${String(run.iterations).padEnd(11)} | ${String(run.executionTimeMs).padEnd(7)} ms | ${run.finalError.toExponential(3)} | ${run.converged ? "CONVERGIDO" : "FALLIDO"}\n`;
+        const methodLabel =
+          run.method === "sor"
+            ? `SOR (w=${run.omega})`
+            : run.method === "gauss-seidel"
+            ? "Gauss-Seidel (w=1.0)"
+            : "Jacobi (Simultáneo)";
+        content += `${String(index + 1).padEnd(2)} | ${methodLabel.padEnd(19)} | ${run.gridSize.padEnd(5)} | ${String(run.iterations).padEnd(11)} | ${String(run.executionTimeMs).padEnd(7)} ms | ${run.finalError.toExponential(3)} | ${run.converged ? "CONVERGIDO" : "FALLIDO"}\n`;
       });
       content += "\n";
     }
@@ -1196,7 +1323,53 @@ export default function Interfaz() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Direct Links to Detailed Interactive Presentation and Poster */}
+            <a
+              href="/presentacion/05_Presentacion_Interactiva_Feria_Fisica.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border text-xs font-extrabold transition-all cursor-pointer ${
+                isDarkMode
+                  ? "bg-indigo-950/70 border-indigo-700/80 text-indigo-300 hover:bg-indigo-900/70"
+                  : "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+              }`}
+              title="Abrir Presentación Interactiva y Guía Explicativa Detallada"
+            >
+              <BookOpen className="w-4 h-4 text-indigo-400" />
+              <span>Presentación Explicativa</span>
+            </a>
+
+            <a
+              href="/presentacion/poster/Poster_Visual_80x120cm.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
+                isDarkMode
+                  ? "bg-slate-900 border-slate-800 text-emerald-400 hover:bg-slate-800"
+                  : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+              }`}
+              title="Abrir Póster Científico Oficial 80x120 cm (Español)"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Póster (ES)</span>
+            </a>
+
+            <a
+              href="/presentacion/poster/Poster_Visual_80x120cm_EN.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
+                isDarkMode
+                  ? "bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-800"
+                  : "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+              }`}
+              title="Open Official Scientific Poster 80x120 cm (English)"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Poster (EN)</span>
+            </a>
+
             {/* Color Switch Button */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -1518,6 +1691,9 @@ export default function Interfaz() {
                   method={config.method}
                   isDarkMode={isDarkMode}
                   onDownloadFullReport={descargarDocumentoMallaCompleto}
+                  validationSummary={validateGridPhysics(grid, routers, walls, cellSize)}
+                  onCompareMethods={handleCompareMethods}
+                  activeFrequency={routers[0]?.frequency || "2.4 GHz"}
                 />
 
                 {/* Admin Audit system evaluation module */}
@@ -1539,7 +1715,7 @@ export default function Interfaz() {
                       {history.length > 0 ? (
                         <button
                           onClick={() => setShowReportModal(true)}
-                          className="flex items-center gap-1.5 px-4_5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl shadow-md cursor-pointer transition"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl shadow-md cursor-pointer transition"
                         >
                           <FileText className="w-4 h-4" />
                           Generar Informe Técnico
@@ -1591,7 +1767,7 @@ export default function Interfaz() {
                   config={config}
                   setConfig={setConfig}
                   isRunning={isRunning}
-                  onStart={() => setIsRunning(true)}
+                  onStart={handleStartAnimation}
                   onPause={() => setIsRunning(false)}
                   onSolveInstant={handleSolveInstant}
                   onSingleStep={handleSingleStep}
@@ -1604,7 +1780,7 @@ export default function Interfaz() {
                   timeMs={timeMs}
                   onLoadPreset={handleLoadPreset}
                   gridSize={gridSize}
-                  setGridSize={setGridSize}
+                  setGridSize={handleGridSizeUpdate}
                   isDarkMode={isDarkMode}
                   isAdmin={currentUser.role === "admin"}
                   walls={walls}
@@ -1844,11 +2020,11 @@ export default function Interfaz() {
                             <td className="py-2 px-3">{run.executionTimeMs} ms</td>
                             <td className="py-2 px-3">{run.finalError < 1e-4 ? run.finalError.toExponential(2) : run.finalError.toFixed(5)}</td>
                             <td className="py-2 px-3">
-                              {run.converged && run.iterations <= 100 ? (
-                                <span className="text-emerald-650 font-bold">ESTABLE</span>
+                              {run.converged ? (
+                                <span className="text-emerald-600 font-bold">CONVERGIDO</span>
                               ) : (
-                                <span className="text-rose-650 font-bold">
-                                  {run.iterations > 100 ? "INESTABLE (>100)" : "INCONGRUENTE"}
+                                <span className="text-amber-600 font-bold">
+                                  LÍMITE ITER.
                                 </span>
                               )}
                             </td>

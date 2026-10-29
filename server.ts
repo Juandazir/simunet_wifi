@@ -19,6 +19,12 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  // Servir la carpeta de presentación interactiva y póster en /presentacion
+  const presentacionPath = path.join(process.cwd(), "presentacion");
+  if (fs.existsSync(presentacionPath)) {
+    app.use("/presentacion", express.static(presentacionPath));
+  }
+
   // Guardar resultado (CSV, PNG, reportes, etc.) en la carpeta "resultados"
   app.post("/api/guardar-resultado", (req, res) => {
     try {
