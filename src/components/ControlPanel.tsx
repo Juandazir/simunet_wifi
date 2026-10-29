@@ -1,73 +1,85 @@
+// Importa React y sus hooks fundamentales para manejar estados locales, referencias al DOM y efectos reactivos
 import React, { useState, useRef, useEffect } from "react";
-import { SolverMethod, MaterialType, SimulationConfig } from "../types";
+// Importa las interfaces tipadas de métodos numéricos, materiales, configuración y resultados de optimización (Capa 1)
+import {
+  SolverMethod,
+  MaterialType,
+  SimulationConfig,
+  RouterConfig,
+  OptimizationResult,
+} from "../types";
+// Importa el catálogo de materiales dieléctricos, modelos de routers y el motor de resolución desde la Capa 2
 import { MATERIALS, ROUTER_MODELS, buildInitialGrid, solveInstant } from "../controlador";
+// Importa la función de visión artificial por luminancia ITU-R BT.601 para digitalizar planos (Capa 3)
 import { traducirImagenAMatriz } from "../traduccion";
-import { 
-  Play, Pause, RotateCcw, FastForward, Sliders, Layout, RefreshCw, 
-  Layers, Cpu, Eraser, ShieldAlert, Lock, Upload, Image, SlidersHorizontal, 
-  CheckCircle2, Sparkles, Binary, FileSpreadsheet, Radio, Maximize2,
-  MapPin, TrendingUp, Award, Move
+// Importa los iconos vectoriales utilizados en los botones de simulación, herramientas y selectores
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  FastForward,
+  Sliders,
+  Layout,
+  RefreshCw,
+  Layers,
+  Cpu,
+  Eraser,
+  Upload,
+  CheckCircle2,
+  Binary,
+  FileSpreadsheet,
+  Radio,
+  Maximize2,
+  MapPin,
+  Award,
+  Move,
 } from "lucide-react";
 
+// Propiedades de entrada recibidas por el panel lateral de controles ControlPanel
 interface ControlPanelProps {
-  config: SimulationConfig;
-  setConfig: React.Dispatch<React.SetStateAction<SimulationConfig>>;
-  isRunning: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onSolveInstant: () => void;
-  onSingleStep: () => void;
-  onReset: () => void;
-  onClearWalls: () => void;
-  selectedTool: "router" | MaterialType | "eraser" | "move";
-  setSelectedTool: (tool: "router" | MaterialType | "eraser" | "move") => void;
-  currentIteration: number;
-  currentError: number;
-  timeMs: number;
-  onLoadPreset: (presetName: string) => void;
-  gridSize: { rows: number; cols: number };
-  setGridSize: (size: { rows: number; cols: number }) => void;
-  isDarkMode: boolean;
-  isAdmin: boolean;
-  walls: { x: number; y: number; material: MaterialType }[];
-  setWalls: React.Dispatch<React.SetStateAction<{ x: number; y: number; material: MaterialType }[]>>;
-  selectedRouterModelId: string;
-  setSelectedRouterModelId: (id: string) => void;
-  cellSize: number;
-  setCellSize: (size: number) => void;
-  onFindBestRouterPlace: (targetCount?: number) => void;
-  isOptimizing: boolean;
-  optimizationResult: {
-    x: number;
-    y: number;
-    avgSignal: number;
-    coveragePct: number;
-    candidatesTested: number;
-    topCandidates?: Array<{
-      x: number;
-      y: number;
-      avgSignal: number;
-      coveragePct: number;
-      score: number;
-      zoneName: string;
-    }>;
-    isMultiRouter?: boolean;
-    optimizedRouters?: Array<{
-      x: number;
-      y: number;
-      power: number;
-      ssid: string;
-      frequency: string;
-      modelId: string;
-      zoneName: string;
-    }>;
-    uniformityIndex?: number;
-  } | null;
-  onApplyBestRouterPlace: (customX?: number, customY?: number) => void;
-  routers: any[];
-  onClearRouters: () => void;
+  config: SimulationConfig;                                                                   // Configuración actual del solucionador numérico
+  setConfig: React.Dispatch<React.SetStateAction<SimulationConfig>>;                          // Actualizador reactivo de la configuración numérica
+  isRunning: boolean;                                                                         // Indica si la animación iterativa paso a paso está activa
+  onStart: () => void;                                                                        // Inicia la animación paso a paso del método numérico
+  onPause: () => void;                                                                        // Pausa la animación iterativa en curso
+  onSolveInstant: () => void;                                                                 // Resuelve de inmediato hasta alcanzar la convergencia estacionaria
+  onSingleStep: () => void;                                                                   // Avanza exactamente una iteración (+1 paso k)
+  onReset: () => void;                                                                        // Reinicia el potencial escalar de la malla al estado inicial
+  onClearWalls: () => void;                                                                   // Elimina todos los obstáculos dieléctricos del recinto
+  selectedTool: "router" | MaterialType | "eraser" | "move";                                  // Herramienta de dibujo o edición actualmente seleccionada
+  setSelectedTool: (tool: "router" | MaterialType | "eraser" | "move") => void;               // Cambia la herramienta de edición activa
+  currentIteration: number;                                                                   // Contador de iteración actual k
+  currentError: number;                                                                       // Valor actual de la norma infinito del error residual
+  timeMs: number;                                                                             // Tiempo de cómputo acumulado en milisegundos
+  onLoadPreset: (presetName: string) => void;                                                 // Carga un escenario arquitectónico predefinido
+  gridSize: { rows: number; cols: number };                                                   // Dimensiones discretas N_y × N_x de la malla
+  setGridSize: (size: { rows: number; cols: number }) => void;                                // Actualiza la resolución de nodos de la malla
+  isDarkMode: boolean;                                                                        // Estado activo del modo visual oscuro o claro
+  isAdmin: boolean;                                                                           // Indica si el usuario actual posee rol de administrador
+  walls: { x: number; y: number; material: MaterialType }[];                                  // Lista de muros dieléctricos presentes en la malla
+  setWalls: React.Dispatch<React.SetStateAction<{ x: number; y: number; material: MaterialType }[]>>; // Actualiza la lista de muros (usado por el digitalizador)
+  selectedRouterModelId: string;                                                              // ID del modelo comercial de router activo en el catálogo
+  setSelectedRouterModelId: (id: string) => void;                                             // Cambia el perfil de router comercial seleccionado
+  cellSize: number;                                                                           // Escala espacial física h en metros por celda
+  setCellSize: (size: number) => void;                                                        // Modifica el tamaño físico en metros de cada celda
+  onFindBestRouterPlace: (targetCount?: number) => void;                                      // Ejecuta el algoritmo de optimización espacial (1 o K routers)
+  isOptimizing: boolean;                                                                      // Indica si el barrido de optimización espacial está en curso
+  optimizationResult: OptimizationResult | null;                                              // Resultado estructurado de la optimización espacial
+  onApplyBestRouterPlace: (customX?: number, customY?: number) => void;                       // Aplica en la malla la ubicación óptima seleccionada
+  routers: RouterConfig[];                                                                    // Arreglo de transmisores activos actualmente en la malla
+  onClearRouters: () => void;                                                                 // Elimina todos los routers emisores del plano
 }
 
+/**
+ * Componente lateral de control que agrupa:
+ * 1. Panel de ejecución numérica (Animar, Instantáneo, Iteración +1, Resetear, Quitar Muros/Routers).
+ * 2. Motor de optimización espacial de cobertura (búsqueda exhaustiva para 1 router y K-Means para K routers).
+ * 3. Selector de hardware transmisor comercial (PIRE, potencia Tx, ganancia, frecuencia y longitud de onda λ).
+ * 4. Control de paso espacial h (escala métrica en metros por celda).
+ * 5. Paleta de herramientas y materiales dieléctricos (ITU-R P.2040).
+ * 6. Digitalizador de planos arquitectónicos (conversión Imagen -> Matriz por luminancia ITU-R BT.601).
+ * 7. Sintonizador de métodos numéricos (Jacobi, Gauss-Seidel, SOR) y buscador automático del ω óptimo.
+ */
 export default function ControlPanel({
   config,
   setConfig,
@@ -80,14 +92,10 @@ export default function ControlPanel({
   onClearWalls,
   selectedTool,
   setSelectedTool,
-  currentIteration,
-  currentError,
-  timeMs,
   onLoadPreset,
   gridSize,
   setGridSize,
   isDarkMode,
-  isAdmin,
   walls,
   setWalls,
   selectedRouterModelId,
@@ -101,40 +109,55 @@ export default function ControlPanel({
   routers,
   onClearRouters,
 }: ControlPanelProps) {
-  
-  // Estados del digitalizador e índice de optimización
-  const [numRoutersToOpt, setNumRoutersToOpt] = useState<number>(routers.length > 0 ? routers.length : 1);
+  // Cantidad objetivo de routers K a distribuir mediante el optimizador espacial
+  const [numRoutersToOpt, setNumRoutersToOpt] = useState<number>(
+    routers.length > 0 ? routers.length : 1
+  );
+  // Material dieléctrico que se asignará por defecto a los trazos oscuros detectados al digitalizar un plano
   const [uploadWallMaterial, setUploadWallMaterial] = useState<MaterialType>("concrete");
 
-  // Mantener la cantidad sincronizada con los routers reales si se añaden manualmente
+  // Sincroniza el selector de cantidad de routers a optimizar cuando el usuario agrega o quita routers en la malla
   useEffect(() => {
     if (routers.length > 0) {
       setNumRoutersToOpt(routers.length);
     }
   }, [routers.length]);
+
+  // Umbral de luminancia ITU-R BT.601 (0 a 255) para discriminar muros frente al fondo blanco en el escáner
   const [sensitivity, setSensitivity] = useState<number>(160);
+  // Mensaje temporal de confirmación tras digitalizar un plano arquitectónico con éxito
   const [scanSuccessMsg, setScanSuccessMsg] = useState<string>("");
+  // Estado visual para resaltar la zona de arrastrar y soltar (Drag & Drop) al acercar un archivo de imagen
   const [dragActive, setDragActive] = useState<boolean>(false);
+  // Referencia al elemento <input type="file"> oculto para disparar el selector de archivos del sistema
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Estados para optimización de Omega (w)
+  // Bandera que indica si se está ejecutando el barrido espectral para hallar el factor ω óptimo de SOR
   const [isOptimizingOmega, setIsOptimizingOmega] = useState(false);
+  // Lista ordenada con los resultados de convergencia obtenidos para cada valor candidato de ω probado
   const [omegaResults, setOmegaResults] = useState<Array<{
     omega: number;
     iterations: number;
     error: number;
     converged: boolean;
   }> | null>(null);
+  // Mejor valor numérico del parámetro de relajación ω encontrado para la geometría actual del recinto
   const [bestOmegaFound, setBestOmegaFound] = useState<number | null>(null);
 
+  /**
+   * Realiza un barrido paramétrico experimental sobre el factor de sobre-relajación ω ∈ [1.0, 1.9]
+   * resolviendo la malla actual con SOR para cada valor e identificando aquel que minimiza las iteraciones.
+   */
   const handleOptimizeOmega = () => {
+    // Activa el indicador de carga y limpia resultados previos
     setIsOptimizingOmega(true);
     setOmegaResults(null);
     setBestOmegaFound(null);
 
-    // Timeout para dar sensación de procesamiento físico y analítico
+    // Ejecuta el barrido de forma asíncrona para permitir el renderizado de la animación de búsqueda
     setTimeout(() => {
       try {
+        // Arreglo acumulador de métricas para cada ω evaluado
         const results: Array<{
           omega: number;
           iterations: number;
@@ -142,13 +165,24 @@ export default function ControlPanel({
           converged: boolean;
         }> = [];
 
-        // Barrido de omegas de 1.0 a 1.9 con paso de 0.05
-        const omegasToTest = [1.0, 1.1, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9];
+        // Conjunto discreto de factores de relajación ω dentro del intervalo convergente de Kahan (1.0 a 1.9)
+        const omegasToTest = [
+          1.0, 1.1, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85,
+          1.9,
+        ];
+        // Toma la tolerancia ε actual y asegura un techo mínimo de 400 iteraciones de prueba
         const testTolerance = config.tolerance;
         const testMaxIterations = Math.max(config.maxIterations, 400);
 
+        // Evalúa secuencialmente cada candidato ω sobre una copia fresca de la malla actual
         for (const w of omegasToTest) {
-          const testInitialGrid = buildInitialGrid(gridSize.rows, gridSize.cols, routers, walls, cellSize);
+          const testInitialGrid = buildInitialGrid(
+            gridSize.rows,
+            gridSize.cols,
+            routers,
+            walls,
+            cellSize
+          );
           const solveResult = solveInstant(
             testInitialGrid,
             "sor",
@@ -157,16 +191,17 @@ export default function ControlPanel({
             testMaxIterations
           );
 
+          // Determina si el método alcanzó la tolerancia antes de agotar el máximo de iteraciones
           const converged = solveResult.finalError < testTolerance;
           results.push({
             omega: w,
             iterations: solveResult.iterations,
             error: solveResult.finalError,
-            converged
+            converged,
           });
         }
 
-        // Ordenar: primero convergentes con menor número de iteraciones, si ninguno converge por menor error
+        // Ordena los candidatos: prioriza los que convergieron en menos iteraciones; en caso de empate, menor error
         const sorted = [...results].sort((a, b) => {
           if (a.converged && !b.converged) return -1;
           if (!a.converged && b.converged) return 1;
@@ -176,15 +211,16 @@ export default function ControlPanel({
           return a.error - b.error;
         });
 
+        // Selecciona el ω ganador en la primera posición de la tabla ordenada
         const best = sorted[0];
         setOmegaResults(sorted);
         setBestOmegaFound(best.omega);
-        
-        // Aplicar el omega óptimo del SOR
+
+        // Actualiza automáticamente la configuración activa para usar el método SOR con el ω óptimo hallado
         setConfig((prev) => ({
           ...prev,
           method: "sor",
-          omega: best.omega
+          omega: best.omega,
         }));
       } catch (err) {
         console.error("Error optimizando omega:", err);
@@ -194,12 +230,19 @@ export default function ControlPanel({
     }, 1205);
   };
 
+  /**
+   * Actualiza simultáneamente el número de filas y columnas para mantener una malla cuadrada N × N.
+   */
   const handleGridSizeChange = (size: number) => {
     setGridSize({ rows: size, cols: size });
   };
 
-  // Dibujador y analizador del canvas para planos predefinidos con un clic
+  /**
+   * Genera programáticamente en un lienzo HTML5 Canvas uno de los tres planos arquitectónicos de prueba
+   * ('apartment', 'classroom' o 'hosp') y lo envía al digitalizador de píxeles para convertirlo en muros.
+   */
   const drawAndAnalyzePresetBlueprint = (presetType: string) => {
+    // Define un lienzo sintético de 300×300 píxeles
     const w = 300;
     const h = 300;
     const canvas = document.createElement("canvas");
@@ -208,54 +251,53 @@ export default function ControlPanel({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Dibuja un plano arquitectónico limpio (fondo blanco, índigo puro para las paredes)
+    // Pinta el fondo blanco puro (luminancia Y = 255) y configura trazos oscuros (luminancia Y < 40)
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "#1e1b4b"; // Índigo oscuro (luminosidad baja < 160)
-    ctx.lineWidth = 14; // Líneas gruesas para trasladarse de forma óptima a la cuadrícula de N x N
+    ctx.strokeStyle = "#1e1b4b";
+    ctx.lineWidth = 14;
 
     if (presetType === "apartment") {
-      // Muros perimetrales exteriores
+      // Marco perimetral del apartamento
       ctx.strokeRect(10, 10, w - 20, h - 20);
-      
-      // Línea divisoria horizontal del apartamento
+
+      // Muro divisorio horizontal central
       ctx.beginPath();
       ctx.moveTo(10, h / 2);
       ctx.lineTo(w - 10, h / 2);
       ctx.stroke();
 
-      // Paredes verticales de separación de habitaciones
+      // Tabique vertical superior con vano de puerta
       ctx.beginPath();
       ctx.moveTo(w / 3, 10);
-      ctx.lineTo(w / 3, h / 2 - 40); // dejando espacio para una puerta
+      ctx.lineTo(w / 3, h / 2 - 40);
       ctx.stroke();
 
+      // Tabique vertical inferior con apertura de paso
       ctx.beginPath();
-      ctx.moveTo((w * 2) / 3, h / 2 + 40); // apertura de la puerta
+      ctx.moveTo((w * 2) / 3, h / 2 + 40);
       ctx.lineTo((w * 2) / 3, h - 10);
       ctx.stroke();
 
-      // Pilar central adicional
+      // Columna central de carga
       ctx.fillRect(w / 2 - 10, h / 2 - 40, 20, 80);
-
     } else if (presetType === "classroom") {
-      // Muros perimetrales exteriores
+      // Marco exterior del laboratorio
       ctx.strokeRect(10, 10, w - 20, h - 20);
 
-      // Línea divisoria entre el escritorio del profesor y el laboratorio de computación
+      // División de oficina docente y sala de cómputo
       ctx.beginPath();
       ctx.moveTo(10, h / 3);
       ctx.lineTo(w - 100, h / 3);
       ctx.stroke();
 
-      // Sala central del gabinete de servidores
+      // Cuarto central de servidores (rack aislado)
       ctx.strokeRect(w / 2 - 40, h / 2 - 40, 80, 80);
-
     } else if (presetType === "hosp") {
-      // Frontera estructural de la estructura general
+      // Cerramiento exterior de planta hospitalaria
       ctx.strokeRect(10, 10, w - 20, h - 20);
 
-      // Pasillo largo central
+      // Corredor longitudinal central
       ctx.beginPath();
       ctx.moveTo(10, h / 2 - 15);
       ctx.lineTo(w - 10, h / 2 - 15);
@@ -263,7 +305,7 @@ export default function ControlPanel({
       ctx.lineTo(w - 10, h / 2 + 15);
       ctx.stroke();
 
-      // Tres salas de separación (pasillo superior)
+      // Consultorios superiores
       ctx.beginPath();
       ctx.moveTo(w / 3, 10);
       ctx.lineTo(w / 3, h / 2 - 15);
@@ -271,49 +313,69 @@ export default function ControlPanel({
       ctx.lineTo((w * 2) / 3, h / 2 - 15);
       ctx.stroke();
 
-      // Tres salas de separación (pasillo inferior)
+      // Pabellón inferior dividido
       ctx.beginPath();
       ctx.moveTo(w / 2, h / 2 + 15);
       ctx.lineTo(w / 2, h - 10);
       ctx.stroke();
     }
 
-    // Pasa el lienzo al escáner de píxeles principal para convertir imagen a matriz
+    // Invoca el escáner de submuestreo y umbralización sobre el plano recién dibujado
     runPixelScan(canvas, uploadWallMaterial, sensitivity);
   };
 
-  // Rutina de soporte para escanear píxeles de un lienzo y actualizar la rejilla de muros delegada a la Capa 3: Traducción
+  /**
+   * Submuestrea cualquier imagen/canvas a la resolución exacta de la malla (cols × rows)
+   * y delega en la Capa 3 (`traducirImagenAMatriz`) la extracción de coordenadas de muros.
+   */
   const runPixelScan = (canvas: HTMLCanvasElement, wallMat: MaterialType, thresh: number) => {
+    // Crea un lienzo auxiliar con el número exacto de columnas y filas de la malla discreta
     const scanCanvas = document.createElement("canvas");
     scanCanvas.width = gridSize.cols;
     scanCanvas.height = gridSize.rows;
     const scanCtx = scanCanvas.getContext("2d");
     if (!scanCtx) return;
 
-    // Dibuja el original sobre el tamaño objetivo reducido
+    // Proyecta la imagen original escalándola a las dimensiones de la rejilla N_x × N_y
     scanCtx.drawImage(canvas, 0, 0, gridSize.cols, gridSize.rows);
+    // Extrae el buffer binario RGBA (Uint8ClampedArray) de todos los píxeles
     const imgData = scanCtx.getImageData(0, 0, gridSize.cols, gridSize.rows);
-    
-    // Traducir los píxeles digitales de la imagen cargada en muros discretos numéricos de la malla (Capa 3: Traducción)
-    const newScannedWalls = traducirImagenAMatriz(imgData.data, gridSize.rows, gridSize.cols, thresh, wallMat);
 
+    // Convierte los píxeles cuya luminancia Y sea menor a 'thresh' en celdas de muro con el material elegido
+    const newScannedWalls = traducirImagenAMatriz(
+      imgData.data,
+      gridSize.rows,
+      gridSize.cols,
+      thresh,
+      wallMat
+    );
+
+    // Actualiza el estado de muros de la simulación e informa al usuario la cantidad de nodos detectados
     setWalls(newScannedWalls);
-    setScanSuccessMsg(`¡Plano convertido! Encontrados ${newScannedWalls.length} bloques de muro (${MATERIALS[wallMat].name}) en la matriz.`);
-    
+    setScanSuccessMsg(
+      `¡Plano convertido! Encontrados ${newScannedWalls.length} bloques de muro (${MATERIALS[wallMat].name}) en la matriz.`
+    );
+
+    // Oculta automáticamente el mensaje de éxito después de 4.5 segundos
     setTimeout(() => {
       setScanSuccessMsg("");
     }, 4500);
   };
 
-  // Lector dinámico de archivos de imagen plano
+  /**
+   * Procesa un archivo de imagen subido desde el selector de archivos del navegador
+   * y lo digitaliza en la malla de diferencias finitas.
+   */
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Lee el archivo local como DataURL en Base64 mediante FileReader
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new window.Image();
       img.onload = () => {
+        // Dibuja la imagen cargada sobre un lienzo normalizado de 400×400 con fondo blanco
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = 400;
         tempCanvas.height = 400;
@@ -330,6 +392,9 @@ export default function ControlPanel({
     reader.readAsDataURL(file);
   };
 
+  /**
+   * Controla los eventos de arrastre (dragenter, dragover, dragleave) sobre la zona de carga de planos.
+   */
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -340,6 +405,9 @@ export default function ControlPanel({
     }
   };
 
+  /**
+   * Procesa el archivo de imagen soltado directamente (Drop) sobre la zona del digitalizador.
+   */
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -368,8 +436,9 @@ export default function ControlPanel({
     }
   };
 
-  const cardBgClass = isDarkMode 
-    ? "bg-slate-900 border-slate-800 text-slate-100" 
+  // Clases reutilizables de Tailwind CSS adaptadas al tema oscuro o claro
+  const cardBgClass = isDarkMode
+    ? "bg-slate-900 border-slate-800 text-slate-100"
     : "bg-white border-slate-200 text-slate-800 shadow-sm";
 
   const itemBgClass = isDarkMode
@@ -385,26 +454,27 @@ export default function ControlPanel({
     : "bg-white border-slate-200 hover:border-slate-300 text-slate-800 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm";
 
   return (
-    <div className={`flex flex-col gap-4.5 rounded-3xl border p-5 transition-all duration-300 ${cardBgClass}`}>
-      
-      {/* Simulation Information Header in sleek Bento styling */}
+    <div
+      className={`flex flex-col gap-4.5 rounded-3xl border p-5 transition-all duration-300 ${cardBgClass}`}
+    >
+      {/* Cabecera del Panel de Controles */}
       <div className={`border-b pb-3 ${isDarkMode ? "border-slate-850" : "border-slate-100"}`}>
         <h3 className="text-base font-extrabold flex items-center gap-1.5 leading-none">
           <Sliders className="w-4.5 h-4.5 text-indigo-500 animate-pulse" />
           Controles de Simulación
         </h3>
         <p className="text-[11px] text-slate-550 dark:text-slate-400 mt-1 leading-relaxed">
-          Diseña el espacio, sintoniza el solucionador electrodinámico y calcula señales de manera digital.
+          Diseña el recinto, configura las propiedades dieléctricas y resuelve numéricamente el
+          campo electromagnético.
         </p>
       </div>
 
-      {/* COMPACT OPERATIONAL BUTTONS GROUP (SOLVES 'AWAY' BUTTON PROBLEM) */}
+      {/* Grupo 1: Panel de Acción Directa (Ejecución animada, instantánea, paso a paso y limpieza) */}
       <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-slate-50/50 dark:bg-slate-950/40 border dark:border-slate-850">
         <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 block mb-1">
           Panel de Acción Directa
         </span>
         <div className="grid grid-cols-2 gap-1.5">
-          {/* Play / Pause animation solving */}
           {isRunning ? (
             <button
               onClick={onPause}
@@ -425,7 +495,6 @@ export default function ControlPanel({
             </button>
           )}
 
-          {/* Instant solver convergence logic */}
           <button
             onClick={onSolveInstant}
             className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition hover:scale-[1.02] cursor-pointer text-[11px] shadow-sm"
@@ -437,7 +506,6 @@ export default function ControlPanel({
         </div>
 
         <div className="grid grid-cols-2 gap-1.5">
-          {/* Run standard single step loop */}
           <button
             onClick={onSingleStep}
             disabled={isRunning}
@@ -448,7 +516,6 @@ export default function ControlPanel({
             Iteración +1
           </button>
 
-          {/* Restart signal powers */}
           <button
             onClick={onReset}
             className={`flex items-center justify-center gap-1 px-3 py-1.8 rounded-xl transition cursor-pointer text-[11px] border ${itemBgClass}`}
@@ -477,18 +544,19 @@ export default function ControlPanel({
         </div>
       </div>
 
-      {/* SECCIÓN PROPUESTA DE MEJOR UBICACIÓN DEL ROUTER / OPTIMIZACIÓN NUMÉRICA */}
+      {/* Grupo 2: Optimización Espacial de Cobertura (1 Router o K-Means Multi-Router) */}
       <div className="flex flex-col gap-2.5 p-3 rounded-2xl bg-amber-500/5 dark:bg-amber-500/5 border border-amber-500/20 dark:border-amber-500/20 shadow-sm animate-fade-in">
         <label className="text-[10px] uppercase font-black tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
           <Binary className="w-3.5 h-3.5 text-amber-500 shadow-sm" />
           Distribución Uniforme de Señal
         </label>
-        
+
         <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal">
-          Calcula la distribución óptima espacial de acuerdo a la cantidad de enrutadores deseados. Utiliza agrupamiento de Dirichlet y Laplace para fragmentar el mapa y nivelar la señal uniformemente.
+          Calcula la distribución espacial óptima según el número de transmisores deseados mediante
+          evaluación de condiciones de Dirichlet y partición geométrica K-Means.
         </p>
 
-        {/* NÚMERO DE ROUTERS PARA DISTRIBUCIÓN UNIFORME */}
+        {/* Selector de cantidad de routers a optimizar (K ∈ [1, 6]) */}
         <div className="flex items-center justify-between gap-1 bg-amber-500/5 dark:bg-amber-950/25 p-1 px-2 rounded-xl text-[10px] border border-amber-550/10">
           <span className="font-semibold text-amber-700 dark:text-amber-300 font-sans">
             Enrutadores a distribuir:
@@ -496,7 +564,7 @@ export default function ControlPanel({
           <div className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setNumRoutersToOpt(prev => Math.max(1, prev - 1))}
+              onClick={() => setNumRoutersToOpt((prev) => Math.max(1, prev - 1))}
               className="p-1 px-1.5 rounded-lg bg-slate-200/50 dark:bg-slate-800 hover:bg-slate-300 pointer-events-auto cursor-pointer font-bold disabled:opacity-40 text-slate-600 dark:text-slate-300 text-[10px] transition"
               disabled={numRoutersToOpt <= 1 || isOptimizing}
             >
@@ -507,7 +575,7 @@ export default function ControlPanel({
             </span>
             <button
               type="button"
-              onClick={() => setNumRoutersToOpt(prev => Math.min(6, prev + 1))}
+              onClick={() => setNumRoutersToOpt((prev) => Math.min(6, prev + 1))}
               className="p-1 px-1.5 rounded-lg bg-slate-200/50 dark:bg-slate-800 hover:bg-slate-300 pointer-events-auto cursor-pointer font-bold disabled:opacity-40 text-slate-600 dark:text-slate-300 text-[10px] transition"
               disabled={numRoutersToOpt >= 6 || isOptimizing}
             >
@@ -530,14 +598,17 @@ export default function ControlPanel({
             className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white transition hover:scale-[1.01] cursor-pointer text-xs shadow-md shadow-amber-500/10"
           >
             <Binary className="w-3.5 h-3.5" />
-            {numRoutersToOpt > 1 ? `Distribuir ${numRoutersToOpt} Routers` : "Calcular Posición Óptima"}
+            {numRoutersToOpt > 1
+              ? `Distribuir ${numRoutersToOpt} Routers`
+              : "Calcular Posición Óptima"}
           </button>
         )}
 
+        {/* Tarjeta de resultados cuando el optimizador ha finalizado */}
         {optimizationResult && (
           <div className="mt-1 p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 dark:bg-amber-950/30 flex flex-col gap-2.5 text-[10px] animate-fade-in">
             {optimizationResult.isMultiRouter ? (
-              // --- RENDERIZADO CUANDO SE OPTIMIZAN MÚLTIPLES ROUTERS ---
+              // Vista de resultados para sistema distribuido multi-router (K >= 2)
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center border-b border-amber-500/10 pb-1 flex-wrap">
                   <span className="font-bold text-amber-700 dark:text-amber-350 flex items-center gap-1">
@@ -549,15 +620,19 @@ export default function ControlPanel({
                 <div className="grid grid-cols-2 gap-1.5 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200/50 dark:border-slate-800 font-mono text-[9px]">
                   <div className="flex flex-col">
                     <span className="text-slate-400 text-[8px] uppercase">Señal Promedio</span>
-                    <strong className="text-slate-800 dark:text-slate-100 text-[10px]">{optimizationResult.avgSignal}%</strong>
+                    <strong className="text-slate-800 dark:text-slate-100 text-[10px]">
+                      {optimizationResult.avgSignal}%
+                    </strong>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-slate-400 text-[8px] uppercase">Área Cobertura</span>
-                    <strong className="text-emerald-600 dark:text-emerald-400 text-[10px]">{optimizationResult.coveragePct}%</strong>
+                    <strong className="text-emerald-600 dark:text-emerald-400 text-[10px]">
+                      {optimizationResult.coveragePct}%
+                    </strong>
                   </div>
                 </div>
 
-                {/* ÍNDICE DE UNIFORMIDAD DE SEÑAL */}
+                {/* Barra de progreso del Índice de Uniformidad Global */}
                 <div className="p-2 rounded-xl bg-indigo-500/5 border border-indigo-500/20 flex flex-col gap-1">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-indigo-700 dark:text-indigo-300 uppercase text-[8.5px]">
@@ -568,14 +643,14 @@ export default function ControlPanel({
                     </span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-indigo-500 rounded-full transition-all duration-500" 
+                    <div
+                      className="h-full bg-indigo-500 rounded-full transition-all duration-500"
                       style={{ width: `${optimizationResult.uniformityIndex || 50}%` }}
                     />
                   </div>
                   <p className="text-[8px] text-slate-500 dark:text-slate-400 leading-tight">
-                    {Number(optimizationResult.uniformityIndex) > 80 
-                      ? "Excelente equilibrio: la señal está sumamente equilibrada en todo el plano." 
+                    {Number(optimizationResult.uniformityIndex) > 80
+                      ? "Excelente equilibrio: la señal está sumamente equilibrada en todo el plano."
                       : "Distribución equilibrada óptima calculada en base a las particiones de la sala."}
                   </p>
                 </div>
@@ -586,7 +661,10 @@ export default function ControlPanel({
                   </span>
                   <div className="grid grid-cols-1 gap-1 max-h-[140px] overflow-y-auto pr-0.5">
                     {optimizationResult.optimizedRouters?.map((r, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-1.5 px-2 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-200/55 dark:border-slate-800/80">
+                      <div
+                        key={idx}
+                        className="flex justify-between items-center p-1.5 px-2 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-200/55 dark:border-slate-800/80"
+                      >
                         <span className="font-bold text-slate-600 dark:text-slate-350">
                           Router #{idx + 1} ({r.zoneName})
                         </span>
@@ -607,7 +685,7 @@ export default function ControlPanel({
                 </button>
               </div>
             ) : (
-              // --- RENDERIZADO CLÁSICO CUANDO ES SOLAMENTE 1 ROUTER ---
+              // Vista de resultados para optimización de 1 único router (Top candidatas)
               <div>
                 <div className="flex justify-between items-center border-b border-amber-500/10 pb-1 flex-wrap">
                   <span className="font-bold text-amber-700 dark:text-amber-350 flex items-center gap-1">
@@ -625,72 +703,85 @@ export default function ControlPanel({
                   </span>
 
                   <div className="flex flex-col gap-2">
-                    {optimizationResult.topCandidates && optimizationResult.topCandidates.map((cand, idx) => {
-                      const isAbsoluteBest = idx === 0;
-                      return (
-                        <div 
-                          key={`${cand.x}-${cand.y}`}
-                          className={`p-2 rounded-xl border transition-all ${
-                            isAbsoluteBest 
-                              ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/40 shadow-sm"
-                              : "bg-slate-50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-1 mb-1">
-                            <span className="font-bold flex items-center gap-1 text-[9.5px]">
-                              {isAbsoluteBest ? (
-                                <Award className="w-3.5 h-3.5 text-amber-500" />
-                              ) : (
-                                <MapPin className="w-3 h-3 text-slate-400" />
-                              )}
-                              <span className={isAbsoluteBest ? "text-amber-600 dark:text-amber-400 font-extrabold" : "text-slate-600 dark:text-slate-300 font-bold"}>
-                                {idx + 1}º Opción ({cand.zoneName})
-                              </span>
-                            </span>
-                            <span className="font-mono font-bold text-[8.5px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded-full">
-                              [{cand.x}, {cand.y}]
-                            </span>
-                          </div>
-
-                          {/* Stats comparisons bar */}
-                          <div className="grid grid-cols-2 gap-1 text-[9px] text-slate-500 dark:text-slate-400 font-mono mb-1">
-                            <div className="flex items-center gap-1">
-                              <span>Señal Promedio:</span>
-                              <strong className="text-slate-800 dark:text-white font-bold">{cand.avgSignal}%</strong>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span>Cobertura (&ge;-75 dBm):</span>
-                              <strong className="text-emerald-500 font-bold">{cand.coveragePct}%</strong>
-                            </div>
-                          </div>
-
-                          {/* Score indicator indicator bar */}
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <div className="flex-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full ${isAbsoluteBest ? "bg-amber-500" : "bg-indigo-500"}`}
-                                style={{ width: `${Math.min(100, Math.max(10, cand.score))}%` }}
-                              />
-                            </div>
-                            <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 font-mono">
-                              Puntaje: {Math.round(cand.score)}/100
-                            </span>
-                          </div>
-
-                          <button
-                            onClick={() => onApplyBestRouterPlace(cand.x, cand.y)}
-                            className={`w-full py-1 rounded-lg text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+                    {optimizationResult.topCandidates &&
+                      optimizationResult.topCandidates.map((cand, idx) => {
+                        const isAbsoluteBest = idx === 0;
+                        return (
+                          <div
+                            key={`${cand.x}-${cand.y}`}
+                            className={`p-2 rounded-xl border transition-all ${
                               isAbsoluteBest
-                                ? "bg-amber-500 hover:bg-amber-600 text-white shadow"
-                                : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                ? "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/40 shadow-sm"
+                                : "bg-slate-50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800"
                             }`}
                           >
-                            <CheckCircle2 className="w-3 h-3" />
-                            {isAbsoluteBest ? "Aplicar Posición Ideal (Recom.)" : "Aplicar Posición Alternativa"}
-                          </button>
-                        </div>
-                      );
-                    })}
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <span className="font-bold flex items-center gap-1 text-[9.5px]">
+                                {isAbsoluteBest ? (
+                                  <Award className="w-3.5 h-3.5 text-amber-500" />
+                                ) : (
+                                  <MapPin className="w-3 h-3 text-slate-400" />
+                                )}
+                                <span
+                                  className={
+                                    isAbsoluteBest
+                                      ? "text-amber-600 dark:text-amber-400 font-extrabold"
+                                      : "text-slate-600 dark:text-slate-300 font-bold"
+                                  }
+                                >
+                                  {idx + 1}º Opción ({cand.zoneName})
+                                </span>
+                              </span>
+                              <span className="font-mono font-bold text-[8.5px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded-full">
+                                [{cand.x}, {cand.y}]
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-1 text-[9px] text-slate-500 dark:text-slate-400 font-mono mb-1">
+                              <div className="flex items-center gap-1">
+                                <span>Señal Promedio:</span>
+                                <strong className="text-slate-800 dark:text-white font-bold">
+                                  {cand.avgSignal}%
+                                </strong>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span>Cobertura (&ge;-75 dBm):</span>
+                                <strong className="text-emerald-500 font-bold">
+                                  {cand.coveragePct}%
+                                </strong>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <div className="flex-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${
+                                    isAbsoluteBest ? "bg-amber-500" : "bg-indigo-500"
+                                  }`}
+                                  style={{ width: `${Math.min(100, Math.max(10, cand.score))}%` }}
+                                />
+                              </div>
+                              <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 font-mono">
+                                Puntaje: {Math.round(cand.score)}/100
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => onApplyBestRouterPlace(cand.x, cand.y)}
+                              className={`w-full py-1 rounded-lg text-[9px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+                                isAbsoluteBest
+                                  ? "bg-amber-500 hover:bg-amber-600 text-white shadow"
+                                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                              }`}
+                            >
+                              <CheckCircle2 className="w-3 h-3" />
+                              {isAbsoluteBest
+                                ? "Aplicar Posición Ideal (Recom.)"
+                                : "Aplicar Posición Alternativa"}
+                            </button>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
@@ -699,7 +790,7 @@ export default function ControlPanel({
         )}
       </div>
 
-      {/* SECCIÓN PLANIFICADOR DE EQUIPO (ROUTER DIGITAL) */}
+      {/* Grupo 3: Selector de Hardware Transmisor Comercial y Ficha de Radiofrecuencia */}
       <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-indigo-50/20 dark:bg-slate-950/25 border border-indigo-100/30 dark:border-slate-850">
         <label className="text-[10px] uppercase font-black tracking-wider text-indigo-500/90 dark:text-indigo-400 flex items-center gap-1.5">
           <Radio className="w-3.5 h-3.5 text-indigo-500" />
@@ -717,28 +808,53 @@ export default function ControlPanel({
             </option>
           ))}
         </select>
-        
-        {/* Router Specs card */}
+
+        {/* Ficha de especificaciones electromagnéticas del transmisor activo */}
         <div className="p-2 border rounded-xl bg-white/50 dark:bg-slate-900/40 text-[10px] flex flex-col gap-1 text-slate-500 font-medium border-slate-100 dark:border-slate-800">
           <div className="flex justify-between">
-            <span className="font-bold text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].brand} • {ROUTER_MODELS[selectedRouterModelId].model}</span>
-            <span className="font-mono text-[9px] text-indigo-500 bg-indigo-500/10 px-1 py-0.5 rounded leading-none font-bold">{ROUTER_MODELS[selectedRouterModelId].standard}</span>
+            <span className="font-bold text-slate-600 dark:text-slate-300">
+              {ROUTER_MODELS[selectedRouterModelId].brand} •{" "}
+              {ROUTER_MODELS[selectedRouterModelId].model}
+            </span>
+            <span className="font-mono text-[9px] text-indigo-500 bg-indigo-500/10 px-1 py-0.5 rounded leading-none font-bold">
+              {ROUTER_MODELS[selectedRouterModelId].standard}
+            </span>
           </div>
           <div className="flex justify-between font-mono text-[9px] mt-0.5 border-t border-dashed border-slate-200 dark:border-slate-800 pt-1">
-            <span>Banda: <strong className="text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].frequency}</strong></span>
-            <span>Potencia Tx: <strong className="text-slate-600 dark:text-slate-300">{ROUTER_MODELS[selectedRouterModelId].txPowerDbm} dBm</strong></span>
+            <span>
+              Banda:{" "}
+              <strong className="text-slate-600 dark:text-slate-300">
+                {ROUTER_MODELS[selectedRouterModelId].frequency}
+              </strong>
+            </span>
+            <span>
+              Potencia Tx:{" "}
+              <strong className="text-slate-600 dark:text-slate-300">
+                {ROUTER_MODELS[selectedRouterModelId].txPowerDbm} dBm
+              </strong>
+            </span>
           </div>
           <div className="flex justify-between font-mono text-[9px]">
-            <span>Ganancia: <strong className="text-slate-600 dark:text-slate-300">+{ROUTER_MODELS[selectedRouterModelId].gainDbi} dBi</strong></span>
-            <span>EIRP Total: <strong className="text-indigo-500 font-bold">{ROUTER_MODELS[selectedRouterModelId].eirpDbm} dBm</strong></span>
+            <span>
+              Ganancia:{" "}
+              <strong className="text-slate-600 dark:text-slate-300">
+                +{ROUTER_MODELS[selectedRouterModelId].gainDbi} dBi
+              </strong>
+            </span>
+            <span>
+              EIRP Total:{" "}
+              <strong className="text-indigo-500 font-bold">
+                {ROUTER_MODELS[selectedRouterModelId].eirpDbm} dBm
+              </strong>
+            </span>
           </div>
           <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal mt-1 italic">
-            "{ROUTER_MODELS[selectedRouterModelId].description}"
+            &quot;{ROUTER_MODELS[selectedRouterModelId].description}&quot;
           </p>
         </div>
       </div>
 
-      {/* SECCIÓN ESCALADO FÍSICO DE CELDAS */}
+      {/* Grupo 4: Control del Paso Espacial h (Escala Física de Celdas en metros) */}
       <div className="flex flex-col gap-1 p-3 rounded-2xl bg-emerald-50/20 dark:bg-slate-950/25 border border-emerald-100/30 dark:border-slate-850">
         <label className="text-[10px] uppercase font-black tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
           <span className="flex items-center gap-1.5 font-bold">
@@ -749,7 +865,7 @@ export default function ControlPanel({
             {cellSize} metros
           </span>
         </label>
-        
+
         <input
           type="range"
           min="0.1"
@@ -766,37 +882,40 @@ export default function ControlPanel({
           <span>2.5m (Largo Rango)</span>
         </div>
         <p className="text-[9px] text-slate-550 dark:text-slate-400 leading-normal mt-1">
-          La propagación de la señal se debilita a mayor distancia física, modelando con rigor un espacio real.
+          La propagación de la señal se debilita a mayor distancia física, modelando con rigor un
+          espacio real.
         </p>
       </div>
 
-      {/* DRAWING TOOLS & PEN SETS SECTION */}
+      {/* Grupo 5: Paleta de Herramientas Interactivas y Materiales Dieléctricos (ITU-R P.2040) */}
       <div>
         <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1.5 flex items-center gap-1">
           <Layers className="w-3.5 h-3.5 text-indigo-500" />
           Herramientas de Lápiz y Pinceles
         </h4>
         <div className="grid grid-cols-3 gap-1">
-          {/* Router tool selection */}
           <button
             onClick={() => setSelectedTool("router")}
             className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
               selectedTool === "router"
-                ? isDarkMode 
+                ? isDarkMode
                   ? "bg-emerald-950/40 border-emerald-800 text-emerald-400 shadow-sm font-bold"
                   : "bg-emerald-50 border-emerald-250 text-emerald-700 shadow-sm font-bold"
                 : itemBgClass
             }`}
             id="tool_router"
           >
-            <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-mono text-[8px] font-bold shrink-0">R</div>
+            <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-mono text-[8px] font-bold shrink-0">
+              R
+            </div>
             <div className="flex flex-col overflow-hidden">
               <span className="text-[10px] font-bold truncate">Router</span>
-              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Fuente</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">
+                Fuente
+              </span>
             </div>
           </button>
 
-          {/* Move router tool */}
           <button
             onClick={() => setSelectedTool("move")}
             className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
@@ -811,11 +930,12 @@ export default function ControlPanel({
             <Move className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
             <div className="flex flex-col overflow-hidden">
               <span className="text-[10px] font-bold truncate">Mover</span>
-              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Arrastrar</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">
+                Arrastrar
+              </span>
             </div>
           </button>
 
-          {/* Eraser tool */}
           <button
             onClick={() => setSelectedTool("eraser")}
             className={`flex items-center gap-1 px-1.5 py-1.5 rounded-lg border transition text-left cursor-pointer ${
@@ -830,19 +950,23 @@ export default function ControlPanel({
             <Eraser className="w-3.5 h-3.5 text-rose-500 shrink-0" />
             <div className="flex flex-col overflow-hidden">
               <span className="text-[10px] font-bold truncate">Borrador</span>
-              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">Limpiar</span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 leading-none truncate">
+                Limpiar
+              </span>
             </div>
           </button>
         </div>
 
-        {/* Dynamic obstacle material catalog */}
+        {/* Catálogo de materiales constructivos con pérdida en dB y permitividad ε_r */}
         <div className="mt-2">
-          <span className="text-[9px] text-slate-550 dark:text-slate-400 font-extrabold mb-1 block">Materiales de Construcción Manual:</span>
+          <span className="text-[9px] text-slate-550 dark:text-slate-400 font-extrabold mb-1 block">
+            Materiales de Construcción Manual:
+          </span>
           <div className="grid grid-cols-4 gap-1">
             {Object.values(MATERIALS).map((material) => {
               if (material.id === "air") return null;
               const isSelected = selectedTool === material.id;
-              
+
               return (
                 <button
                   key={material.id}
@@ -857,8 +981,16 @@ export default function ControlPanel({
                   }`}
                 >
                   <div className={`w-2.5 h-2.5 rounded border ${material.color.split(" ")[0]}`} />
-                  <span className="text-[8px] font-black line-clamp-1 leading-none">{material.name}</span>
-                  <span className={`text-[7px] font-mono leading-none ${isSelected ? "text-indigo-400" : "text-slate-500"}`}>-{material.dbLoss}dB • εᵣ={material.relativePermittivity}</span>
+                  <span className="text-[8px] font-black line-clamp-1 leading-none">
+                    {material.name}
+                  </span>
+                  <span
+                    className={`text-[7px] font-mono leading-none ${
+                      isSelected ? "text-indigo-400" : "text-slate-500"
+                    }`}
+                  >
+                    -{material.dbLoss}dB • εᵣ={material.relativePermittivity}
+                  </span>
                 </button>
               );
             })}
@@ -866,7 +998,7 @@ export default function ControlPanel({
         </div>
       </div>
 
-      {/* BLUEPRINT DIGITIZER (IMAGE ➜ MATRIX) - SOLVES SECOND REQUIREMENT */}
+      {/* Grupo 6: Digitalizador de Planos Arquitectónicos (Imagen -> Malla 2D) */}
       <div className={`p-3 rounded-2xl border ${formBgClass} space-y-2.5 shadow-inner`}>
         <div className="flex items-center justify-between">
           <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400 flex items-center gap-1">
@@ -879,7 +1011,8 @@ export default function ControlPanel({
         </div>
 
         <p className="text-[10px] text-slate-550 dark:text-slate-400 leading-snug">
-          Coloca o carga un plano técnico con paredes y la aplicación estimará automáticamente sus coordenadas para formar la matriz electromagnética de análisis.
+          Coloca o carga un plano técnico con paredes y la aplicación estimará automáticamente sus
+          coordenadas para formar la matriz electromagnética de análisis.
         </p>
 
         {scanSuccessMsg && (
@@ -888,7 +1021,7 @@ export default function ControlPanel({
           </div>
         )}
 
-        {/* Blueprint preset test button (1-click conversion without file finding) */}
+        {/* Botones de planos sintéticos de 1 clic */}
         <div className="space-y-1">
           <span className="text-[8px] uppercase tracking-wider font-extrabold text-slate-550 dark:text-slate-400 block">
             A) Probar con Diseños de Plano Preestablecidos:
@@ -924,29 +1057,39 @@ export default function ControlPanel({
           </div>
         </div>
 
-        {/* Drag & Drop uploader area */}
+        {/* Zona Drag & Drop para subir archivos JPEG/PNG propios */}
         <div className="space-y-1">
           <span className="text-[8px] uppercase tracking-wider font-extrabold text-slate-550 dark:text-slate-400 block">
             B) Cargar tu Archivo de Imagen Personal (Plano / Croquis):
           </span>
-          <div 
+          <div
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-xl p-3 text-center transition duration-200 cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
-              dragActive 
-                ? "border-indigo-500 bg-indigo-500/10 text-indigo-400" 
+              dragActive
+                ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
                 : "border-slate-300 dark:border-slate-800 hover:border-indigo-400"
             }`}
           >
-            <Upload className={`w-5 h-5 ${dragActive ? "text-indigo-400 scale-110 animate-bounce" : "text-slate-550 dark:text-slate-400"}`} />
+            <Upload
+              className={`w-5 h-5 ${
+                dragActive
+                  ? "text-indigo-400 scale-110 animate-bounce"
+                  : "text-slate-550 dark:text-slate-400"
+              }`}
+            />
             <div className="flex flex-col select-none">
-              <span className="text-[9px] font-bold text-slate-600 dark:text-slate-300 text-center">Arrastra tu plano o haz clic para subir</span>
-              <span className="text-[7.5px] text-slate-500 dark:text-slate-400">Acepta JPEG, PNG (Detecta contornos oscuros)</span>
+              <span className="text-[9px] font-bold text-slate-600 dark:text-slate-300 text-center">
+                Arrastra tu plano o haz clic para subir
+              </span>
+              <span className="text-[7.5px] text-slate-500 dark:text-slate-400">
+                Acepta JPEG, PNG (Detecta contornos oscuros)
+              </span>
             </div>
-            <input 
+            <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
@@ -956,11 +1099,12 @@ export default function ControlPanel({
           </div>
         </div>
 
-        {/* Parameter configuration for scanner */}
+        {/* Controles del escáner: material asignado y umbral de luminancia */}
         <div className="pt-1.5 border-t dark:border-slate-850/60 grid grid-cols-2 gap-2">
-          {/* Scan Wall Material Selector */}
           <div className="flex flex-col gap-0.5">
-            <label className="text-[8.5px] font-bold text-slate-550 dark:text-slate-400">Material Resultante:</label>
+            <label className="text-[8.5px] font-bold text-slate-550 dark:text-slate-400">
+              Material Resultante:
+            </label>
             <select
               value={uploadWallMaterial}
               onChange={(e) => setUploadWallMaterial(e.target.value as MaterialType)}
@@ -973,7 +1117,6 @@ export default function ControlPanel({
             </select>
           </div>
 
-          {/* Threshold Slider */}
           <div className="flex flex-col gap-0.5">
             <div className="flex justify-between items-center text-[8.5px] font-bold text-slate-550 dark:text-slate-400">
               <span>Sensibilidad Escáner:</span>
@@ -992,7 +1135,7 @@ export default function ControlPanel({
         </div>
       </div>
 
-      {/* DIFERENCIAS FINITAS Y PARÁMETROS NUMÉRICOS */}
+      {/* Grupo 7: Configuración del Esquema en Diferencias Finitas y Parámetros Numéricos */}
       <div className={`space-y-3 rounded-2xl p-4 border transition-all ${formBgClass}`}>
         <div className="flex items-center justify-between">
           <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 flex items-center gap-1">
@@ -1004,14 +1147,16 @@ export default function ControlPanel({
           </span>
         </div>
 
-        {/* Selección de Método */}
+        {/* Selector de algoritmo numérico iterativo */}
         <div className="flex flex-col gap-1.5 p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/40 dark:bg-slate-950/20">
           <label className="text-[10px] font-black uppercase tracking-wider text-indigo-500/90 dark:text-indigo-400 flex justify-between">
             <span>Método Iterativo:</span>
           </label>
           <select
             value={config.method}
-            onChange={(e) => setConfig((prev) => ({ ...prev, method: e.target.value as SolverMethod }))}
+            onChange={(e) =>
+              setConfig((prev) => ({ ...prev, method: e.target.value as SolverMethod }))
+            }
             className={`w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold focus:outline-none transition ${selectClass}`}
             id="select_solver_method"
           >
@@ -1028,11 +1173,15 @@ export default function ControlPanel({
           </p>
         </div>
 
-        {/* Omega Slider (SOR) */}
+        {/* Control deslizante del factor de sobre-relajación ω */}
         <div className="flex flex-col gap-0.5 pt-0.5">
           <div className="flex justify-between items-center text-[10px]">
-            <span className="font-semibold text-slate-605 dark:text-slate-300">Factor de Relajación (ω):</span>
-            <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">{config.omega}</span>
+            <span className="font-semibold text-slate-605 dark:text-slate-300">
+              Factor de Relajación (ω):
+            </span>
+            <span className="font-mono text-[9px] font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">
+              {config.omega}
+            </span>
           </div>
           <input
             type="range"
@@ -1042,7 +1191,9 @@ export default function ControlPanel({
             value={config.omega}
             disabled={config.method !== "sor"}
             onChange={(e) => setConfig((prev) => ({ ...prev, omega: parseFloat(e.target.value) }))}
-            className={`w-full accent-indigo-500 cursor-pointer my-1 ${config.method !== "sor" ? "opacity-40 cursor-not-allowed" : ""}`}
+            className={`w-full accent-indigo-500 cursor-pointer my-1 ${
+              config.method !== "sor" ? "opacity-40 cursor-not-allowed" : ""
+            }`}
             id="slider_omega"
           />
           <div className="flex justify-between text-[8px] text-slate-500 dark:text-slate-400 font-mono leading-none">
@@ -1052,7 +1203,7 @@ export default function ControlPanel({
           </div>
         </div>
 
-        {/* Optimización de Omega (w) */}
+        {/* Botón de auto-cálculo experimental del ω óptimo */}
         <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800/50 flex flex-col gap-1.5">
           {isOptimizingOmega ? (
             <button
@@ -1081,34 +1232,58 @@ export default function ControlPanel({
                 ¡Valor de ω Óptimo Encontrado!
               </span>
               <p className="text-[9px] text-slate-555 dark:text-slate-400 leading-normal">
-                El barrido espectral determinó que <strong className="text-emerald-600 dark:text-emerald-400">&omega; = {bestOmegaFound}</strong> minimiza el número de iteraciones para estabilizar el campo electromagnético.
+                El barrido espectral determinó que{" "}
+                <strong className="text-emerald-600 dark:text-emerald-400">
+                  &omega; = {bestOmegaFound}
+                </strong>{" "}
+                minimiza el número de iteraciones para estabilizar el campo electromagnético.
               </p>
               <div className="flex flex-col gap-1 mt-1 font-mono text-[8.5px] border-t border-emerald-500/10 pt-1.5">
-                <span className="text-[8px] uppercase font-black text-slate-550 dark:text-slate-400 tracking-wider mb-0.5">Velocidad de Convergencia:</span>
-                {omegaResults
-                  .slice(0, 3)
-                  .map((r, i) => (
-                    <div key={r.omega} className="flex justify-between items-center text-slate-500 dark:text-slate-455 px-1 hover:bg-slate-500/5 rounded">
-                      <span className={r.omega === bestOmegaFound ? "font-bold text-emerald-600 dark:text-emerald-400" : ""}>
-                        {i + 1}º) &omega; = {r.omega.toFixed(2)} {r.omega === bestOmegaFound ? "★" : ""}
-                      </span>
-                      <span className={r.omega === bestOmegaFound ? "font-bold text-emerald-600 dark:text-emerald-400" : ""}>
-                        {r.iterations} iters
-                      </span>
-                    </div>
-                  ))}
+                <span className="text-[8px] uppercase font-black text-slate-550 dark:text-slate-400 tracking-wider mb-0.5">
+                  Velocidad de Convergencia:
+                </span>
+                {omegaResults.slice(0, 3).map((r, i) => (
+                  <div
+                    key={r.omega}
+                    className="flex justify-between items-center text-slate-500 dark:text-slate-455 px-1 hover:bg-slate-500/5 rounded"
+                  >
+                    <span
+                      className={
+                        r.omega === bestOmegaFound
+                          ? "font-bold text-emerald-600 dark:text-emerald-400"
+                          : ""
+                      }
+                    >
+                      {i + 1}º) &omega; = {r.omega.toFixed(2)}{" "}
+                      {r.omega === bestOmegaFound ? "★" : ""}
+                    </span>
+                    <span
+                      className={
+                        r.omega === bestOmegaFound
+                          ? "font-bold text-emerald-600 dark:text-emerald-400"
+                          : ""
+                      }
+                    >
+                      {r.iterations} iters
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </div>
 
-        {/* Tolerance and Grid Multipliers */}
+        {/* Selectores de Tolerancia ε y Tamaño de Malla N × N */}
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col gap-0.5">
-            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">Tolerancia Límite (ε):</label>
+            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">
+              Tolerancia Límite (ε):
+            </label>
             <select
               value={config.tolerance}
-              onChange={(e) => setConfig((prev) => ({ ...prev, tolerance: parseFloat(e.target.value) }))}
+              onChange={(e) =>
+                setConfig((prev) => ({ ...prev, tolerance: parseFloat(e.target.value) }))
+              }
               className={`w-full px-2 py-1 rounded-xl text-[11px] focus:outline-none transition ${selectClass}`}
               id="select_tolerance"
             >
@@ -1120,7 +1295,9 @@ export default function ControlPanel({
           </div>
 
           <div className="flex flex-col gap-0.5">
-            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">Malla Nodos (N &times; N):</label>
+            <label className="text-[10px] font-semibold text-slate-605 dark:text-slate-300">
+              Malla Nodos (N &times; N):
+            </label>
             <select
               value={gridSize.rows}
               onChange={(e) => handleGridSizeChange(parseInt(e.target.value))}
@@ -1134,10 +1311,12 @@ export default function ControlPanel({
           </div>
         </div>
 
-        {/* Animation delay speed control slider */}
+        {/* Control de retardo de animación entre iteraciones */}
         <div className="flex flex-col gap-0.5">
           <div className="flex justify-between text-[10px]">
-            <span className="font-semibold text-slate-605 dark:text-slate-300 font-sans">Retardo de Animación:</span>
+            <span className="font-semibold text-slate-605 dark:text-slate-300 font-sans">
+              Retardo de Animación:
+            </span>
             <span className="font-mono text-indigo-500 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded leading-none">
               {config.animationDelay === 0 ? "0 ms (Fijo)" : `${config.animationDelay} ms`}
             </span>
@@ -1148,14 +1327,16 @@ export default function ControlPanel({
             max="150"
             step="10"
             value={config.animationDelay}
-            onChange={(e) => setConfig((prev) => ({ ...prev, animationDelay: parseInt(e.target.value) }))}
+            onChange={(e) =>
+              setConfig((prev) => ({ ...prev, animationDelay: parseInt(e.target.value) }))
+            }
             className="w-full accent-indigo-500 h-1 cursor-pointer my-1"
             id="slider_delay"
           />
         </div>
       </div>
 
-      {/* FIXED CLASSIC PRESET LOADERS BOX */}
+      {/* Grupo 8: Escenarios Físicos Preconfigurados (Espacio Libre, Oficina, Jaula de Faraday) */}
       <div className={`border-t pt-3 ${isDarkMode ? "border-slate-850" : "border-slate-100"}`}>
         <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-2 flex items-center gap-1">
           <Layout className="w-3.5 h-3.5 text-indigo-500" />
