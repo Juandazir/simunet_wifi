@@ -4,12 +4,35 @@
   <meta charset="UTF-8" />
   <title>Póster 80x120 cm — Feria de la Física 2026 — Juan David Conde Duarte</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script>
+    function ejecutarKaTeX() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+    window.addEventListener('DOMContentLoaded', ejecutarKaTeX);
+    window.addEventListener('load', ejecutarKaTeX);
+  </script>
   <style>
-    @page { size: 80cm 120cm; margin: 0; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @page {
+      size: 800mm 1200mm;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       background: #e2e8f0;
@@ -18,9 +41,27 @@
       padding: 20px;
     }
     @media print {
-      body { background: white; padding: 0; }
-      .poster { box-shadow: none !important; width: 80cm !important; height: 120cm !important; }
-      .lang-switcher { display: none !important; }
+      html, body {
+        width: 800mm !important;
+        height: 1200mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: white !important;
+      }
+      .lang-switcher {
+        display: none !important;
+      }
+      .poster {
+        width: 1200px !important;
+        height: 1800px !important;
+        min-height: 1800px !important;
+        max-height: 1800px !important;
+        transform: scale(2.519685) !important;
+        transform-origin: top left !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+      }
     }
     .lang-switcher {
       position: fixed;
