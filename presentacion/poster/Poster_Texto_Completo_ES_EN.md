@@ -14,10 +14,10 @@
 - **Título:**  
   **Modelado computacional de la propagación e intensidad de campo electromagnético UHF/SHF en recintos con materiales dieléctricos**
 - **Autores:**  
-  **Juan David Conde Duarte$^1$ | Profesora Tutora: Gladys Liliana Bautista Wilches$^2$**
+  **Juan David Conde Duarte$^1$ | Gladys Liliana Bautista Wilches$^2$**
 - **Filiación:**  
   $^1$Programa de Ingeniería de Sistemas, Facultad de Ingenierías y Arquitectura, Universidad de Pamplona, Pamplona, Colombia (C.C. 1102349090, `juan.conde2@unipamplona.edu.co`)  
-  $^2$Asignatura: Electromagnetismo, Departamento de Física, Facultad de Ciencias Básicas, Universidad de Pamplona (`gladys.bautista@unipamplona.edu.co`)
+  $^2$Programa de Física, Departamento de Física, Facultad de Ciencias Básicas, Universidad de Pamplona, Pamplona, Colombia (`gladys.bautista@unipamplona.edu.co`)
 
 ### Resumen ($\le 250$ palabras)
 El estudio de la distribución espacial de ondas electromagnéticas en interiores constituye un problema fundamental del electromagnetismo aplicado, debido a los fenómenos de atenuación, absorción dieléctrica y apantallamiento producidos por las estructuras constructivas. En este trabajo se desarrolla un modelo computacional bidimensional para simular la propagación estacionaria y la intensidad de campo electromagnético en las bandas UHF ($2.4\text{ GHz}$, $\lambda = 12.5\text{ cm}$) y SHF ($5.0\text{ GHz}$, $\lambda = 6.0\text{ cm}$) dentro de recintos con materiales dieléctricos y conductores. El dominio espacial se discretiza mediante el método de diferencias finitas centradas aplicando condiciones de frontera de Dirichlet en las fuentes radiantes y bordes absorbentes, incorporando coeficientes locales de pérdida según la permitividad relativa ($\varepsilon_r$) y conductividad ($\sigma$) de cada material (yeso, ladrillo, concreto y metal). El sistema algebraico resultante se resuelve iterativamente mediante Sobre-Relajación Sucesiva (SOR), determinando en cada nodo la potencia recibida ($\text{dBm}$), la magnitud media del vector de Poynting ($\mu\text{W/m}^2$) y el campo eléctrico eficaz $E_{\text{rms}}$ ($\text{V/m}$). La validación frente al modelo analítico log-distancia e ITU-R P.1238 arroja una alta correlación ($R^2 = 0.978$) y un error cuadrático medio de $1.84\text{ dB}$, confirmando la mayor penetración dieléctrica de la banda de $2.4\text{ GHz}$ y el efecto de Jaula de Faraday en recintos metálicos.
@@ -116,10 +116,10 @@ En la Figura 2(a) se valida el perfil radial numérico contra el modelo analíti
 - **Title:**  
   **Computational modeling of UHF/SHF electromagnetic field propagation and intensity in enclosures with dielectric materials**
 - **Authors:**  
-  **Juan David Conde Duarte$^1$ | Faculty Advisor: Gladys Liliana Bautista Wilches$^2$**
+  **Juan David Conde Duarte$^1$ | Gladys Liliana Bautista Wilches$^2$**
 - **Affiliation:**  
   $^1$Systems Engineering Program, Faculty of Engineering and Architecture, University of Pamplona, Pamplona, Colombia (ID 1102349090, `juan.conde2@unipamplona.edu.co`)  
-  $^2$Course: Electromagnetism, Department of Physics, Faculty of Basic Sciences, University of Pamplona (`gladys.bautista@unipamplona.edu.co`)
+  $^2$Physics Program, Department of Physics, Faculty of Basic Sciences, University of Pamplona, Pamplona, Colombia (`gladys.bautista@unipamplona.edu.co`)
 
 ### Abstract ($\le 250$ words)
 The study of the spatial distribution of indoor electromagnetic waves is a fundamental problem in applied electromagnetism due to attenuation, dielectric absorption, and shielding phenomena caused by building structures. In this work, a two-dimensional computational model is developed to simulate stationary propagation and electromagnetic field intensity in the UHF ($2.4\text{ GHz}$, $\lambda = 12.5\text{ cm}$) and SHF ($5.0\text{ GHz}$, $\lambda = 6.0\text{ cm}$) bands within enclosures containing dielectric and conductive materials. The spatial domain is discretized using the centered finite-difference method, applying Dirichlet boundary conditions at radiating sources and absorbing boundaries, while incorporating local loss coefficients based on the relative permittivity ($\varepsilon_r$) and conductivity ($\sigma$) of each material (drywall, brick, concrete, and metal). The resulting algebraic system is iteratively solved via Successive Over-Relaxation (SOR), determining at each node the received power ($\text{dBm}$), the time-averaged Poynting vector magnitude ($\mu\text{W/m}^2$), and the root-mean-square electric field $E_{\text{rms}}$ ($\text{V/m}$). Validation against the analytical log-distance and ITU-R P.1238 models yields a high correlation ($R^2 = 0.978$) and a root-mean-square error of $1.84\text{ dB}$, confirming the higher dielectric penetration of the $2.4\text{ GHz}$ band and the Faraday cage shielding effect in metallic enclosures.
