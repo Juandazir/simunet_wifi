@@ -32,12 +32,21 @@ Cuando una onda electromagnética de microondas se propaga en un recinto cerrado
 
 **Objetivo general:** Modelar y validar numéricamente la distribución espacial de potencia ($P_{\text{rx}}$), magnitud del vector de Poynting ($\langle S \rangle$) e intensidad de campo eléctrico eficaz ($E_{\text{rms}}$) en las bandas de $2.4\text{ GHz}$ y $5.0\text{ GHz}$ en recintos 2D con materiales dieléctricos y conductores mediante diferencias finitas y relajación SOR.
 
+**Objetivos específicos:** (1) Discretizar el dominio 2D en diferencias finitas y resolver con SOR. (2) Cuantificar la absorción dieléctrica según $\varepsilon_r$ y $\sigma$. (3) Modelar el blindaje de Jaula de Faraday y validar frente a la norma ITU-R P.1238.
+
 #### 2. Marco teórico / Modelo físico
 En el aire (impedancia intrínseca $\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$), la magnitud media temporal del **vector de Poynting** $\langle S \rangle$ ($\text{W/m}^2$) se relaciona con el campo eléctrico eficaz $E_{\text{rms}}$ ($\text{V/m}$), el campo magnético $H_{\text{rms}}$ ($\text{A/m}$) y la potencia captada $P_{\text{rx}}$ por una apertura efectiva isotrópica $A_{\text{eff}} = \lambda^2/(4\pi)$ mediante [1]:
 $$\langle S \rangle = \frac{E_{\text{rms}}^2}{\eta_0} = \frac{4\pi\,P_{\text{rx}}}{\lambda^2} \implies E_{\text{rms}} = \sqrt{\frac{4\pi\,\eta_0\,P_{\text{rx}}}{\lambda^2}}, \quad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0} \quad (1)$$
 Al atravesar un obstáculo dieléctrico con pérdidas o un conductor, el campo se atenúa exponencialmente según la ley de Beer-Lambert $E(x) = E_0 e^{-\alpha x}$. En régimen estacionario 2D, la envolvente normalizada de intensidad energética $u(x,y) \in [0, 100]$ sobre el dominio $\Omega$ con absorción espacial $\kappa^2(x,y)$ se modela mediante la ecuación diferencial parcial elíptica [3]:
 $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{en } \Omega \quad (2)$$
 sujeta a condiciones de frontera de **Dirichlet** fijas en la fuente radiante $u(x_0,y_0) = u_{\text{PIRE}}$ y fronteras absorbentes nulas en los bordes exteriores $u|_{\partial\Omega} = 0$.
+
+**Nomenclatura física de variables:**
+- $\langle S \rangle$: Vector de Poynting temporal medio ($\mu\text{W/m}^2$), flujo neto de energía por unidad de área.
+- $E_{\text{rms}},\, H_{\text{rms}}$: Valores eficaces de campo eléctrico ($\text{V/m}$) y campo magnético ($\text{A/m}$).
+- $\eta_0$: Impedancia intrínseca de onda en el aire ($\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega$).
+- $P_{\text{rx}}$: Potencia recibida en antena isotrópica ($A_{\text{eff}} = \lambda^2/4\pi$) en dBm convertida a vatios.
+- $u(x,y)$: Intensidad energética normalizada ($0 \le u \le 100$); $\kappa(x,y)$: Disipación local ($m^{-1}$).
 
 #### 3. Descripción del sistema modelado
 El aplicativo desarrollado (*SimuNet Física*) discretiza recintos de $12\text{ m} \times 12\text{ m}$ en mallas de $24 \times 24$ nodos ($h = 0.5\text{ m}$), permitiendo ubicar fuentes en $2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$) y $5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$) e insertar muros con las propiedades constitutivas de la Tabla 1 [4].
@@ -52,11 +61,14 @@ El aplicativo desarrollado (*SimuNet Física*) discretiza recintos de $12\text{ 
 | **Concreto (Hormigón)** | $6.5$ | $0.085$ | $15\text{ dB}$ | $0.1500$ |
 | **Metal (Jaula Faraday)** | — | $3.5 \times 10^7$ | $\ge 35\text{ dB}$ | $0.2500$ |
 
+**Coeficiente Base ($\alpha_{i,j}$):** Factor adimensional de atenuación dieléctrica nodal a $2.4\text{ GHz}$ (ITU-R P.2040) derivado de la permitividad y conductividad del medio. A $5.0\text{ GHz}$, el factor escala $1.4\times$ por mayor dispersión y absorción molecular.
+
 #### 4. Metodología computacional
 - **Discretización en Diferencias Finitas (5 puntos):** Aproximando el operador laplaciano en la malla con el factor local de absorción dieléctrica $\alpha_{i,j}(f, \varepsilon_r, \sigma)$:
   $$u_{i,j}^{\text{GS}} = \big(1 - \alpha_{i,j}\big)\,\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4} \quad (3)$$
 - **Resolución mediante Sobre-Relajación Sucesiva (SOR):** Se extrapola el paso de Gauss-Seidel ($\omega = 1$) mediante el factor óptimo $\omega \in (1, 2)$ hasta cumplir $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$ [3]:
   $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}} \quad (4)$$
+  donde $\omega_{\text{opt}} = 1.45$ minimiza el radio espectral de convergencia iterativa con tolerancia $\varepsilon = 10^{-4}$.
 - **Validación analítica:** Se contrasta el perfil radial numérico frente al modelo log-distancia e ITU-R P.1238: $P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{muro}}$ [5].
 
 ### Columna Derecha
@@ -122,12 +134,21 @@ When a microwave electromagnetic wave propagates inside an enclosed space, its e
 
 **General objective:** To numerically model and validate the spatial distribution of received power ($P_{\text{rx}}$), time-averaged Poynting vector magnitude ($\langle S \rangle$), and root-mean-square electric field intensity ($E_{\text{rms}}$) in the $2.4\text{ GHz}$ and $5.0\text{ GHz}$ bands inside 2D enclosures with dielectric and conductive materials using finite differences and SOR relaxation.
 
+**Specific objectives:** (1) Discretize the 2D domain via finite differences and solve with SOR. (2) Quantify dielectric absorption across $\varepsilon_r$ and $\sigma$. (3) Model Faraday cage shielding and validate against ITU-R P.1238.
+
 #### 2. Theoretical framework / Physical model
 In air (intrinsic impedance $\eta_0 = \sqrt{\mu_0/\varepsilon_0} \approx 376.7\,\Omega$), the time-averaged magnitude of the **Poynting vector** $\langle S \rangle$ ($\text{W/m}^2$) relates to the RMS electric field $E_{\text{rms}}$ ($\text{V/m}$), the RMS magnetic field $H_{\text{rms}}$ ($\text{A/m}$), and the received power $P_{\text{rx}}$ captured by an isotropic effective aperture $A_{\text{eff}} = \lambda^2/(4\pi)$ as follows [1]:
 $$\langle S \rangle = \frac{E_{\text{rms}}^2}{\eta_0} = \frac{4\pi\,P_{\text{rx}}}{\lambda^2} \implies E_{\text{rms}} = \sqrt{\frac{4\pi\,\eta_0\,P_{\text{rx}}}{\lambda^2}}, \quad H_{\text{rms}} = \frac{E_{\text{rms}}}{\eta_0} \quad (1)$$
 When traversing a lossy dielectric material or a conductor, the field attenuates exponentially according to the Beer-Lambert law $E(x) = E_0 e^{-\alpha x}$. In a 2D stationary regime, the normalized energy intensity envelope $u(x,y) \in [0, 100]$ over the domain $\Omega$ with spatial absorption $\kappa^2(x,y)$ is governed by the elliptic partial differential equation [3]:
 $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{in } \Omega \quad (2)$$
 subject to fixed **Dirichlet** boundary conditions at the radiating source $u(x_0,y_0) = u_{\text{EIRP}}$ and null absorbing boundaries along the outer perimeter $u|_{\partial\Omega} = 0$.
+
+**Physical variable nomenclature:**
+- $\langle S \rangle$: Time-averaged Poynting vector ($\mu\text{W/m}^2$, net energy flux per unit area).
+- $E_{\text{rms}},\, H_{\text{rms}}$: Root-mean-square electric ($\text{V/m}$) and magnetic ($\text{A/m}$) field strengths.
+- $\eta_0$: Free-space intrinsic wave impedance ($\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega$).
+- $P_{\text{rx}}$: Received power at isotropic antenna ($A_{\text{eff}} = \lambda^2/4\pi$) in dBm converted to Watts.
+- $u(x,y)$: Normalized energy intensity envelope ($0 \le u \le 100$); $\kappa(x,y)$: Spatial dissipation ($m^{-1}$).
 
 #### 3. Description of the modeled system
 The developed software (*SimuNet Física*) discretizes $12\text{ m} \times 12\text{ m}$ enclosures into $24 \times 24$ node grids ($h = 0.5\text{ m}$), allowing placement of sources operating at $2.4\text{ GHz}$ ($\lambda = 12.5\text{ cm}$) and $5.0\text{ GHz}$ ($\lambda = 6.0\text{ cm}$) as well as walls with the constitutive properties listed in Table 1 [4].
@@ -142,11 +163,14 @@ The developed software (*SimuNet Física*) discretizes $12\text{ m} \times 12\te
 | **Reinforced Concrete** | $6.5$ | $0.085$ | $15\text{ dB}$ | $0.1500$ |
 | **Metal (Faraday Cage)** | — | $3.5 \times 10^7$ | $\ge 35\text{ dB}$ | $0.2500$ |
 
+**Base Coefficient ($\alpha_{i,j}$):** Dimensionless nodal dielectric attenuation factor at $2.4\text{ GHz}$ (ITU-R P.2040) derived from medium permittivity and conductivity. At $5.0\text{ GHz}$, the factor scales by $1.4\times$ due to increased dispersion and molecular absorption.
+
 #### 4. Computational methodology
 - **5-Point Finite-Difference Discretization:** Approximating the Laplacian operator on the 2D grid with the local dielectric absorption factor $\alpha_{i,j}(f, \varepsilon_r, \sigma)$:
   $$u_{i,j}^{\text{GS}} = \big(1 - \alpha_{i,j}\big)\,\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4} \quad (3)$$
 - **Successive Over-Relaxation (SOR) Solver:** Extrapolating the Gauss-Seidel step ($\omega = 1$) using the optimal relaxation factor $\omega \in (1, 2)$ until satisfying $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$ [3]:
   $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}} \quad (4)$$
+  where $\omega_{\text{opt}} = 1.45$ minimizes the spectral radius of iterative convergence with tolerance $\varepsilon = 10^{-4}$.
 - **Analytical Validation:** Contrasting the numerical radial profile against the log-distance and ITU-R P.1238 indoor model: $P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{wall}}$ [5].
 
 ### Right Column

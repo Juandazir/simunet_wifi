@@ -109,81 +109,82 @@
     }
     .header-banner img {
       width: 100%;
-      max-height: 125px;
+      max-height: 145px;
       object-fit: cover;
       display: block;
     }
     .title-section {
       text-align: center;
-      padding: 4px 20px 2px 20px;
+      padding: 12px 30px 8px 30px;
     }
     .title-section h1 {
-      font-size: 20px;
-      line-height: 1.14;
+      font-size: 26px;
+      line-height: 1.22;
       color: #0a193c;
       font-weight: 900;
-      margin-bottom: 2px;
+      margin-bottom: 6px;
     }
     .title-section .authors {
-      font-size: 13px;
+      font-size: 16.5px;
       font-weight: 800;
       color: #1e293b;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .title-section .affil {
-      font-size: 9.8px;
+      font-size: 12px;
       font-style: italic;
       color: #334155;
-      line-height: 1.15;
+      line-height: 1.32;
     }
     .content-wrapper {
-      padding: 0 16px;
+      padding: 0 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
     .block {
       background: #f8fafc;
-      border-radius: 4px;
+      border-radius: 5px;
       overflow: hidden;
       border: 1px solid #cbd5e1;
     }
     .block-title {
       background: #0a193c;
       color: #ffffff;
-      font-size: 12.5px;
+      font-size: 15px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 5px 12px;
     }
     .block-body {
-      padding: 3px 6px;
-      font-size: 10.2px;
-      line-height: 1.25;
+      padding: 8px 12px;
+      font-size: 11.8px;
+      line-height: 1.38;
       color: #0f172a;
       text-align: justify;
     }
     .columns {
+      flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 16px;
       align-items: start;
     }
     .col {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1.5px;
-      font-size: 9.2px;
+      margin-top: 4px;
+      font-size: 10.8px;
       background: white;
     }
     th, td {
       border: 1px solid #64748b;
-      padding: 1px 2.5px;
+      padding: 3px 5px;
       text-align: center;
     }
     th {
@@ -192,23 +193,23 @@
       font-weight: 800;
     }
     .caption {
-      font-size: 8.8px;
+      font-size: 10.5px;
       text-align: center;
-      margin: 1px 0;
+      margin: 3px 0;
       color: #1e293b;
     }
     .fig-box {
       background: white;
       border: 1px solid #cbd5e1;
-      padding: 2px;
-      border-radius: 3px;
-      margin: 1px 0;
+      padding: 4px;
+      border-radius: 4px;
+      margin: 3px 0;
       text-align: center;
     }
     .fig-box img {
       width: 100%;
       height: auto;
-      max-height: 142px;
+      max-height: 195px;
       object-fit: contain;
       display: block;
     }
@@ -217,17 +218,17 @@
       color: white;
       text-align: center;
       font-weight: 800;
-      font-size: 12.5px;
-      padding: 4px;
+      font-size: 15px;
+      padding: 7px;
       margin: 0;
     }
-    ul { padding-left: 14px; }
-    li { margin-bottom: 1px; }
+    ul { padding-left: 18px; }
+    li { margin-bottom: 2.5px; }
     .katex-display {
-      margin: 1px 0 !important;
+      margin: 3px 0 !important;
     }
     .katex {
-      font-size: 0.94em !important;
+      font-size: 1.05em !important;
     }
   </style>
 </head>
@@ -270,12 +271,13 @@
         <!-- 2 COLUMNS -->
         <div class="columns">
           <!-- LEFT COLUMN -->
-          <div class="col">
+          <div class="col" style="gap: 12px;">
             <div class="block">
               <div class="block-title">Introduction and motivation</div>
               <div class="block-body">
                 When a microwave electromagnetic wave propagates inside an enclosed space, its energy flux density decreases due to both geometric wavefront divergence and dissipation within walls characterized by relative permittivity $\varepsilon_r$ and effective conductivity $\sigma > 0$ [1, 2]. While closed-form free-space analytical equations are only valid in homogeneous media, numerical modeling enables solving realistic architectural geometries.<br/><br/>
-                <strong>General objective:</strong> To numerically model and validate the spatial distribution of received power ($P_{\text{rx}}$), time-averaged Poynting vector magnitude ($\langle S \rangle$), and root-mean-square electric field intensity ($E_{\text{rms}}$) in the $2.4\text{ GHz}$ and $5.0\text{ GHz}$ bands inside 2D enclosures with dielectric and conductive materials using finite differences and SOR relaxation.
+                <strong>General objective:</strong> To numerically model and validate the spatial distribution of received power ($P_{\text{rx}}$), time-averaged Poynting vector magnitude ($\langle S \rangle$), and root-mean-square electric field intensity ($E_{\text{rms}}$) in the $2.4\text{ GHz}$ and $5.0\text{ GHz}$ bands inside 2D enclosures with dielectric and conductive materials using finite differences and SOR relaxation.<br/>
+                <strong>Specific objectives:</strong> (1) Discretize the 2D domain via finite differences and solve with SOR. (2) Quantify dielectric absorption across $\varepsilon_r$ and $\sigma$. (3) Model Faraday cage shielding and validate against ITU-R P.1238.
               </div>
             </div>
 
@@ -287,6 +289,14 @@
                 When traversing a lossy dielectric material or a conductor, the field attenuates exponentially according to the Beer-Lambert law $E(x) = E_0 e^{-\alpha x}$. In a 2D stationary regime, the normalized energy intensity envelope $u(x,y) \in [0, 100]$ over the domain $\Omega$ with spatial absorption $\kappa^2(x,y)$ is governed by the elliptic partial differential equation [3]:
                 $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{in } \Omega \quad (2)$$
                 subject to fixed <strong>Dirichlet</strong> boundary conditions at the radiating source $u(x_0,y_0) = u_{\text{EIRP}}$ and null absorbing boundaries along the outer perimeter $u|_{\partial\Omega} = 0$.
+                <div style="margin-top:6px; background:#edf2f7; border-left:3px solid #0a193c; padding:5px 8px; border-radius:3px; font-size:11px; line-height:1.32;">
+                  <strong>Physical variable nomenclature:</strong><br/>
+                  • $\langle S \rangle$: Time-averaged Poynting vector ($\mu\text{W/m}^2$, net energy flux per unit area).<br/>
+                  • $E_{\text{rms}},\, H_{\text{rms}}$: Root-mean-square electric ($\text{V/m}$) and magnetic ($\text{A/m}$) field strengths.<br/>
+                  • $\eta_0$: Free-space intrinsic wave impedance ($\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega$).<br/>
+                  • $P_{\text{rx}}$: Received power at isotropic antenna ($A_{\text{eff}} = \lambda^2/4\pi$) in dBm converted to Watts.<br/>
+                  • $u(x,y)$: Normalized energy intensity envelope ($0 \le u \le 100$); $\kappa(x,y)$: Spatial dissipation ($m^{-1}$).
+                </div>
               </div>
             </div>
 
@@ -313,6 +323,9 @@
                     <tr><td style="text-align:left;font-weight:bold;">Metal (Faraday Cage)</td><td>—</td><td>$3.5 \times 10^7$</td><td>$\ge 35$ dB</td><td>0.2500</td></tr>
                   </tbody>
                 </table>
+                <div style="margin-top:5px; font-size:11.2px; line-height:1.34;">
+                  <strong>Base Coefficient ($\alpha_{i,j}$):</strong> Dimensionless nodal dielectric attenuation factor at $2.4\text{ GHz}$ (ITU-R P.2040) derived from medium permittivity and conductivity. At $5.0\text{ GHz}$, the factor scales by $1.4\times$ due to increased dispersion and molecular absorption.
+                </div>
               </div>
             </div>
 
@@ -320,11 +333,12 @@
               <div class="block-title">Computational methodology</div>
               <div class="block-body">
                 <ul>
-                  <li><strong>5-Point Finite-Difference Discretization:</strong> Approximating the Laplacian operator on the 2D grid with the local dielectric absorption factor $\alpha_{i,j}(f, \varepsilon_r, \sigma)$:
+                  <li><strong>5-Point Finite-Difference Discretization:</strong> Approximando the Laplacian operator on the 2D grid with the local dielectric absorption factor $\alpha_{i,j}(f, \varepsilon_r, \sigma)$:
                     $$u_{i,j}^{\text{GS}} = \big(1 - \alpha_{i,j}\big)\,\frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1}}{4} \quad (3)$$
                   </li>
                   <li><strong>Successive Over-Relaxation (SOR) Solver:</strong> Extrapolating the Gauss-Seidel step ($\omega = 1$) using the optimal relaxation factor $\omega \in (1, 2)$ until satisfying $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$ [3]:
                     $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}} \quad (4)$$
+                    where $\omega_{\text{opt}} = 1.45$ minimizes the spectral radius of iterative convergence with tolerance $\varepsilon = 10^{-4}$.
                   </li>
                   <li><strong>Analytical Validation:</strong> Contrasting the numerical radial profile against the log-distance and ITU-R P.1238 indoor model: $P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{wall}}$ [5].</li>
                 </ul>

@@ -152,6 +152,9 @@
 					
 					\vspace{0.2cm}
 					\textbf{General objective:} To numerically model and validate the spatial distribution of received power (\(P_{\text{rx}}\)), time-averaged Poynting vector magnitude (\(\langle S \rangle\)), and root-mean-square electric field intensity (\(E_{\text{rms}}\)) in the \(2.4\text{ GHz}\) and \(5.0\text{ GHz}\) bands inside 2D enclosures with dielectric and conductive materials using finite differences and SOR relaxation.
+					
+					\vspace{0.15cm}
+					\textbf{Specific objectives:} (1) Discretize the 2D domain via finite differences and solve with SOR. (2) Quantify dielectric absorption across \(\varepsilon_r\) and \(\sigma\). (3) Model Faraday cage shielding and validate against ITU-R P.1238.
 				\end{block}
 				
 				\begin{block}{Theoretical framework / Physical model}
@@ -164,6 +167,16 @@
 						\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{in } \Omega
 					\end{equation}
 					subject to fixed \textbf{Dirichlet} boundary conditions at the radiating source \(u(x_0,y_0) = u_{\text{EIRP}}\) and null absorbing boundaries along the outer perimeter \(u|_{\partial\Omega} = 0\).
+					
+					\vspace{0.15cm}
+					\textbf{Physical variable nomenclature:}
+					\begin{itemize}
+						\item \(\langle S \rangle\): Time-averaged Poynting vector (\(\mu\text{W/m}^2\)), net energy flux per unit area.
+						\item \(E_{\text{rms}},\, H_{\text{rms}}\): Root-mean-square electric (\(\text{V/m}\)) and magnetic (\(\text{A/m}\)) field strengths.
+						\item \(\eta_0\): Free-space intrinsic wave impedance (\(\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega\)).
+						\item \(P_{\text{rx}}\): Received power at isotropic antenna (\(A_{\text{eff}} = \lambda^2/4\pi\)) in dBm converted to Watts.
+						\item \(u(x,y)\): Normalized energy intensity envelope (\(0 \le u \le 100\)); \(\kappa(x,y)\): Spatial dissipation (\(m^{-1}\)).
+					\end{itemize}
 				\end{block}
 				
 				\begin{block}{Description of the modeled system}
@@ -191,6 +204,9 @@
 							\hline
 						\end{tabular}
 					\end{table}
+					
+					\vspace{0.15cm}
+					\textbf{Base Coefficient (\(\alpha_{i,j}\)):} Dimensionless nodal dielectric attenuation factor at \(2.4\text{ GHz}\) (ITU-R P.2040) derived from medium permittivity and conductivity. At \(5.0\text{ GHz}\), the factor scales by \(1.4\times\) due to increased dispersion and molecular absorption.
 				\end{block}
 				
 				\begin{block}{Computational methodology}
@@ -203,6 +219,7 @@
 						\begin{equation}
 							u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}}
 						\end{equation}
+						where \(\omega_{\text{opt}} = 1.45\) minimizes the spectral radius of iterative convergence with tolerance \(\varepsilon = 10^{-4}\).
 						\item \textbf{Analytical Validation:} Contrasting the numerical radial profile against the log-distance and ITU-R P.1238 indoor model: \(P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{wall}}\) [5].
 					\end{itemize}
 				\end{block}

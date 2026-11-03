@@ -109,81 +109,82 @@
     }
     .header-banner img {
       width: 100%;
-      max-height: 125px;
+      max-height: 145px;
       object-fit: cover;
       display: block;
     }
     .title-section {
       text-align: center;
-      padding: 4px 20px 2px 20px;
+      padding: 12px 30px 8px 30px;
     }
     .title-section h1 {
-      font-size: 20px;
-      line-height: 1.14;
+      font-size: 26px;
+      line-height: 1.22;
       color: #0a193c;
       font-weight: 900;
-      margin-bottom: 2px;
+      margin-bottom: 6px;
     }
     .title-section .authors {
-      font-size: 13px;
+      font-size: 16.5px;
       font-weight: 800;
       color: #1e293b;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .title-section .affil {
-      font-size: 9.8px;
+      font-size: 12px;
       font-style: italic;
       color: #334155;
-      line-height: 1.15;
+      line-height: 1.32;
     }
     .content-wrapper {
-      padding: 0 16px;
+      padding: 0 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
     .block {
       background: #f8fafc;
-      border-radius: 4px;
+      border-radius: 5px;
       overflow: hidden;
       border: 1px solid #cbd5e1;
     }
     .block-title {
       background: #0a193c;
       color: #ffffff;
-      font-size: 12.5px;
+      font-size: 15px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 5px 12px;
     }
     .block-body {
-      padding: 3px 6px;
-      font-size: 10.2px;
-      line-height: 1.25;
+      padding: 8px 12px;
+      font-size: 11.8px;
+      line-height: 1.38;
       color: #0f172a;
       text-align: justify;
     }
     .columns {
+      flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 16px;
       align-items: start;
     }
     .col {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1.5px;
-      font-size: 9.2px;
+      margin-top: 4px;
+      font-size: 10.8px;
       background: white;
     }
     th, td {
       border: 1px solid #64748b;
-      padding: 1px 2.5px;
+      padding: 3px 5px;
       text-align: center;
     }
     th {
@@ -192,23 +193,23 @@
       font-weight: 800;
     }
     .caption {
-      font-size: 8.8px;
+      font-size: 10.5px;
       text-align: center;
-      margin: 1px 0;
+      margin: 3px 0;
       color: #1e293b;
     }
     .fig-box {
       background: white;
       border: 1px solid #cbd5e1;
-      padding: 2px;
-      border-radius: 3px;
-      margin: 1px 0;
+      padding: 4px;
+      border-radius: 4px;
+      margin: 3px 0;
       text-align: center;
     }
     .fig-box img {
       width: 100%;
       height: auto;
-      max-height: 142px;
+      max-height: 195px;
       object-fit: contain;
       display: block;
     }
@@ -217,17 +218,17 @@
       color: white;
       text-align: center;
       font-weight: 800;
-      font-size: 12.5px;
-      padding: 4px;
+      font-size: 15px;
+      padding: 7px;
       margin: 0;
     }
-    ul { padding-left: 14px; }
-    li { margin-bottom: 1px; }
+    ul { padding-left: 18px; }
+    li { margin-bottom: 2.5px; }
     .katex-display {
-      margin: 1px 0 !important;
+      margin: 3px 0 !important;
     }
     .katex {
-      font-size: 0.94em !important;
+      font-size: 1.05em !important;
     }
   </style>
 </head>
@@ -270,12 +271,13 @@
         <!-- 2 COLUMNAS -->
         <div class="columns">
           <!-- COLUMNA IZQUIERDA -->
-          <div class="col">
+          <div class="col" style="gap: 12px;">
             <div class="block">
               <div class="block-title">Introducción y motivación</div>
               <div class="block-body">
                 Cuando una onda electromagnética de microondas se propaga en un recinto cerrado, su densidad de flujo de energía disminuye por la divergencia geométrica del frente de onda y por la disipación en muros con permitividad relativa $\varepsilon_r$ y conductividad efectiva $\sigma > 0$ [1, 2]. Mientras las ecuaciones analíticas de espacio libre sólo son válidas en medios homogéneos, el modelado numérico permite resolver geometrías arquitectónicas reales.<br/><br/>
-                <strong>Objetivo general:</strong> Modelar y validar numéricamente la distribución espacial de potencia ($P_{\text{rx}}$), magnitud del vector de Poynting ($\langle S \rangle$) e intensidad de campo eléctrico eficaz ($E_{\text{rms}}$) en las bandas de $2.4\text{ GHz}$ y $5.0\text{ GHz}$ en recintos 2D con materiales dieléctricos y conductores mediante diferencias finitas y relajación SOR.
+                <strong>Objetivo general:</strong> Modelar y validar numéricamente la distribución espacial de potencia ($P_{\text{rx}}$), magnitud del vector de Poynting ($\langle S \rangle$) e intensidad de campo eléctrico eficaz ($E_{\text{rms}}$) en las bandas de $2.4\text{ GHz}$ y $5.0\text{ GHz}$ en recintos 2D con materiales dieléctricos y conductores mediante diferencias finitas y relajación SOR.<br/>
+                <strong>Objetivos específicos:</strong> (1) Discretizar el dominio 2D en diferencias finitas y resolver con SOR. (2) Cuantificar la absorción dieléctrica según $\varepsilon_r$ y $\sigma$. (3) Modelar el blindaje de Jaula de Faraday y validar frente a la norma ITU-R P.1238.
               </div>
             </div>
 
@@ -287,6 +289,14 @@
                 Al atravesar un obstáculo dieléctrico con pérdidas o un conductor, el campo se atenúa según la ley de Beer-Lambert $E(x) = E_0 e^{-\alpha x}$. En régimen estacionario 2D, la envolvente normalizada de intensidad energética $u(x,y) \in [0, 100]$ sobre el dominio $\Omega$ con absorción espacial $\kappa^2(x,y)$ se modela mediante la ecuación diferencial parcial elíptica [3]:
                 $$\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{en } \Omega \quad (2)$$
                 sujeta a condiciones de frontera de <strong>Dirichlet</strong> fijas en la fuente radiante $u(x_0,y_0) = u_{\text{PIRE}}$ y fronteras absorbentes nulas en los bordes exteriores $u|_{\partial\Omega} = 0$.
+                <div style="margin-top:6px; background:#edf2f7; border-left:3px solid #0a193c; padding:5px 8px; border-radius:3px; font-size:11px; line-height:1.32;">
+                  <strong>Nomenclatura física de variables:</strong><br/>
+                  • $\langle S \rangle$: Vector de Poynting temporal medio ($\mu\text{W/m}^2$), flujo neto de energía por unidad de área.<br/>
+                  • $E_{\text{rms}},\, H_{\text{rms}}$: Valores eficaces de campo eléctrico ($\text{V/m}$) y campo magnético ($\text{A/m}$).<br/>
+                  • $\eta_0$: Impedancia intrínseca de onda en el aire ($\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega$).<br/>
+                  • $P_{\text{rx}}$: Potencia recibida en antena isotrópica ($A_{\text{eff}} = \lambda^2/4\pi$) en dBm convertida a vatios.<br/>
+                  • $u(x,y)$: Intensidad energética normalizada ($0 \le u \le 100$); $\kappa(x,y)$: Disipación local ($m^{-1}$).
+                </div>
               </div>
             </div>
 
@@ -313,6 +323,9 @@
                     <tr><td style="text-align:left;font-weight:bold;">Metal (Jaula Faraday)</td><td>—</td><td>$3.5 \times 10^7$</td><td>$\ge 35$ dB</td><td>0.2500</td></tr>
                   </tbody>
                 </table>
+                <div style="margin-top:5px; font-size:11.2px; line-height:1.34;">
+                  <strong>Coeficiente Base ($\alpha_{i,j}$):</strong> Factor adimensional de atenuación dieléctrica nodal a $2.4\text{ GHz}$ (ITU-R P.2040) derivado de la permitividad y conductividad del medio. A $5.0\text{ GHz}$, el factor escala $1.4\times$ por mayor dispersión y absorción molecular.
+                </div>
               </div>
             </div>
 
@@ -325,6 +338,7 @@
                   </li>
                   <li><strong>Resolución mediante Sobre-Relajación Sucesiva (SOR):</strong> Se extrapola el paso de Gauss-Seidel ($\omega = 1$) mediante el factor óptimo $\omega \in (1, 2)$ hasta cumplir $\|u^{(k+1)} - u^{(k)}\|_\infty < \varepsilon$ [3]:
                     $$u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}} \quad (4)$$
+                    donde $\omega_{\text{opt}} = 1.45$ minimiza el radio espectral de convergencia iterativa con tolerancia $\varepsilon = 10^{-4}$.
                   </li>
                   <li><strong>Validación analítica:</strong> Se contrasta el perfil radial numérico frente al modelo log-distancia e ITU-R P.1238: $P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{muro}}$ [5].</li>
                 </ul>

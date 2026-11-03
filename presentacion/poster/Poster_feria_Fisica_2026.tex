@@ -152,6 +152,9 @@
 					
 					\vspace{0.2cm}
 					\textbf{Objetivo general:} Modelar y validar numéricamente la distribución espacial de potencia (\(P_{\text{rx}}\)), magnitud del vector de Poynting (\(\langle S \rangle\)) e intensidad de campo eléctrico eficaz (\(E_{\text{rms}}\)) en las bandas de \(2.4\text{ GHz}\) y \(5.0\text{ GHz}\) en recintos 2D con materiales dieléctricos y conductores mediante diferencias finitas y relajación SOR.
+					
+					\vspace{0.15cm}
+					\textbf{Objetivos específicos:} (1) Discretizar el dominio 2D en diferencias finitas y resolver con SOR. (2) Cuantificar la absorción dieléctrica según \(\varepsilon_r\) y \(\sigma\). (3) Modelar el blindaje de Jaula de Faraday y validar frente a la norma ITU-R P.1238.
 				\end{block}
 				
 				\begin{block}{Marco teórico / Modelo físico}
@@ -164,6 +167,16 @@
 						\nabla^2 u(x,y) - \kappa^2(x,y)\,u(x,y) = 0 \quad \text{en } \Omega
 					\end{equation}
 					sujeta a condiciones de frontera de \textbf{Dirichlet} fijas en la fuente radiante \(u(x_0,y_0) = u_{\text{PIRE}}\) y fronteras absorbentes nulas en los bordes exteriores \(u|_{\partial\Omega} = 0\).
+					
+					\vspace{0.15cm}
+					\textbf{Nomenclatura física de variables:}
+					\begin{itemize}
+						\item \(\langle S \rangle\): Vector de Poynting temporal medio (\(\mu\text{W/m}^2\)), flujo neto de energía por unidad de área.
+						\item \(E_{\text{rms}},\, H_{\text{rms}}\): Valores eficaces de campo eléctrico (\(\text{V/m}\)) y campo magnético (\(\text{A/m}\)).
+						\item \(\eta_0\): Impedancia intrínseca de onda en el aire (\(\sqrt{\mu_0/\varepsilon_0} \approx 376.73\,\Omega \approx 120\pi\,\Omega\)).
+						\item \(P_{\text{rx}}\): Potencia recibida en antena isotrópica (\(A_{\text{eff}} = \lambda^2/4\pi\)) en dBm convertida a vatios.
+						\item \(u(x,y)\): Intensidad energética normalizada (\(0 \le u \le 100\)); \(\kappa(x,y)\): Disipación local (\(m^{-1}\)).
+					\end{itemize}
 				\end{block}
 				
 				\begin{block}{Descripción del sistema modelado}
@@ -191,6 +204,9 @@
 							\hline
 						\end{tabular}
 					\end{table}
+					
+					\vspace{0.15cm}
+					\textbf{Coeficiente Base (\(\alpha_{i,j}\)):} Factor adimensional de atenuación dieléctrica nodal a \(2.4\text{ GHz}\) (ITU-R P.2040) derivado de la permitividad y conductividad del medio. A \(5.0\text{ GHz}\), el factor escala \(1.4\times\) por mayor dispersión y absorción molecular.
 				\end{block}
 				
 				\begin{block}{Metodología computacional}
@@ -203,6 +219,7 @@
 						\begin{equation}
 							u_{i,j}^{(k+1)} = (1 - \omega)\,u_{i,j}^{(k)} + \omega\,u_{i,j}^{\text{GS}}
 						\end{equation}
+						donde \(\omega_{\text{opt}} = 1.45\) minimiza el radio espectral de convergencia iterativa con tolerancia \(\varepsilon = 10^{-4}\).
 						\item \textbf{Validación analítica:} Se contrasta el perfil radial numérico frente al modelo log-distancia e ITU-R P.1238: \(P_{\text{rx}}(d) = P_0(d_0) - 10n\log_{10}(d/d_0) - \sum L_{\text{muro}}\) [5].
 					\end{itemize}
 				\end{block}
